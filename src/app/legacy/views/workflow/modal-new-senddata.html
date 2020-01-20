@@ -1,0 +1,41 @@
+<md-dialog aria-label="Select send data" class="send-data-modal md-default-theme">
+    <form name="SendDataSelectForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>Action Required</h2>
+                <span flex></span>
+                <md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+        			<span class="icon icon-close-2"></span>
+        		</md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:320px;max-width:320px">
+            <div class="esign-radio-wrap">
+                <div layout="column" layout-align="space-around center">
+                    <md-radio-group ng-model="sd_action" required>
+                        <md-radio-button value="email">
+                            Send email
+                            <span class="icon icon-send-email"></span>
+                        </md-radio-button>
+                        <md-radio-button value="webhook">
+                            Send webhook
+                            <span class="icon icon-send-webhook"></span>
+                        </md-radio-button>
+                        <md-radio-button value="updateval">
+                            Send update-value
+                            <span class="icon icon-send-value"></span>
+                        </md-radio-button>
+                    </md-radio-group>
+                </div>
+            </div>
+
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="start();" ng-disabled="SendDataSelectForm.$invalid" md-autofocus>
+                <span>Start</span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

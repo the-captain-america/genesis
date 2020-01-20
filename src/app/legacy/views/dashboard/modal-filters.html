@@ -1,0 +1,163 @@
+<md-dialog aria-label="New filter" class="filter-modal md-default-theme">
+    <form name="myForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="mode === 'list'">Your Filters</h2>
+                <h2 ng-if="mode === 'new'">New Filter</h2>
+                <h2 ng-if="mode === 'upd'">Update Filter</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content style="min-width:600px;max-width:600px;max-height:810px;">
+            <div ng-if="mode === 'list'" class="fltr-list">
+                <label>Filter name</label>
+                <div class="fltr-nmWrap none">
+                    <span class="text truncate" ng-click="showApplyNoneFilter();">None</span>
+                </div>
+                <div class="fltr-nmWrap" ng-repeat="dashfilter in dashfilters track by $index">
+                    <span class="text truncate" ng-click="showApplyFilter(dashfilter);" >{{dashfilter.name}}</span>
+                    <span class="edtbtn-wrap">
+                        <md-button ng-click="showUpdateFilter(dashfilter);" class="md-raised edit-btn" aria-label="Edit">
+                            <span class="text">EDIT</span>
+                        </md-button>
+                    </span>
+                    <md-button class="delete-btn" ng-click="deleteFilter(dashfilter.filterid);" aria-label="Delete">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+                <md-button class="new-fltr-btn" ng-click="newfilter();" ng-if="dashfilters.length < 10">
+                    <span class="icon icon-plus"></span>
+                    <span class="text">New filter</span>
+                </md-button>
+            </div>
+            <div ng-if="mode === 'new' || mode === 'upd'">
+                <div layout layout-sm="column">
+                    <md-input-container class="required" flex>
+                        <label>Filter name</label>
+                        <input md-no-asterisk name="name" ng-model="filter.name" required focus="true">
+                        <span class="blrdv"></span>
+                    </md-input-container>
+                </div>
+
+                <div class="select-group-wrap">
+                    <label class="heading">Select the data you like to show on Dashboard</label>
+
+                    <div layout="row" class="crt-wrap" ng-repeat="criteria in filter.criteria" ng-init="criteriaIndex = $index">
+                        <div flex="40">
+                            <!-- <md-input-container md-no-float>
+                                <md-select md-no-asterisk aria-label="Criteria" ng-model="criteria.field" placeholder="Select" required ng-change="selectCategory($index, criteria.field)">
+                                    <md-option value="{{cat.key}}" ng-repeat="cat in category">{{cat.dispnm}}</md-option>
+                                </md-select>
+                            </md-input-container> -->
+
+                            <md-menu-bar>
+                                <md-menu>
+                                    <button ng-click="$mdOpenMenu()">
+                                        <span class="text" ng-if="criteria.field && criteria.dispnm.length > 0 && criteria.dispnm.length < 36">{{criteria.dispnm}}</span>
+                                        <span class="text" ng-if="criteria.field && criteria.dispnm.length > 35">...<a title="{{criteria.dispnm}}">{{criteria.dispnm.substring(criteria.dispnm.length-35,criteria.dispnm.length)}}</a></span>
+                                        <span class="text plhldr" ng-if="!criteria.field">Select</span>
+                                        <span class="icon icon-arrow-7"></span>
+                                    </button>
+                                    <md-menu-content class="fltrmm">
+			                             <md-menu-item>
+			                                <md-menu>
+			                                    <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="cat in category">
+                                                            <md-button ng-click="selectCategory(criteriaIndex, criteria, cat, true)">
+                                                                <span class="icon-dtype icon-f-choice"></span>
+                                                                {{cat.dispnm}}
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+			                                </md-menu>
+			                            </md-menu-item>
+			                             <md-menu-item>
+			                                <md-menu>
+			                                    <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="cf in cflist">
+                                                            <md-button ng-click="selectCustomField(criteriaIndex, criteria, cf, true)">
+                                                                <span ng-if="cf.typ !== 'f-picklist'" class="icon-dtype icon-{{cf.typ}}"></span>
+                                                                <span ng-if="cf.typ === 'f-picklist'" class="icon-dtype icon-f-choice"></span>
+                                                                {{cf.nm}}
+                                                            </md-button>
+                                                        </md-menu-item>
+			                                    </md-menu-content>
+			                                </md-menu>
+			                            </md-menu-item>
+                                        <md-menu-item>
+			                                <md-button ng-click="selectUser(criteriaIndex, criteria, true)">User</md-button>
+			                            </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-bar>
+                        </div>
+                        <div flex="20">
+                            <md-input-container md-no-float class="equal-sep">
+                                <md-select md-no-asterisk aria-label="Criteria" md-container-class="equal-cont" ng-model="criteria.op" placeholder="Select" required>
+                                    <md-option value="eq">
+                                        <span class="icon icon-symbol-1"></span>
+                                        <span class="text">Equals</span>
+                                    </md-option>
+                                    <md-option value="noteq">
+                                        <span class="icon icon-symbol-2"></span>
+                                        <span class="text">Not Equals</span>
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div flex="40">
+                            <md-input-container md-no-float class="cat-dd">
+                                <md-select md-no-asterisk aria-label="Criteria" md-container-class="crit-cont" ng-model="criteria.value" md-selected-html="displayOrValues(criteria.value, $index)" placeholder="Select" multiple required>
+                                    <md-option value="{{valChoice.key}}" ng-repeat="valChoice in valueChoices[$index]">{{valChoice.val}}</md-option>
+                                </md-select>
+                                <div class="mask" ng-if="!criteria.field"></div>
+                            </md-input-container>
+                        </div>
+                        <md-button class="delete-btn" ng-click="deleteCriteria($index)" aria-label="Close" ng-if="$index > 0">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                    </div>
+
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="addCriteria();">
+                            <span class="icon icon-plus"></span>
+                            <span class="text">and</span>
+                        </md-button>
+                    </div>
+
+                    <div class="error" ng-if="filterErr === 'yes'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Some error goes here.</span>
+                    </div>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <!-- <md-dialog-actions layout="row" ng-if="mode === 'list'">
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="cancel();" md-autofocus>
+                <span class="text">Close</span>
+            </md-button>
+        </md-dialog-actions> -->
+        <md-dialog-actions layout="row" ng-if="mode === 'new' || mode === 'upd'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();">
+                <span class="text">Back</span>
+            </md-button>
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="save();" ng-disabled="myForm.$invalid" md-autofocus>
+                <span class="text">Save</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved
+                    <span class="icon-notification-ok"></span>
+                </span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+
+    </form>
+</md-dialog>

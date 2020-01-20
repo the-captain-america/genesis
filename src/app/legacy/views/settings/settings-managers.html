@@ -1,0 +1,115 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">{{custlabels.Manager || 'Manager'}} List</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','managerlist')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','managerlist')">
+	<h4>Add all {{custlabels.managers || 'managers'}} you wish to access across workflows.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<div class="settings-wrap-inner">
+		<div class="table-responsive">
+			<table class="table table-hover manager-list-table">
+				<thead>
+					<tr>
+						<!-- <th>No.</th> -->
+						<th>{{custlabels.Manager || 'Manager'}} label</th>
+						<th>Profile</th>
+						<th>Preferred contact</th>
+                        <th>
+                            {{custlabels.Manager || 'Manager'}} type
+                            <span class="tooltip-wrap">
+                                <span class="icon icon-tooltip"></span>
+                                <md-tooltip class="manager-tooltip" md-direction="left">
+                                    <span class="copy">
+                                        <p>
+                                            {{custlabels.Manager || 'Manager'}} types determine when you enter a {{custlabels.Manager_s || "manager's"}} details into the workflow:
+                                        </p>
+                                        <h4 class="title">Variable {{(custlabels.Manager || 'manager') | lowercase}} type</h4>
+                                        <p>
+                                            This is used for {{(custlabels.Manager || 'manager') | lowercase}} roles that change depending on who the {{custlabels.employee || 'employee'}} is, like Mentors, Direct {{custlabels.Managers || 'Managers'}}, etc.
+                                        </p>
+                                        <h4 class="title">Fixed {{(custlabels.Manager || 'manager') | lowercase}} type</h4>
+                                        <p>
+                                            This is used for {{(custlabels.Manager || 'manager') | lowercase}} roles that remain the same for all the {{custlabels.employees || 'employees'}}, like HR, IT and CEO.
+                                        </p>
+                                    </span>
+                                </md-tooltip>
+                            </span>
+                        </th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in rowCollection track by $index">
+						<!-- <td ng-click="showManagerModal($event,'update',$index)" class="td-container">
+							<div>{{$index+1}}</div>
+						</td> -->
+						<td ng-click="showManagerModal($event,'update',$index)" class="td-container">
+							<div>
+                                <span class="text">{{row.l}}</span>
+                            </div>
+						</td>
+						<td ng-click="showManagerModal($event,'update',$index)" class="td-container" ng-if="row.t==='s'">
+							<div>
+                                <span class="profile-pic">
+                                    <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+									<img ng-if="!row.photo" class="prfimg" src="" alt="">
+									<img ng-if="row.photo" class="prfimg" ng-src="{{row.photo}}{{refreshProfileToken}}" alt="">
+                                </span>
+                                <span class="text">{{row.n}}</span>
+                            </div>
+						</td>
+                        <td ng-click="showManagerModal($event,'update',$index)" class="td-container" ng-if="row.t==='d'">
+                            <div class="disable-text">
+                                <span class="profile-na">
+                                    <span class="txt">Na</span>
+                                </span>
+                                <span class="text">Enter at runtime</span>
+                            </div>
+                        </td>
+						<td ng-if="row.t==='s'" ng-click="showManagerModal($event,'update',$index)" class="td-container">
+							<div ng-if="row.e && row.m">
+                                <span ng-if="row.pref === 'eml'">{{row.e}}</span>
+                                <span ng-if="row.pref === 'mob'">{{row.m}}</span>
+                            </div>
+							<div ng-if="!(row.e && row.m)">{{row.e}}{{row.m}}</div>
+						</td>
+						<td ng-if="row.t==='d'" ng-click="showManagerModal($event,'update',$index)" class="td-container">
+							<div class="disable-text">Enter at runtime</div>
+						</td>
+                        <td ng-click="showManagerModal($event,'update',$index)" class="td-container" ng-if="row.t==='s'">
+							<div>Fixed</div>
+						</td>
+                        <td ng-click="showManagerModal($event,'update',$index)" class="td-container" ng-if="row.t==='d'">
+							<div ng-class='{disabletext:$first}'>Variable</div>
+						</td>
+
+						<td class="td-container delete-col">
+							<div ng-if="$index > 0">
+								<md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow($event,$index);">
+									<span class="icon icon-close-5"></span>
+								</md-button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="btnDiv">
+			<md-button class="md-raised" ng-click="showManagerModal($event,'add',-1);">
+				<span class="icon icon-plus"></span>
+				Add New
+			</md-button>
+		</div>
+
+	</div>
+</div>

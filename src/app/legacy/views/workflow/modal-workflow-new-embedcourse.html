@@ -1,0 +1,133 @@
+<md-dialog aria-label="EMBED COURSE" ng-class="{'modal-embed': embedData.preview}" class="modal-embedcourse md-default-theme">
+<form name="NewEmbedCourseModalForm" novalidate>
+<!-- EMBED DIALOG BEGIN -->
+<md-toolbar ng-if="!embedData.preview">
+	<div class="md-toolbar-tools">
+        <span>
+            <h2 ng-if="embedData.level1">EMBED COURSE</h2>
+    		<h2 ng-if="embedData.level2 && embedData.embedType === 'link'">
+                <span class="icn icon-embed-link"></span>
+                <span class="text">EMBED URL</span>
+            </h2>
+    		<h2 ng-if="embedData.level2 && embedData.embedType === 'h5p'">
+                <span class="icn icon-embed-h5p"></span>
+                <span class="text">EMBED H5P</span>
+            </h2>
+        </span>
+		<span flex></span>
+		<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content ng-if="!embedData.preview" style="min-width:570px;max-width:570px">
+
+	<div layout="row" layout-align="space-around center" layout-wrap>
+        <div flex ng-if="embedData.level1">
+            <md-input-container md-no-float>
+                <label>What do you want to embed?</label>
+                <md-select md-no-asterisk md-container-class="embedcrs-dd" ng-model="embedData.embedType" placeholder="What do you want to embed?" ng-change="level1To2();" required>
+                    <md-option value="link">
+                        <span class="icn icon-embed-link"></span>
+                        <span class="text">Embed URL (Online link)</span>
+                    </md-option>
+                    <md-option value="h5p">
+                        <span class="icn icon-embed-h5p"></span>
+                        <span class="text">Embed H5P</span>
+                    </md-option>
+                    <md-option disabled value="adobecaptivate">
+                        <span class="icn icon-embed-cp"></span>
+                        <span class="text">Embed Adobe Captivate <small><em>(coming soon)</em></small></span>
+                    </md-option>
+                    <md-option disabled value="articulate">
+                        <span class="icn icon-embed-a"></span>
+                        <span class="text">Embed Articulate <small><em>(coming soon)</em></small></span>
+                    </md-option>
+                    <md-option disabled value="htmlfiles">
+                        <span class="icn icon-embed-htlm"></span>
+                        <span class="text">Embed HTML files <small><em>(coming soon)</em></small></span>
+                    </md-option>
+                    <md-option disabled value="lms">
+                        <span class="icn icon-embed-lms"></span>
+                        <span class="text">Embed LMS <small><em>(coming soon)</em></small></span>
+                    </md-option>
+                    <md-option disabled value="scorm">
+                        <span class="icn icon-embed-s"></span>
+                        <span class="text">Embed SCORM <small><em>(coming soon)</em></small></span>
+                    </md-option>
+                </md-select>
+            </md-input-container>
+		</div>
+
+        <div flex ng-if="embedData.level2 && embedData.embedType === 'link'">
+            <label class="heading heading-inside">Paste in URL (online link) to embed.</label>
+            <div class="vidinptwrp">
+                <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="embedData.uri" required>
+                <span class="lbl-plhldr">URL:</span>
+                <div class="preview-btn-wrap">
+                    <md-button ng-click="openPreview();" class="preview-btn md-raised" ng-if="embedData.uri.length > 0">
+                        <span class="pre-icon icon-preview-small"></span>
+                    </md-button>
+                </div>
+            </div>
+		</div>
+        <div flex ng-if="embedData.level2 && embedData.embedType === 'h5p'">
+            <label class="heading heading-inside">Paste in H5P-DATA (online link) to embed.</label>
+            <div class="vidinptwrp h5p">
+                <input placeholder="Paste H5P-DATA to embed" type="text" class="video-url embedinput" ng-model="embedData.h5pData" required>
+                <span class="lbl-plhldr">H5P-DATA:</span>
+                <div class="preview-btn-wrap">
+                    <md-button ng-click="openPreview();" class="preview-btn md-raised" ng-if="embedData.h5pData.length > 0">
+                        <span class="pre-icon icon-preview-small"></span>
+                    </md-button>
+                </div>
+            </div>
+		</div>
+    </div>
+
+    <div class="error" ng-if="embedData.error === true">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">Wrong URL link.<br>Try to copy the online link as directed from the platform.</span>
+    </div>
+    
+    <div class="error" ng-if="embedDataHttps.error === true">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">Please use a URL with 'https'.<br>We only display certified and secure web content.</span>
+    </div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row" ng-if="embedData.level2">
+    <md-button aria-label="Back" class="md-raised md-default-theme" ng-click="level2To1()" md-autofocus>
+        Back
+    </md-button>
+    <md-button aria-label="Embed" class="save md-default-theme" ng-click="validateUriLevel2();" ng-disabled="NewEmbedCourseModalForm.$invalid" md-autofocus>
+		<span class="text">Embed</span>
+	</md-button>
+</md-dialog-actions>
+
+<!-- EMBED DIALOG END -->
+
+<!-- PREVIEW IFRAME DIALOG BEGIN -->
+
+<md-toolbar ng-if="embedData.preview">
+    <div class="md-toolbar-tools">
+        <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="closePreview()">
+            <span class="text">Close</span>
+            <span class="icon icon-close-3"></span>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-dialog-content ng-if="embedData.preview" style="min-width:1030px;max-width:1030px">
+    <div class="video-iframe-wrap" ng-style="{ height: windowHeight }" resizeframe>
+        <div layout="row" layout-align="center center">
+            <iframe title="EmbedFrame" class="video-iframe" ng-src="{{embedData.trustUri}}"></iframe>
+        </div>
+    </div>
+</md-dialog-content>
+<!-- PREVIEW IFRAME DIALOG END -->
+
+</form>
+</md-dialog>

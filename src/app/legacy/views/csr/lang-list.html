@@ -1,0 +1,62 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Language List</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('csrsettings','languagelist')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('csrsettings','languagelist')">
+    <h4>Create and manage language translations.</h4>
+	<div class="settings-wrap-inner">
+
+        <div class="table-responsive">
+            <table class="table company-list-table lang-tbl">
+                <thead>
+                    <tr>
+                        <th class="lnghd">Language</th>
+                        <th>Translations</th>
+                        <th class="dnldhd">&nbsp;</th>
+                        <th class="dlthd">&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- <tr class="nhvr"> -->
+                    <tr ng-repeat="row in rowCollection track by $index" ng-class="{nhvr : row.tkey === 'val_lang_en', llbl : (row.avail_count/row.total_count) < 0.5}">
+                        <td ng-click="showLanguageModal($event,'update',row.tkey);" class="td-container">
+                            <div>{{row.lang}}</div>
+                        </td>
+                        <td ng-click="showLanguageModal($event,'update',row.tkey);" class="td-container">
+                            <div>{{row.avail_count}} / {{row.total_count}}</div>
+                        </td>
+                        <td cass="td-container">
+                            <div>
+                                <md-button class="dnldbtn md-raised" ng-click="" ng-csv="getCSVData(row.tkey)" filename="{{getLangFileName(row.lang)}}">
+                                    <span class="text">download</span>
+                                </md-button>
+                            </div>
+                        </td>
+                        <td class="delete-col td-container">
+                            <div>
+								<md-button class="delete-btn" aria-label="Delete" ng-click="deleteTranslation(row)">
+									<span class="icon icon-close-5"></span>
+								</md-button>
+							</div>
+                        </td>
+                        <td class="mask"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btnDiv">
+            <md-button class="md-raised" ng-click="showLanguageModal($event,'add');">
+                <span class="icon icon-plus"></span>
+                add more
+            </md-button>
+        </div>
+
+    </div>
+</div>

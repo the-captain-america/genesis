@@ -1,0 +1,334 @@
+<md-dialog aria-label="{{action}} User" class="filter-modal add-user-modal md-default-theme">
+    <form name="AddUserModalForm" novalidate>
+
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="showchangepwd !== 'yes' && showCropArea === 'no' && !filtermodal">User details</h2>
+                <h2 ng-if="showchangepwd !== 'yes' && showCropArea === 'yes' && !filtermodal">crop image</h2>
+                <h2 ng-if="showchangepwd === 'yes' && !filtermodal">Change Password</h2>
+                <h2 ng-if="filtermodal === 'filterlist'">Workflow data filters</h2>
+                <h2 ng-if="filtermodal === 'newfilter'">New filter</h2>
+                <h2 ng-if="filtermodal === 'updfilter'">Edit filter</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:570px;max-width:570px">
+            <div ng-if="filtermodal === 'filterlist' && localData.data.dfdisabled !== 'yes'" class="fltr-list">
+                <label>Filter name</label>
+                <div class="fltr-nmWrap" ng-repeat="dfilter in localData.data.datafilters track by dfilter.uid">
+                    <span class="text truncate" ng-click="editDataFilter(dfilter);">{{dfilter.name}}</span>
+                    <span class="edtbtn-wrap" ng-click="editDataFilter(dfilter);">
+                        <span class="icn icon-edit"></span>
+                    </span>
+                    <md-button class="delete-btn" ng-click="deleteDataFilter(dfilter.uid);" aria-label="Delete">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+                <div class="add-more-wrap nwfltr">
+                    <md-button class="add-more" ng-click="addDataFilter('filterlist');">
+                        <span class="icon icon-plus"></span>
+                        <span class="text">new filter</span>
+                    </md-button>
+                </div>
+                <div class="error" ng-if="datafilterErr">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{datafilterErr}}</span>
+                </div>
+            </div>
+            <div ng-if="(filtermodal === 'newfilter' || filtermodal === 'updfilter') && localData.data.dfdisabled !== 'yes'">
+                {{filter}}
+                <div layout layout-sm="column">
+                    <md-input-container class="required" flex>
+                        <label>Filter name</label>
+                        <input md-no-asterisk name="name" ng-model="datafilter.name" required focus="true">
+                        <span class="blrdv"></span>
+                    </md-input-container>
+                </div>
+
+                <div class="select-group-wrap">
+                    <label class="heading">
+                        Create a filter limiting the access to workflow data<br>for a group of admins
+                        <span class="tooltip-wrap">
+                                <a href="https://help.enboarder.com/en/articles/3184355-admin-filters" target="_blank">
+                                    <span class="icon icon-tooltip"></span>
+                                </a>
+                                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                                    <span class="copy">
+                                        <h4 class="title">
+                                            DATA FILTER
+                                        </h4>
+                                        <p>
+                                            Tap the icon to learn more and see examples
+                                        </p>
+                                    </span>
+                                </md-tooltip>
+                            </span>
+                    </label>
+
+                    <div layout="row" class="crt-wrap" ng-repeat="criteria in datafilter.criteria" ng-init="criteriaIndex = $index">
+                        <div flex="40">
+                            <md-menu-bar>
+                                <md-menu>
+                                    <button ng-click="$mdOpenMenu()">
+                                        <span class="text" ng-if="criteria.field && criteria.dispnm.length > 0 && criteria.dispnm.length < 36">{{criteria.dispnm}}</span>
+                                        <span class="text" ng-if="criteria.field && criteria.dispnm.length > 35">...<a title="{{criteria.dispnm}}">{{criteria.dispnm.substring(criteria.dispnm.length-35,criteria.dispnm.length)}}</a></span>
+                                        <span class="text plhldr" ng-if="!criteria.field">Select</span>
+                                        <span class="icon icon-arrow-7"></span>
+                                    </button>
+                                    <md-menu-content class="fltrmm">
+                                        <md-menu-item ng-repeat="cat in category track by $index">
+                                            <md-button ng-click="selectCategory(criteriaIndex, criteria, cat, true)">
+                                                <span class="icon-dtype icon-f-choice"></span>
+                                                {{cat.dispnm}}
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-bar>
+                        </div>
+                        <div flex="20">
+                            <md-input-container md-no-float class="equal-sep">
+                                <md-select md-no-asterisk aria-label="Criteria" md-container-class="equal-cont" ng-model="criteria.op" placeholder="Select" required>
+                                    <md-option value="eq">
+                                        <span class="icon icon-symbol-1"></span>
+                                        <span class="text">Equals</span>
+                                    </md-option>
+                                    <md-option value="ne">
+                                        <span class="icon icon-symbol-2"></span>
+                                        <span class="text">Not Equals</span>
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div flex="40">
+                            <md-input-container md-no-float class="cat-dd">
+                                <md-select md-no-asterisk aria-label="Criteria" md-container-class="crit-cont" ng-model="criteria.value" md-selected-html="displayOrValues(criteria.value, $index)" placeholder="Select" multiple required>
+                                    <md-option value="{{valChoice.key}}" ng-repeat="valChoice in valueChoices[$index]">{{valChoice.val}}</md-option>
+                                </md-select>
+                                <div class="mask" ng-if="!criteria.field"></div>
+                            </md-input-container>
+                        </div>
+
+                        <md-button class="delete-btn" ng-click="deleteCriteria($index)" aria-label="Close" ng-if="$last">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                        <span class="cnnme" ng-if="!$last">AND</span>
+                    </div>
+
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="addCriteria();">
+                            <span class="icon icon-plus"></span>
+                            <span class="text">and</span>
+                        </md-button>
+                    </div>
+
+                    <div class="error" ng-if="datafilterErr">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">{{datafilterErr}}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div ng-if="showchangepwd === 'no' && !filtermodal">
+                <div ng-show="showCropArea === 'no'">
+                    <div layout="row" layout-align="center" layout-wrap>
+                        <div flex="100" class="img-wrap">
+                            <div class="imginn" ngf-select="fileSelected($file)" ngf-drop="fileSelected($file)" ngf-max-size="5MB" name="file" ng-model="picFile" accept="image/*">
+                                <img ng-if="!localData.data.photo_l" alt="Profile pic" alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif"/>
+                                <span ng-if="!localData.data.photo_l" class="adimglbl">Add image</span>
+                                <img ng-if="localData.data.photo_l" alt="Profile pic" alt="Profile pic" ng-src="{{localData.data.photoCdn_l || localData.data.photo_l}}"/>
+                            </div>
+        				</div>
+                    </div>
+                    <div class="errmsg" ng-if="AddUserModalForm.file.$error.maxSize">
+                        <span class="text">Please upload file no more than 5MB</span>
+                    </div>
+                    <div class="errmsg" ng-if="invalidContentTypeError==='yes'">
+                        <span class="text">Wrong format, we accept .JPG .PNG &amp; .GIF</span>
+                    </div>
+                    <div class="errmsg" ng-if="error==='yes'">
+                        <span class="text">Something went wrong. Details: {{errMsg}}</span>
+                    </div>
+                    <div class="msktxtwrp">
+                        <div ng-if="ssouser === 'yes' && showCropArea === 'no'">
+                                <div class="msktxt">Admin details controlled<br>through SSO</div>
+                                <div class="msken"></div>
+                        </div>
+                        <div layout layout-sm="column">
+                            <md-input-container flex class="required" ng-class="{dsbl : upd}">
+                                <div class="msk"></div>
+                                <label>User name / Email</label>
+                                <input md-no-asterisk ng-model="localData.data.uname" type="email" ng-disabled="upd" required>
+                            </md-input-container>
+                        </div>
+                        <div layout layout-sm="column">
+                            <md-input-container flex class="required" ng-class="{dsbl : sso === 'yes'}">
+                                <div class="msk"></div>
+                                <label>Name</label>
+                                <input md-no-asterisk ng-model="localData.data.name" required>
+                            </md-input-container>
+                        </div>
+                        <div layout="row" layout-align="space-between center">
+                            <md-input-container flex="45" ng-class="{dsbl : allowRoleChange !== 'yes'}">
+                                <div class="msk"></div>
+                                <label>Role</label>
+                                <md-select md-no-asterisk aria-label="Role" ng-model="localData.data.role" required ng-disabled="allowRoleChange !== 'yes'">
+                                    <md-option value="admin">Administrator</md-option>
+                                    <md-option value="restrictedadmin">Restricted Admin</md-option>
+                                    <md-option value="reportingadmin">Reporting Admin</md-option>
+                                    <md-option value="restrictedcontentadmin">Restricted Content Admin</md-option>
+                                    <md-option value="initiator">Initiator</md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-input-container flex="45" ng-class="{dsbl : upd && hideStatus !== 'no'}">
+                                <div class="msk"></div>
+                                <label>Status</label>
+                                <md-select md-no-asterisk aria-label="Status" ng-model="localData.data.active" required ng-disabled="upd && hideStatus !== 'no'">
+                                    <md-option value="Y">Active</md-option>
+                                    <md-option value="N">Inactive</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="column" layout-align="space-between center" class="select-group" ng-if="localData.data.dfdisabled !== 'yes'">
+                        <label class="heading heading-inside">
+                            <span class="icn icon-filter-small"></span>
+                            <span class="txt">
+                                Visible workflow data
+                                <span class="tooltip-wrap">
+                                    <a href="https://help.enboarder.com/en/articles/3184355-admin-filters" target="_blank">
+                                        <span class="icon icon-tooltip"></span>
+                                    </a>
+                                    <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                                        <span class="copy">
+                                            <h4 class="title">
+                                                DATA FILTER
+                                            </h4>
+                                            <p>
+                                                Tap the icon to learn more and see examples
+                                            </p>
+                                        </span>
+                                    </md-tooltip>
+                                </span>
+                            </span>
+                        </label>
+                        <div class="fltr-wrap">
+                            <div class="nfltr" ng-if="(!localData.data.userdatafilters || (localData.data.userdatafilters.length === 0))">Add filter limiting access to workflow data...</div>
+                            <div class="chipwrp" ng-if="(localData.data.userdatafilters && (localData.data.userdatafilters.length > 0))">
+                                <span class="chiporwrp" ng-repeat="udfilter in localData.data.userdatafilters track by udfilter.uid">
+                                    <span class="chips">
+                                        <span class="txt">{{udfilter.name}}</span>
+                                        <span class="icon icon-close-3" ng-click="deleteUserFilter(udfilter.uid)"></span>
+                                    </span>
+                                    <span class="or" ng-if="!$last">or</span>
+                                </span>
+                            </div>
+                            <md-input-container>
+                                <md-select md-container-class="fixed-dd" md-no-asterisk aria-label="Status" ng-model="localData.data.selfilter">
+                                    <md-option value="{{dfilter.uid}}" md-option-empty=true ng-click="addDataFilterToUser(dfilter.uid);" ng-repeat="dfilter in localData.data.datafilters track by dfilter.uid">{{dfilter.name}}</md-option>
+                                    <md-option value="ADD" class="btn-txt" ng-click="addDataFilter('userdetail');">+ Add filter</md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div class="add-more-wrap">
+                            <md-button class="add-more" ng-click="openFilterModal();">
+                                <span class="text">Edit filter list</span>
+                            </md-button>
+                        </div>
+                        <div class="error" ng-if="datafilterErr">
+                            <span class="icon icon-notification-alert"></span>
+                            <span class="text">{{datafilterErr}}</span>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" ng-if="allowRoleChange === 'no'">
+                        <md-button class="add-more" ng-click="showChangePassword();" ng-disabled="showSigninAs === true">
+                            <span class="text">change password</span>
+                        </md-button>
+                        <span class="icn icon-notification-ok" ng-if="passSent === 'yes'"></span>
+                    </div>
+                    <span class="ps-snt" ng-if="passSent === 'yes'">Reset-password instructions sent to your email address.</span>
+
+                    <div class="errmsg" ng-show="useralreadyexists === true">
+                        <span class="icon icon-close-5"></span>
+                        <span class="text">Entered username already exists. Please choose a different username.</span>
+                    </div>
+                </div>
+                <div layout="row" layout-align="center" layout-wrap ng-show="showCropArea === 'yes'">
+                    <div flex="100" class="img-wrap">
+                        <div ngf-drop ng-model="picFile" ngf-pattern="image/*" class="cropArea">
+                            <ui-cropper image="picFile | ngfDataUrl" result-image="croppedDataUrl"
+                                ng-init="croppedDataUrl='{{localData.data.photoCdn_l ||localData.data.photo_l}}'"
+                                ng-keypress="uiCropperHandleKeypress($event, croppedDataUrl, picFile.name);">
+                            </ui-cropper>
+                            <md-progress-circular md-diameter="55px"></md-progress-circular>
+                        </div>
+                        <md-dialog-actions layout="row" class="cropbtn-wrap">
+                            <md-button aria-label="Back" class="backbtn md-raised md-default-theme" ng-click="backToUser()" md-autofocus>
+                                Back
+                            </md-button>
+                            <md-button class="save save-spinner md-default-theme" aria-label="Save" ng-click="upload(croppedDataUrl, picFile.name)" md-autofocus>
+                                <span class="text">Crop</span>
+                                <span class="text-save">Crop</span>
+                                <span class="text-saved">Cropped<span class="icon-notification-ok"></span></span>
+                                <span class="spinner">
+                                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                                </span>
+                            </md-button>
+                        </md-dialog-actions>
+                    </div>
+                </div>
+            </div>
+            <!-- change password section -->
+            <div ng-if="showchangepwd === 'yes' && !filtermodal">
+                <div class="smsk" ng-if="ssouser === 'yes'">
+                    <span class="icon icon-security-2"></span>
+                    <span class="text">These user-details are managed<br>from your SSO account.</span>
+                </div>
+                <div ng-if="ssouser !== 'yes'">
+                    <div layout layout-sm="column">
+                        <md-input-container flex class="required" ng-class="{err : errscope === 'currpwd'}">
+                            <label>Current Password</label>
+                            <input md-no-asterisk placeholder="Enter your current password" ng-model="changepwd.currpwd" type="password" required autocomplete="off">
+                        </md-input-container>
+                    </div>
+                    <div layout layout-sm="column">
+                        <md-input-container flex class="required" ng-class="{err : errscope === 'newpwd' || errscope === 'newpwdempty'}">
+                            <label>New Password</label>
+                            <input md-no-asterisk ng-model="changepwd.newpwd" type="password" required autocomplete="off">
+                        </md-input-container>
+                    </div>
+                    <div layout layout-sm="column">
+                        <md-input-container flex class="required" ng-class="{err : errscope === 'newpwd' || errscope === 'confirmpwdempty'}">
+                            <label>Re-enter new Password</label>
+                            <input md-no-asterisk ng-model="changepwd.newpwdconfirm" type="password" required autocomplete="off">
+                        </md-input-container>
+                    </div>
+                    <div class="error errCpss" ng-show="pwderrmsg">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">{{pwderrmsg}}</span>
+                    </div>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button aria-label="Back" class="backbtn md-raised md-default-theme" ng-click="backToDetails()" md-autofocus ng-show="showchangepwd === 'yes' || filtermodal === 'newfilter' || filtermodal === 'updfilter' || filtermodal === 'filterlist'">
+            	Back
+            </md-button>
+
+            <md-button class="save md-default-theme" aria-label="Save" ng-click="saveUser();" ng-disabled="AddUserModalForm.$invalid || (ssouser === 'yes' && photoupdated === 'no')" md-autofocus ng-show="(showchangepwd !== 'yes' && showCropArea === 'no' && !filtermodal) || filtermodal === 'newfilter' || filtermodal === 'updfilter'">Save</md-button>
+
+            <md-button class="save save-spinner md-default-theme" aria-label="Save" ng-click="changePassword();" ng-disabled="AddUserModalForm.$invalid || ssouser === 'yes'" md-autofocus ng-show="showchangepwd === 'yes'">
+                <span class="text">Save changes</span>
+                <span class="text-save">Saving</span>
+                <span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

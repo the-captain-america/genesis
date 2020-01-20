@@ -1,0 +1,714 @@
+<md-dialog aria-label="Bulk upload" class="embed-params-modal bulkupload-modal md-default-theme">
+<form name="BulkuploadForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+        <h2 ng-if="wizardState === 'editMappingList'">PRESET MAPPING LIST</h2>
+        <h2 ng-if="wizardState === 'selectUploadMethod'">MANUAL UPLOAD</h2>
+        <h2 ng-if="wizardState === 'scanprogressStart'">UPLOADING</h2>
+        <h2 ng-if="wizardState === 'scanprogressScan'">Scanning</h2>
+        <h2 ng-if="wizardState === 'scanprogressBad'">BAD UPLOAD</h2>
+		<h2 ng-if="wizardState === 'scanprogressNone'">FIELD MAPPING</h2>
+        <h2 ng-if="wizardState === 'incompleteMapping'">Warning</h2>
+		<h2 ng-if="wizardState === 'duplicateAlert'">DUPLICATE ALERT</h2>
+		<h2 ng-if="wizardState === 'confirmMapping'">CONFIRM</h2>
+		<h2 ng-if="wizardState === 'scanprogressEnd'">&nbsp;</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:620px;max-width:620px" ng-class="{cnfrmScrn : wizardState === 'confirmMapping'}">
+
+    <div layout="row" class="filter-modal premap-modal md-default-theme" ng-if="wizardState === 'editMappingList'">
+        <div class="fltr-list" style="min-width:600px;max-width:600px;max-height:810px;">
+            <label>Name</label>
+            <div class="fltr-nmWrap" ng-repeat="mapping in presetmappings | filter:{method:localdata.method}">
+                <span class="text truncate">{{mapping.name}}</span>
+                <md-button class="delete-btn" ng-click="delete(mapping.uid)" aria-label="Delete">
+                    <span class="icon icon-close-5"></span>
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+    <div layout="column" ng-if="wizardState === 'selectUploadMethod'">
+        <div class="radio-wrap">
+            <md-radio-group ng-model="localdata.method" required>
+                <div class="rdwrp">
+                    <md-radio-button value="std">
+                        <span class="text">Standard upload</span>
+                    </md-radio-button>
+                    <span class="ttl-wrp">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="bottom">
+                            <span class="copy">
+                                <h4 class="title">STANDARD UPLOAD</h4>
+                                <p>
+                                    Workflows are updated or trigger based on data entered into a CSV table format.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </div>
+                <div class="rdwrp">
+                    <md-radio-button value="smart">
+                        <span class="text">Smart upload</span>
+                    </md-radio-button>
+                    <span class="ttl-wrp">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="bottom">
+                            <span class="copy">
+                                <h4 class="title">SMART UPLOAD</h4>
+                                <p>
+                                    Workflows are updated or triggered based on corelating data within a 'Shapshot' data/people registry.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </div>
+            </md-radio-group>
+        </div>
+        <div ng-if="localdata.method === 'std'">
+            <span class="lblprmp">STANDARD OPTIONS</span>
+            <div class="premapwrap">
+                <md-input-container class="mapping-dropdown" md-no-float>
+                    <label>Field mapping (preset)</label>
+                    <md-select md-no-asterisk md-container-class="fixed-dd" ng-model="localdata.selectedMap">
+                        <md-option value="none" selected>None</md-option>
+                        <md-option value="{{presetmapping.uid}}" ng-repeat="presetmapping in presetmappings | filter:{method:localdata.method}">{{presetmapping.name}}</md-option>
+                        <md-option ng-if="presetmappings && (presetmappings | filter:{method:localdata.method}).length > 0" value="two" ng-click="editMappingList();" class="edtlst">Edit list</md-option>
+                    </md-select>
+                </md-input-container>
+                <md-checkbox aria-label="These workflows are only for testing" ng-model="localdata.iststwf" ng-true-value="'y'" ng-false-value="'n'">
+                    <span>These workflows are only for testing</span>
+                </md-checkbox>
+            </div>
+        </div>
+        <div ng-if="localdata.method === 'smart'">
+            <span class="lblprmp">SMART OPTIONS</span>
+            <div class="premapwrap">
+                <md-input-container class="mapping-dropdown" md-no-float>
+                    <label>Field mapping (preset)</label>
+                    <md-select md-no-asterisk md-container-class="fixed-dd" ng-model="localdata.selectedMap">
+                        <md-option value="none" selected>None</md-option>
+                        <md-option value="{{presetmapping.uid}}" ng-repeat="presetmapping in presetmappings | filter:{method:localdata.method}">{{presetmapping.name}}</md-option>
+                        <md-option ng-if="presetmappings && (presetmappings | filter:{method:localdata.method}).length > 0" value="two" ng-click="editMappingList();">Edit list</md-option>
+                    </md-select>
+                </md-input-container>
+                <md-radio-group ng-model="localdata.smarttype" class="rdgrp" required>
+                    <md-radio-button value="snap_new">
+                        <span class="text">'Snapshot' - Create data registry</span>
+                    </md-radio-button>
+                    <div class="crtdwrp" ng-if="localdata.snapconfig">
+                        <span class="crtdinn" ng-if="localdata.snapconfig && localdata.snapconfig.status !== 'creating' && localdata.snapconfig.created">
+                            <span class="icn icon-file-small"></span>
+                            <span class="text">
+                                Created: {{localdata.snapconfig.created.time}} | {{localdata.snapconfig.created.dt}}
+                            </span>
+                        </span>
+                        <span class="crtdinn" ng-if="localdata.snapconfig && localdata.snapconfig.status === 'creating'">
+                            <span class="text">
+                                Generating data registry
+                            </span>
+                        </span>
+                        <span class="crtdinn" ng-if="localdata.snapconfig && localdata.snapconfig.status !== 'updating' && localdata.snapconfig.upd">
+                            <span class="icn icon-file-small"></span>
+                            <span class="text">
+                                Updated: {{localdata.snapconfig.upd.time}} | {{localdata.snapconfig.upd.dt}}
+                            </span>
+                        </span>
+                        <span class="crtdinn" ng-if="localdata.snapconfig && localdata.snapconfig.status === 'updating'">
+                            <span class="text">
+                                Updating data registry
+                            </span>
+                        </span>
+                    </div>
+                    <md-radio-button value="snap_update" ng-disabled="!localdata.snapconfig || localdata.snapconfig.status !== 'active'">
+                        <span class="text">'Snapshot' - Add to data registry</span>
+                    </md-radio-button>
+                    <md-radio-button value="snap_incr" ng-disabled="!localdata.snapconfig || localdata.snapconfig.status !== 'active'">
+                        <span class="text">'Incremental' - Updates data & workflows based on Snapshot</span>
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+        </div>
+        <div class="advanced-option-wrap pgpwrp">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Advanced options</span>
+            </div>
+            <div class="detail-section">
+                <md-checkbox class="fc" aria-label="Cancel workflows on termination date" ng-model="localdata.termnflg" ng-true-value="'yes'" ng-false-value="'no'" ng-if="localdata.smarttype === 'snap_incr'">
+                    <span>Cancel workflows on termination date</span>
+                </md-checkbox>
+                <md-checkbox aria-label="Scan across all workflows to find a match to unique ID" ng-model="localdata.globalextidlookup" ng-true-value="'yes'" ng-false-value="'no'">
+                    <span>Scan across all workflows to find a match to unique ID</span>
+                </md-checkbox>
+                <md-checkbox aria-label="Use PGP decryption on imported CSV files" ng-model="localdata.ispgp" ng-true-value="'yes'" ng-false-value="'no'">
+                    <span>Use PGP decryption on imported CSV files</span>
+                </md-checkbox>
+                <div ng-if="localdata.ispgp === 'yes'" class="pgpinptwrp">
+                    <md-input-container class="required">
+                        <label>PGP Private key</label>
+                        <textarea ng-model="localdata.pgpkey" md-no-asterisk required></textarea>
+                    </md-input-container>
+                    <md-input-container flex="100">
+                        <label>Pass phrase</label>
+                        <input md-no-asterisk ng-model="localdata.passphrase" placeholder="Optional">
+                    </md-input-container>
+                    <div>
+                        <md-checkbox aria-label="Add ASCII armor encoding" ng-model="localdata.isascii" ng-true-value="'yes'" ng-false-value="'no'">
+                            <span>Add 'ASCII armor' encoding</span>
+                        </md-checkbox>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div layout="column" ng-if="wizardState === 'scanprogressNone'">
+
+        <md-input-container class="md-block">
+            <input type="text" md-no-asterisk placeholder="Preset name" ng-model="tmplt.nm" required>
+        </md-input-container>
+
+        <div class="scan-on errMsg" ng-if="filterError === 'yes' || mappingError === 'yes'">
+            <div class="content">
+                <div class="inner">
+                    <span class="img-wrap">
+                        <img src="//static.enboarder.net/images/warning.gif" alt="Error">
+                        <span class="errNm" ng-if="filterError === 'yes'">
+                            <span>Invalid filter: {{filterMessage}}</span>
+                        </span>
+                        <span class="errNm" ng-if="mappingError === 'yes'">
+                            <span>Mapping Error: {{errorMessage}}</span>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+		<label class="heading heading-inside">
+            <span>Map each column within the CSV that correlates<br>to an Enboarder field</span>
+        </label>
+
+        <div layout="row" layout-align="start center" class="embdlbl-wrap">
+            <div flex="50">
+                <label>CSV COLUMN</label>
+                <span class="uid">
+                    Unique ID
+                    <span ng-if="localdata.method === 'smart'">(Required)</span>
+                </span>
+            </div>
+            <div flex="50">
+                <label class="new-val">ENBOARDER</label>
+            </div>
+        </div>
+        <div class="embd-mainwrap" ng-repeat="mapParam in mapparams track by $index">
+            <div layout="row" layout-align="start start" class="embdfld-wrap">
+                <div flex="50" class="fldname">
+                    <div class="clm-wrap">
+                        <span class="lbl">
+                            {{mapParam.srcField}}
+                            <!-- <md-checkbox class="tstcbox" ng-model="mapParam.extidfld" ng-true-value="'y'" ng-false-value="'n'" ng-click="checkUncheck($index);"></md-checkbox> -->
+                            <md-radio-group class="tstcbox" ng-model="mapParam.extidfld" ng-click="checkUncheck($index);">
+                                <md-radio-button class="tstcbox" ng-value="'y'"></md-radio-button>
+                            </md-radio-group>
+                        </span>
+                        <span class="txt" ng-if="mapParam.row1">{{mapParam.row1}}</span>
+                        <span class="txt" ng-if="mapParam.row2">{{mapParam.row2}}</span>
+                    </div>
+                    <span class="connector"></span>
+                </div>
+                <div flex="50" class="fk-menu" ng-class="{req : !mapParam.lbl}" ng-mouseover="shmn(mapParam);" ng-hide="mapParam.sm === 'yes'">
+                    <span class="text plhldr" ng-if="!mapParam.lbl">Select</span>
+                    <span ng-if="mapParam.lbl.length > 0 && mapParam.lbl.length < 36">
+                        <span class="none" ng-if="mapParam.lbl === 'None'">{{mapParam.lbl}}</span>
+                        <span ng-if="mapParam.lbl !== 'None'">{{mapParam.lbl}}</span>
+                    </span>
+                    <span ng-if="mapParam.lbl.length > 35">...<a title="{{mapParam.lbl}}">{{mapParam.lbl.substring(mapParam.lbl.length-35,mapParam.lbl.length)}}</a></span>
+                    <span class="icon icon-arrow-7"></span>
+                </div>
+                <md-menu-bar flex="50" ng-class="{required : !mapParam.lbl}" ng-if="mapParam.sm === 'yes'">
+                    <md-menu>
+                        <button ng-click="$mdMenu.open()">
+                            <span ng-if="mapParam.lbl.length > 0 && mapParam.lbl.length < 36">
+                                <span class="none" ng-if="mapParam.lbl === 'None'">{{mapParam.lbl}}</span>
+                                <span ng-if="mapParam.lbl !== 'None'">{{mapParam.lbl}}</span>
+                            </span>
+                            <span ng-if="mapParam.lbl.length > 35">...<a title="{{mapParam.lbl}}">{{mapParam.lbl.substring(mapParam.lbl.length-35,mapParam.lbl.length)}}</a></span>
+
+                            <span class="text plhldr" ng-if="!mapParam.lbl">Select</span>
+                            <span class="icon icon-arrow-7"></span>
+                        </button>
+                        <md-menu-content>
+                            <md-menu-item>
+                                <md-button class="none" ng-click="setHeaderMapping(mapParam.srcField, 'none', 'None')">
+                                    <span class="icon-dtype icon-f-none"></span>
+                                    <span class="text">None</span>
+                                </md-button>
+                            </md-menu-item>
+                            <md-menu-item>
+                                <md-menu>
+                                    <md-button ng-click="$mdMenu.open()">Names</md-button>
+                                    <md-menu-content>
+                                        <md-menu ng-repeat="nameEntry in enbHeaders.names track by $index">
+                                            <md-button ng-click="$mdMenu.open()">
+                                                <span class="text">{{nameEntry.lbl}}</span>
+                                            </md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                        <md-button ng-click="setHeaderMapping(mapParam.srcField, namedtl.value, 'Names / '+nameEntry.lbl+' / '+namedtl.lbl)">
+                                                            <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                            <span class="text">{{namedtl.lbl}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                        </md-menu>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="enbHeaders.categories">
+                                <md-menu>
+                                    <md-button ng-click="$mdMenu.open()">Categories</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cat in enbHeaders.categories track by $index">
+                                            <md-button ng-click="setHeaderMapping(mapParam.srcField, cat.value, 'Category / '+cat.lbl)">
+                                                <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                <span class="text">{{cat.lbl}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="enbHeaders.customfields">
+                                <md-menu>
+                                    <md-button ng-click="$mdMenu.open()">Custom Fields</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cf in enbHeaders.customfields track by $index">
+                                            <md-button ng-click="setHeaderMapping(mapParam.srcField, cf.value, 'Custom field / '+cf.lbl)">
+                                                <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                <span class="text">{{cf.lbl}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="enbHeaders['Start date']">
+                                <md-button ng-click="setHeaderMapping(mapParam.srcField, enbHeaders['Start date'], 'Start date')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Start date</span>
+                                </md-button>
+                            </md-menu-item>
+                            <md-menu-item ng-if="enbHeaders['Termination date'] && localdata.method === 'smart'">
+                                <md-button ng-click="setHeaderMapping(mapParam.srcField, enbHeaders['Termination date'], 'Termination date')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Termination date</span>
+                                </md-button>
+                            </md-menu-item>
+                            <!--md-menu-item ng-if="enbHeaders['External id']">
+                                <md-button ng-click="setHeaderMapping(mapParam.srcField, enbHeaders['External id'], 'Unique id')">
+                                    <span class="icon-dtype icon-f-shorttext"></span>
+                                    <span class="text">Unique id</span>
+                                </md-button>
+                            </md-menu-item-->
+                            <md-menu-item ng-if="enbHeaders['Action'] && localdata.method !== 'smart'">
+                                <md-button ng-click="setHeaderMapping(mapParam.srcField, enbHeaders['Action'], 'Action')">
+                                    <span class="icon-dtype icon-refresh"></span>
+                                    <span class="text">Action</span>
+                                </md-button>
+                            </md-menu-item>
+                        </md-menu-content>
+                    </md-menu>
+                </md-menu-bar>
+            </div>
+        </div>
+        <div class="advanced-option-wrap advmpwrp" ng-if="localdata.method === 'smart'">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced options</span>
+            </div>
+            <div class="detail-section adjustment-bulkupload">
+                <md-checkbox class="rdwrp"
+                    aria-label="Only write records that have been processed to CSV report"
+                    ng-model="localdata.rptproc"
+                    ng-true-value="'yes'"
+                    ng-false-value="'no'">
+                    <span>Only write records that have been processed to CSV report</span>
+                </md-checkbox>
+                <md-radio-group ng-model="localdata.filter" required>
+                    <div class="rdwrp">
+                        <md-radio-button value="none">
+                            <span class="text">No filter - use all table data</span>
+                        </md-radio-button>
+                    </div>
+                    <div class="rdwrp">
+                        <md-radio-button value="basic">
+                            <span class="text">Filter - select specific rows</span>
+                        </md-radio-button>
+                        <span class="ttl-wrp">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip" md-direction="top">
+                                <span class="copy">
+                                    <h4 class="title">SPECIFIC ROWS</h4>
+                                    <p>
+                                        Defining the column name and values to filter out the table data to use.
+                                    </p>
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </div>
+                    <div ng-if="localdata.filter == 'basic'">
+                        <md-input-container class="md-block" flex="60">
+                            <input type="text" md-no-asterisk placeholder="Column" ng-model="localdata.basic_column">
+                        </md-input-container>
+                        <md-input-container class="md-block" flex="90">
+                            <textarea placeholder="Value" ng-model="localdata.basic_value"></textarea>
+                        </md-input-container>
+                    </div>
+                    <div class="rdwrp">
+                        <md-radio-button value="advanced">
+                            <span class="text">Filter - use advanced expressions</span>
+                        </md-radio-button>
+                        <span class="ttl-wrp">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip" md-direction="top">
+                                <span class="copy">
+                                    <h4 class="title">ADVANCED EXPRESSIONS</h4>
+                                    <p>
+                                        Use logical expressions to select table data to use.
+                                    </p>
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </div>
+                    <div ng-if="localdata.filter == 'advanced'">
+                        <span class="errNm" ng-if="filterError === 'yes'">
+                            <span>{{filterMessage}}</span>
+                        </span>
+                        <md-input-container md-no-float class="md-block advoptn">
+                            <textarea ng-model="localdata.adv_value"></textarea>
+                        </md-input-container>
+                    </div>
+                </md-radio-group>
+            </div>
+        </div>
+	</div>
+
+    <div layout="column" ng-if="wizardState === 'duplicateAlert'">
+        <label class="heading heading-inside">
+            <span>We found duplicate unique identifiers, please select what duplicates<br>within the CSV upload you like to load into a workflow.</span>
+        </label>
+        <div class="table-responsive">
+ 			<table class="table dup-list-table">
+				<thead>
+					<tr>
+                        <th>&nbsp;</th>
+                        <th>Employee name</th>
+                        <th>Source</th>
+                        <th>Launch date</th>
+						<th>Workflow status</th>
+						<th>Load</th>
+					</tr>
+				</thead>
+
+				<tbody class="collapse-wrap" ng-repeat="dupRow in duplicates track by $index">
+                        <tr class="show-hide-duprow">
+    						<td class="td-container">
+    							<div>
+    							    <span class="icon-before arrow-toggle icon-arrow-1" ng-class="{'icon-arrow-2' : load.cbox === 'yes'}"></span>
+    							</div>
+    						</td>
+    						<td class="td-container">
+    							<div>{{dupRow.empnm}}</div>
+    						</td>
+    						<td class="td-container">
+    							<div>{{dupRow.src}}</div>
+    						</td>
+    						<td class="td-container">
+    							<div> - </div>
+    						</td>
+    						<td class="td-container">
+    							<div> - </div>
+    						</td>
+    						<td class="td-container">
+    							<div>
+                                    <md-checkbox aria-label="load" ng-model="load.cbox" ng-true-value="'yes'" ng-false-value="'no'" ng-change="checkDuplicate(dupRow.extid,load.cbox);">
+                        	         	<span></span>
+                        	        </md-checkbox>
+    							</div>
+    						</td>
+    					</tr>
+                        <tr class="detail-section-duprow" ng-class="{'show-row' : load.cbox === 'yes'}" ng-repeat="dupDtl in dupRow.dupdtls">
+    						<td class="td-container">
+    							<div>&nbsp;</div>
+    						</td>
+    						<td class="td-container">
+    							<div>{{dupDtl.empnm}}</div>
+    						</td>
+    						<td class="td-container">
+    							<div>{{dupDtl.src}}</div>
+    						</td>
+    						<td class="td-container">
+    							<div>{{dupDtl.crdt}}</div>
+    						</td>
+    						<td class="td-container">
+    							<div ng-if="dupDtl.status === 'INIT'">In progress</div>
+                                <div ng-if="dupDtl.status === 'NEW'">Pending</div>
+                                <div ng-if="dupDtl.status === 'DONE'">Complete</div>
+                                <div ng-if="dupDtl.status === 'CANCELLED'">Cancelled</div>
+                                <div ng-if="dupDtl.status === 'DELETED'">Deleted</div>
+                                <div ng-if="dupDtl.status === 'INCOMP'">Incomplete</div>
+    						</td>
+    						<td class="td-container">
+    							<div>&nbsp;</div>
+    						</td>
+    					</tr>
+				</tbody>
+			</table>
+            <div class="cbwrap">
+                <md-checkbox class="tstcbox" aria-label="cancel active workflow to launch new" ng-model="cancelactwf" ng-true-value="'y'" ng-false-value="'n'" ng-change="setCancelActWF(cancelactwf);">
+                    <span>Only allow one 'unique ID' per workflow, cancel active workflow to launch new.</span>
+                </md-checkbox>
+            </div>
+		</div>
+    </div>
+
+    <div layout="column" ng-if="wizardState === 'confirmMapping'">
+        <div class="scan-on errMsg" ng-if="mappingError === 'yes'">
+            <div class="content">
+                <div class="inner">
+                    <span class="img-wrap">
+                        <img src="//static.enboarder.net/images/warning.gif" alt="Error">
+                        <span class="errNm">
+                            <span ng-if="errcount === 1">{{errcount}} ERROR</span>
+                            <span ng-if="errcount > 1">{{errcount}} ERRORS</span>
+                        </span>
+                        <span class="errNm" ng-if="errcount > 0">
+                            These rows are not added into a workflow
+                        </span>
+                    </span>
+                    <span class="error collapse-wrap" ng-repeat="errRecord in errored track by $index">
+                        <span class="errtitle show-hide-dashboard" ng-if="errRecord.errorCols">
+                            Error {{$index+1}}: Row {{errRecord.rownum}}, has an invalid value in column {{errRecord.errorCols}}
+                            <span class="arrow-toggle icon-arrow-1"></span>
+                        </span>
+                        <span class="errtitle show-hide-dashboard" ng-if="!errRecord.errorCols">
+                            Error {{$index+1}}: Row {{errRecord.rownum}}, is missing some mandatory values
+                            <span class="arrow-toggle icon-arrow-2"></span>
+                        </span>
+                        <span class="errmsg detail-section-dashboard" ng-repeat="err in errRecord.error | orderBy:['col']">
+                            {{err.errMesg}} <br/>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="scan-on errMsg" ng-if="mappingAlert === 'yes' && alertcount > 0">
+            <div class="content">
+                <div class="inner">
+                    <span class="img-wrap">
+                        <span class="errNm" ng-class="{alrt : alertcount > 0}">
+                            <span ng-if="alertcount === 1">{{alertcount}} ALERT</span>
+                            <span ng-if="alertcount > 1">{{alertcount}} ALERTS</span>
+                        </span>
+                    </span>
+                    <span class="error alrt" ng-repeat="newHire in newhires track by $index" ng-if="newHire.alert">
+                        <span class="" ng-repeat="alert in newHire.alert | orderBy:['col']" >
+                            Row {{newHire.rownum}}, {{alert.alertMesg}} <br/>
+                        </span>
+                    </span>
+                    <span class="error alrt" ng-repeat="changeHire in changehires track by $index" ng-if="changeHire.alert">
+                        <span class="" ng-repeat="alert in changeHire.alert | orderBy:['col']" >
+                            Row {{changeHire.rownum}}, {{alert.alertMesg}} <br/>
+                        </span>
+                    </span>
+                    <span class="error alrt" ng-repeat="cancelHire in cancelhires track by $index" ng-if="cancelHire.alert">
+                        <span class="" ng-repeat="alert in cancelHire.alert | orderBy:['col']" >
+                            Row {{cancelHire.rownum}}, {{alert.alertMesg}} <br/>
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+		<label class="heading heading-inside" ng-if="newhires.length > 0 || changehires.length > 0 || cancelhires.length > 0">
+            Confirm workflow details before you finish
+        </label>
+        <label class="heading heading-inside" ng-if="newhires.length === 0 && changehires.length === 0 && cancelhires.length === 0">
+            There are no workflows to launch.
+        </label>
+        <div class="table-responsive" ng-if="wfprocessed && wfprocessed.length > 0">
+			<table class="table wflaunched-list-table">
+				<thead>
+					<tr>
+						<th>Workflow</th>
+                        <th>Launch</th>
+                        <th>Update</th>
+                        <th>Cancel</th>
+					</tr>
+				</thead>
+				<tbody>
+                    <tr ng-repeat="wf in wfprocessed">
+                        <td class="td-container">
+                            <div class="truncate">{{wf.name}}</div>
+                        </td>
+                        <td class="td-container">
+							<div>{{wf.launchcount}}</div>
+						</td>
+                        <td class="td-container">
+							<div>{{wf.updatecount}}</div>
+						</td>
+                        <td class="td-container">
+							<div>{{wf.cancelcount}}</div>
+						</td>
+					</tr>
+                    <!--tr>
+                        <td class="td-container">
+                            <div class="truncate">TOTAL</div>
+                        </td>
+                        <td class="td-container">
+							<div ng-if="newhires">{{newhires.length}}</div>
+                            <div ng-if="!newhires">0</div>
+						</td>
+                        <td class="td-container">
+							<div ng-if="changehires">{{changehires.length}}</div>
+                            <div ng-if="!changehires">0</div>
+						</td>
+                        <td class="td-container">
+							<div ng-if="cancelhires">{{cancelhires.length}}</div>
+                            <div ng-if="!cancelhires">0</div>
+						</td>
+					</tr-->
+				</tbody>
+			</table>
+		</div>
+    </div>
+
+    <div class="scan-on" ng-if="wizardState === 'scanprogressStart'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/document-scan.gif" alt="scanning...">
+                </span>
+                <span class="text">Uploading and scanning text fields...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-on" ng-if="wizardState === 'scanprogressScan'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/document-scan.gif" alt="scanning...">
+                </span>
+                <span class="text">Scanning for unique identifiers...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-on" ng-if="wizardState === 'scanprogressBad'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/bad-file.gif" alt="Bad file">
+                </span>
+                <span class="text" ng-if="scanBadMesg">{{scanBadMesg}}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-on errMsg" ng-if="wizardState === 'incompleteMapping'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/warning.gif" alt="Error">
+                    <span class="errNm" ng-if="errorMessage">{{errorMessage}}</span>
+                    <span class="etext" ng-if="errorMessage">Please confirm you do not want to map all columns to Enboarder fields.</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-on" ng-if="wizardState === 'scanprogressEnd'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/tick-animated.gif" alt="Confirmation">
+                </span>
+                <span class="text" ng-if="!inprogressMesg">Success, workflows launched!</span>
+                <span class="text" ng-if="inprogressMesg">Success! <br/> {{inprogressMesg}}</span>
+            </div>
+        </div>
+    </div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row" ng-if="wizardState === 'editMappingList'">
+    <md-button aria-label="Save" class="save md-default-theme" ng-click="backToWizard();" md-autofocus>
+        <span class="text">Close</span>
+    </md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row" ng-if="wizardState === 'scanprogressNone'">
+	<md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveMapping();" ng-disabled="BulkuploadForm.$invalid" md-autofocus ng-if="!(localdata.method === 'smart' && localdata.smarttype !== 'snap_incr')">
+        <span class="text">Save mapping</span>
+        <span class="text-save">Saving...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+    <md-button aria-label="Start now" class="save save-spinner md-default-theme" ng-click="startSmartUpload();" ng-disabled="BulkuploadForm.$invalid" md-autofocus ng-if="localdata.method === 'smart' && localdata.smarttype !== 'snap_incr'">
+        <span class="text">Start now</span>
+        <span class="text-save">Processing...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row" ng-if="wizardState === 'selectUploadMethod'">
+	<md-button ngf-select="uploadCSVFile($file)" aria-label="Save" class="save save-spinner md-default-theme" ng-disabled="BulkuploadForm.$invalid" md-autofocus>
+        <span class="text">Upload CSV</span>
+        <span class="text-save">Uploading...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row" ng-if="wizardState === 'confirmMapping' || wizardState === 'duplicateAlert' || wizardState === 'incompleteMapping'" class="cnrfm-btn">
+    <md-button aria-label="Edit Mapping" class="md-raised md-default-theme" ng-click="editMapping();">
+        edit mapping
+    </md-button>
+    <md-button ng-click="" ng-if="wizardState === 'confirmMapping' && (newhires.length === 0 && changehires.length === 0 && cancelhires.length === 0)" class="save md-default-theme" aria-label="Launch Workflows" md-autofocus disabled>
+        <span class="text">finish now</span>
+    </md-button>
+    <md-button ng-click="LaunchWf();" ng-if="wizardState === 'confirmMapping' && (newhires.length > 0 || changehires.length > 0 || cancelhires.length > 0)" class="save save-spinner md-default-theme" aria-label="Launch Workflows" md-autofocus>
+        <span class="text">finish now</span>
+        <span class="text-save">launching...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+    <md-button ng-click="processAlertedRecords(wizardState);" ng-if="wizardState === 'duplicateAlert'" class="save save-spinner md-default-theme" aria-label="Launch Workflows" md-autofocus>
+        <span class="text">next</span>
+        <span class="text-save">processing...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+    <md-button ng-click="processAlertedRecords(wizardState);" ng-if="wizardState === 'incompleteMapping'" class="save save-spinner md-default-theme" aria-label="Launch Workflows" md-autofocus>
+        <span class="text">yes, continue</span>
+        <span class="text-save">processing...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row" ng-if="wizardState === 'scanprogressEnd'">
+	<md-button aria-label="Continue" class="save md-default-theme" ng-click="cancel();" ng-disabled="BulkuploadForm.$invalid" md-autofocus>
+        <span class="text">Done</span>
+    </md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

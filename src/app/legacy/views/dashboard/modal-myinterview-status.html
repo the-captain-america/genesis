@@ -1,0 +1,34 @@
+<md-dialog aria-label="Video Recording Status" class="esign-status-modal vrc-modal form-status-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>{{modname}}</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content aria-label="Video Recording Status" style="min-width:570px;max-width:570px;max-height:810px;">
+        <div class="status-wrap">
+            <div class="copy" ng-if="action === 'v'">
+                <span>
+                    <p><strong>Viewed:</strong></p>
+                    <p>Page has been viewed but no video has been recorded yet.</p>
+                </span>
+            </div>
+            <div ng-if="action === 'recorded' || action === 'saved'">
+                <div class="copy">
+                    <span>
+                        <p ng-if="action === 'recorded'"><strong>Recorded:</strong></p>
+                        <p ng-if="action === 'saved'"><strong>Saved:</strong></p>
+                        <p>This video was recorded on {{recorddt}}.</p>
+                    </span>
+                </div>
+                <div class="ifrmwrp">
+                    <span class="bgani"></span>
+                    <iframe class="vfrm" title="Video" ng-src="{{videourl}}"></iframe>
+                </div>
+            </div>
+        </div>
+    </md-dialog-content>
+</md-dialog>

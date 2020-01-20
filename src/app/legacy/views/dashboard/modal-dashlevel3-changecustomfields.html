@@ -1,0 +1,58 @@
+<md-dialog aria-label="Custom field" class="dashlevel3-more">
+	<form name="myForm" novalidate>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Custom field</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-dialog-content style="min-width:500px;max-width:500px;max-height:810px;">
+			<div layout="row" layout-wrap>
+                <md-input-container class="stxt" flex md-no-float ng-if="localdata.cf.typ ==='f-shorttext'">
+                    <div class="msk"></div>
+                    <label>{{localdata.cf.nm}}</label>
+                    <input md-no-asterisk name="empid" ng-model="localdata.cf.val" ng-required="localdata.cf.req==='yes'">
+                </md-input-container>
+
+                <md-input-container class="stxt" flex md-no-float ng-if="localdata.cf.typ ==='f-numbers'">
+                    <div class="msk"></div>
+                    <label>{{localdata.cf.nm}}</label>
+                    <input md-no-asterisk name="empid" ng-model="localdata.cf.val" type="number" ng-required="localdata.cf.req==='yes'">
+                </md-input-container>
+
+                <div class="datepicker-wrap date" flex ng-if="localdata.cf.typ ==='f-date'">
+                    <md-datepicker ng-model="localdata.cf.val" md-placeholder="Select {{localdata.cf.nm}}" ng-required="localdata.cf.req==='yes'"></md-datepicker>
+                </div>
+
+                <md-input-container flex md-no-float class="md-block" ng-if="localdata.cf.typ ==='f-time'">
+                    <label class="placeholder">{{localdata.cf.nm}}</label>
+                    <md-select md-no-float md-no-asterisk ng-model="localdata.cf.val" placeholder="{{localdata.cf.nm}}" ng-required="localdata.cf.req==='yes'">
+                        <md-option ng-repeat="timedata in timeArr track by $index" value="{{timedata.value}}">
+                            {{timedata.value}}
+                        </md-option>
+                    </md-select>
+                </md-input-container>
+
+                <md-input-container flex md-no-float ng-if="localdata.cf.typ ==='f-longtext'">
+                    <label class="placeholder">{{localdata.cf.nm}}</label>
+                    <textarea md-no-asterisk name="{{localdata.cf.nm}}" ng-model="localdata.cf.val" ng-required="localdata.cf.req==='yes'"></textarea>
+                </md-input-container>
+
+                <md-input-container flex md-no-float ng-if="localdata.cf.typ ==='f-picklist'">
+                    <label class="placeholder">{{localdata.cf.nm}}</label>
+                    <md-select md-no-float md-no-asterisk md-container-class="mdl-dd" ng-model="localdata.cf.val" placeholder="Select {{localdata.cf.nm}}" ng-required="localdata.cf.req==='yes'">
+                        <md-option ng-repeat="item in localdata.cf.vals" value="{{item.key}}">{{item.val}}</md-option>
+                    </md-select>
+                </md-input-container>
+			</div>
+		</md-dialog-content>
+		<md-dialog-actions layout="row">
+			<md-button aria-label="Save" class="md-raised md-default-theme save" ng-click="saveCustomField($event)" ng-disabled="myForm.$invalid" md-autofocus>
+				Save
+			</md-button>
+		</md-dialog-actions>
+	</form>
+</md-dialog>

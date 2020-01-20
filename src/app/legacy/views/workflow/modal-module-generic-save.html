@@ -1,0 +1,98 @@
+<md-dialog aria-label="Save Document" class="level3-exit-modal md-default-theme">
+<form name="SaveDocumentForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2 ng-if="!savemodbynav">Save Document</h2>
+		<h2 ng-if="savemodbynav">Warning</h2>
+		<span flex></span>
+		<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+	<div ng-if="savemodbynav"class="sve-txt">
+		Save module before proceeding?
+	</div>
+
+	<div layout="column" class="inpt-wrap">
+		<md-input-container class="required" ng-if="savedialog.wfsaveaction === 'updall'">
+			<label>Document <span ng-if="savedialog.wfsavecopy === 'yes'">copy </span>name</label>
+			<input md-no-asterisk ng-model="savedialog.filename" ng-model-options="{ updateOn: 'default' }" required ng-change="checkFileName();" ng-disabled="disableName==='yes'">
+		</md-input-container>
+
+		<md-input-container class="required" ng-if="savedialog.wfsaveaction === 'saveas'">
+			<label>Document name</label>
+			<input md-no-asterisk ng-model="savedialog.origfilename" required disabled>
+		</md-input-container>
+	</div>
+
+	<div class="select-group" ng-if="wfid !== 'default' && modtype !== 'Default' && savedialog.sequsage > 1">
+		<div class="seq-for-wrap" layout="column" layout-align="center center">
+            <div class="error info">
+        		<span class="text">
+                    This module is used in
+                    <span class="more">{{savedialog.sequsage}} places</span>
+                </span>
+        	</div>
+			<div class="seq-radio">
+				<md-input-container>
+					<md-radio-group ng-model="savedialog.wfsaveaction" required ng-change="onSaveAsCopyAll();">
+						<md-radio-button value="updall">Update in all places used</md-radio-button>
+						<md-radio-button value="saveas">Save as a copy</md-radio-button>
+					</md-radio-group>
+				</md-input-container>
+			</div>
+		</div>
+		<div layout="row seq-for-wrap" layout-align="center center">
+			<md-input-container class="required" flex ng-if="savedialog.wfsaveaction === 'saveas'">
+				<label>Document copy name</label>
+				<input md-no-asterisk ng-model="savedialog.saveasfilename" ng-model-options="{ updateOn: 'default' }" required ng-change="checkSaveAsName();">
+			</md-input-container>
+		</div>
+	</div>
+
+	<div layout="row" ng-if="savedialog.sampleacct === 'yes'">
+		<span class="content">
+			<md-checkbox ng-model="savedialog.sampleflag" aria-label="Sample Flag">
+				Mark as sample
+	        </md-checkbox>
+		</span>
+	</div>
+
+	<md-checkbox ng-model="savedialog.wfsavecopy" ng-true-value="'yes'" ng-false-value="'no'" ng-if="savedialog.showSaveAsCopy === 'yes'" ng-change="onSaveAsCopy()">
+		<span>Save as a copy</span>
+	</md-checkbox>
+
+    <div class="error" ng-if="savedialog.duplicateNameError === true">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">This name is already used. Please enter a different name.</span>
+    </div>
+</md-dialog-content>
+
+<md-dialog-actions ng-if="!savemodbynav && !savemodbypath" layout="row">
+	<md-button ng-if="!savedialog.stayOnPage" flex="50" aria-label="Exit and don't Save" class="" ng-click="exitNoSave();">exit and don't save</md-button>
+	<input ng-if="savedialog.wfsaveaction !=='saveas' && !savedialog.stayOnPage" flex="45" type="submit" class="save save-spinner md-button md-raised custom md-default-theme" ng-click="saveAndExitFromDialog();" ng-disabled="SaveDocumentForm.$invalid" md-autofocus name="name" value="{{savedialog.savebtncap}}">
+	<input ng-if="savedialog.wfsaveaction !=='saveas' && savedialog.stayOnPage" flex="100" type="submit" class="save save-spinner md-button md-raised custom md-default-theme" ng-click="saveAndExitFromDialog();" ng-disabled="SaveDocumentForm.$invalid" md-autofocus name="name" value="{{savedialog.savebtncap}}">
+    <span ng-if="savedialog.wfsaveaction !=='saveas'" class="inptspn spinner">
+        <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    </span>
+    <input ng-if="savedialog.wfsaveaction ==='saveas'" flex="45" type="submit" class="save save-spinner md-button md-raised custom md-default-theme" ng-disabled="SaveDocumentForm.$invalid" md-autofocus ng-click="saveAndExitFromDialog();" name="name" value="{{savedialog.savebtncap}}">
+    <span ng-if="savedialog.wfsaveaction ==='saveas'" class="inptspn spinner">
+        <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    </span>
+</md-dialog-actions>
+
+<md-dialog-actions ng-if="savemodbynav || savemodbypath" layout="row">
+	<md-button flex="50" aria-label="Dont' save" class="" ng-click="cancelNoSave();">
+		Dont' save
+	</md-button>
+    <input flex="45" type="submit" class="save save-spinner md-button md-raised custom md-default-theme" ng-click="saveAndExitFromDialog();" ng-disabled="SaveDocumentForm.$invalid" md-autofocus name="name" value="{{savedialog.savebtncap}}">
+    <span class="inptspn spinner" ng-if="savedialog.wfsaveaction ==='saveas'">
+        <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    </span>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

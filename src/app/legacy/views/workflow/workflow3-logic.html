@@ -1,0 +1,116 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+<div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+    <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+    <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+    <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+</div>
+
+<div class="container content-editor">
+    <form name="sendDataWidgetForm" novalidate>
+        <div class="content-editor-content senddata-editor logic-editor" ng-cloak>
+            <div class="maskd" ng-if="locked ==='Y'"></div>
+    		<div class="heading">
+    			<md-input-container class="md-block">
+    				<label>Page title</label>
+    				<input class="heading-input" placeholder="Write a description" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();"></input>
+                    <span class="blrdv esgn"></span>
+    			</md-input-container>
+    		</div>
+
+            <span class="shape-wrap">
+    			<span class="shape"></span>
+    		</span>
+
+
+            <!-- Drag drop placeholder -->
+    		<div class="drag-wrap">
+    			<ul dnd-list="logic.branches" ng-class="{nophl : logic.branches.length > 1}" class="workflow-list drag-holder" dnd-drop="dropCallback(event, index, item);">
+                    <span class="vline"></span>
+    				<li class="new-workflow drag-placeholder">
+    					<span class="text">Drag logic branch here</span>
+    				</li>
+    			</ul>
+    		</div>
+            <ul class="workflow-list" dnd-list="logic.branches" dnd-drop="dropCallback(event, index, item);">
+                <span class="vline"></span>
+                <li dnd-type="item.type" dnd-draggable="branch" dnd-effect-allowed="move" class="active" ng-repeat="branch in logic.branches track by $index" ng-init="outerIndex=$index">
+                    <span>
+                        <span class="desc" ng-if="branch.type === 'activity'">
+                            <span ng-repeat="criteria in branch.criteria track by $index">
+                                <div>
+                                    <span class="ifelse" ng-if="$index === 0">IF</span>
+                                    <span data-ng-bind-html="getCriteriaString(criteria);"></span>
+                                    <span class="ifelse and" ng-if="$index < branch.criteria.length-1">AND</span>
+                                </div>
+                            </span>
+                        </span>
+                        <span class="desc" ng-if="branch.type === 'default'">
+                            <span class="ifelse">Else</span>
+                        </span>
+                        <a>
+                            <span class="text truncate" ng-click="editLogicBranch(outerIndex);" ng-class="{rndcrnr : branch.activity.length == 1}" ng-if="branch.activity[0] && branch.activity[0].type === 'module'">
+                                <span class="icon {{branch.activity[0].actualicon}}"></span>
+                                {{getModuleName(branch.activity[0]);}}
+                            </span>
+                            <span class="text truncate" ng-click="editLogicBranch(outerIndex);" ng-class="{rndcrnr : branch.activity.length == 1}" ng-if="branch.activity[0] && branch.activity[0].type === 'no_op'">Do nothing</span>
+                            <span class="text-tile-wrap-outer" ng-repeat="activity in branch.activity track by $index" ng-if="$index > 0">
+                                <span class="text-tile-wrap">
+                                    <span class="icon {{branch.activity[$index].actualicon}}"></span>
+                                    <span class="text-tile">{{getModuleName(activity);}}</span>
+                                </span>
+                            </span>
+                            <md-button class="delete-btn" ng-click="deleteLogicBranch(outerIndex);" aria-label="Delete" ng-if="!$last">
+                                <span class="icon icon-close-5"></span>
+                            </md-button>
+                        </a>
+                        <span ng-if="!$last" class="hline"></span>
+                    </span>
+                </li>
+            </ul>
+
+    	</div>
+
+        <!-- Exit button -->
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+    </form>
+</div>

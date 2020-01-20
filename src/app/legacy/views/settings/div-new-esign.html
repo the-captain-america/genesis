@@ -1,0 +1,383 @@
+<div ng-controller="esignDetailsCtrl">
+    <form name="EsignSelectForm" novalidate>
+        <md-toolbar>
+            <div ng-class="{'docusign-header' : page==='createdocusign'}" class="md-toolbar-tools">
+                <h2 ng-if="page==='selectprovider'">Select one of our supported E-signing services.</h2>
+                <h2 ng-if="page==='docusignstart_thanks'">Thank you!</h2>
+                <img ng-if="page==='createdocusign_prod' || page==='updatedocusign_prod' || page==='docusigninfo_prod'" src="//static.enboarder.net/images/docusign-live.png" alt="Docusign" />
+                <img ng-if="page==='createdocusign_test' || page==='updatedocusign_test'" src="//static.enboarder.net/images/docusign-test.png" alt="Docusign" />
+
+                <img ng-if="page==='createhellosign'" src="//static.enboarder.net/images/hellosign.png" alt="Hellosign" />
+                <img ng-if="page==='createechosign'" src="//static.enboarder.net/images/Adobesign-logo.png" alt="Echosign" />
+                <img ng-if="page==='createsecuredsign'" src="//static.enboarder.net/images/ss-logo.png" alt="Securesign" />
+
+                <span flex></span>
+                <md-button ng-if="mode ==='update'" type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+        			<span class="icon icon-close-2"></span>
+        		</md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:570px;max-width:570px">
+            <div ng-if="page==='selectprovider'" class="esign-radio-wrap">
+                <div layout="column" layout-align="space-around center">
+                    <md-radio-group ng-model="localdata.conn" required>
+                        <md-radio-button value="echosign">
+                            <div class="img-wrap">
+                                <img src="//static.enboarder.net/images/Adobesign-logo.png" alt="Echosign" />
+                                <span ng-if="availableConn.echosign==='yes'" class="available">
+                                    <span class="text">Integrated</span>
+                                    <span class="icon icon-notification-ok"></span>
+                                </span>
+                            </div>
+                            <!-- <div class="description">
+                                External account &amp; templates, pricing varies on your subscription.
+                            </div> -->
+                        </md-radio-button>
+                        <md-radio-button value="hellosign">
+                            <div class="img-wrap">
+                                <img src="//static.enboarder.net/images/hellosign.png" alt="Hellosign" />
+                                <span ng-if="availableConn.hellosign==='yes'" class="available hellosign">
+                                    <span class="text">Integrated</span>
+                                    <span class="icon icon-notification-ok"></span>
+                                </span>
+                            </div>
+                            <!-- <div class="description">
+                                External account &amp; templates, pricing varies on your subscription.
+                            </div> -->
+                        </md-radio-button>
+                        <md-radio-button value="docusign_prod">
+                            <div class="img-wrap">
+                                <img src="//static.enboarder.net/images/docusign-live.png" alt="Docusign" />
+                                <!-- <label>Live-account</label> -->
+                                <span ng-if="availableConn.docusign_prod==='yes'" class="available">
+                                    <span class="text">Integrated</span>
+                                    <span class="icon icon-notification-ok"></span>
+                                </span>
+                            </div>
+                            <!-- <div class="description">
+                                External account &amp; templates, pricing varies on your subscription.
+                            </div> -->
+                        </md-radio-button>
+                        <md-radio-button value="docusign_test">
+                            <div class="img-wrap">
+                                <img src="//static.enboarder.net/images/docusign-test.png" alt="Docusign" />
+                                <!-- <label>Test-account</label> -->
+                                <span ng-if="availableConn.docusign_test==='yes'" class="available">
+                                    <span class="text">Integrated</span>
+                                    <span class="icon icon-notification-ok"></span>
+                                </span>
+                            </div>
+                            <!-- <div class="description">
+                                External account &amp; templates, pricing varies on your subscription.
+                            </div> -->
+                        </md-radio-button>
+
+                        <md-radio-button value="securedsign">
+                            <div class="img-wrap">
+                                <img src="//static.enboarder.net/images/ss-logo.png" alt="Secured Signing" />
+                                <span ng-if="availableConn.securedsign==='yes'" class="available">
+                                    <span class="text">Integrated</span>
+                                    <span class="icon icon-notification-ok"></span>
+                                </span>
+                            </div>
+                        </md-radio-button>
+
+                    </md-radio-group>
+                </div>
+            </div>
+
+            <div ng-if="page==='createhellosign'" layout="column" layout-align="space-around center">
+                <div class="info-text">
+                    <p>
+                        To integrate with Hellosign, you will need to sign-up for an<br><a href="https://www.hellosign.com/api/pricing" target="_blank">API&nbsp;account</a>&nbsp;subscription.
+                    </p>
+                    <p>
+                        When you have activated your account, enter your API integration key<br>from Hellosign to gain access to your templates.
+                        <span class="more-action-wrap">
+                            <span class="more-action icon icon-tooltip"></span>
+                            <span class="action-popover">
+                                <span class="arrow"></span>
+                                <span class="icon close-popover icon-close-4"></span>
+                                <span class="content">
+                                    <img src="//static.enboarder.net/images/hellosign-animation-1.gif" alt="Get API Key" />
+                                    <a href="https://www.hellosign.com/home/myAccount#api" target="_blank">Go to Hellosign integration key</a>
+                                </span>
+                            </span>
+                        </span>
+                    </p>
+                </div>
+                <div class="input-wrap">
+                    <md-input-container class="employee-mobile-wrap required">
+                        <label>Add API key</label>
+                        <input md-no-asterisk name="hellosignapi" ng-model="hellosign.apikey" required>
+                    </md-input-container>
+                </div>
+                <div class="error" ng-if="hellosignError">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{hellosignErrorMsg}}</span>
+                </div>
+            </div>
+
+            <div ng-if="page==='createechosign'" layout="column" layout-align="space-around center">
+                <div class="info-text">
+                    <p>
+                        To integrate with Adobe Sign, you will need to sign-up for an<br><a href="https://acrobat.adobe.com/au/en/sign/pricing/plans.html" target="_blank">Enterprise&nbsp;plan</a>&nbsp;subscription.
+                    </p>
+                    <p>
+                        When you have activated your account, enter your API integration key from Adobe Sign to gain access to your templates.
+                        <span class="more-action-wrap">
+                            <span class="more-action icon icon-tooltip"></span>
+                            <span class="action-popover">
+                                <span class="arrow"></span>
+                                <span class="icon close-popover icon-close-4"></span>
+                                <span class="content">
+                                    <img src="//static.enboarder.net/images/AdobeSign-2.gif" alt="Integration key-link" />
+                                    <a href="mailto:support@echosign.com">Email Adobe Sign support to get access to the Integration key-link.</a>
+                                </span>
+                            </span>
+                        </span>
+                    </p>
+                </div>
+                <div class="input-wrap">
+                    <md-input-container class="employee-mobile-wrap required">
+                        <label>Add Integration key</label>
+                        <input md-no-asterisk name="hellosignapi" ng-model="echosign.apikey" required>
+                    </md-input-container>
+                </div>
+                <div class="error" ng-if="echosignError">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{echosignErrorMsg}}</span>
+                </div>
+            </div>
+
+            <div ng-if="page==='createsecuredsign'" class="ss-info-wrap" layout="column" layout-align="space-around center">
+                <div class="info-text">
+                    <p>
+                        To integrate with Secured Signing, you will need to sign-up for one of&nbsp;their&nbsp;<a href="https://www.securedsigning.com/pricing" target="_blank">Product plan</a> subscriptions.
+                    </p>
+                    <p>
+                        When you have activated your account, enter your API integration &amp; Secret&nbsp;key&nbsp;from&nbsp;Secured Signing to gain access to your templates.
+                        <span class="more-action-wrap">
+                            <span class="more-action icon icon-tooltip"></span>
+                            <span class="action-popover">
+                                <span class="arrow"></span>
+                                <span class="icon close-popover icon-close-4"></span>
+                                <span class="content">
+                                    <img src="//static.enboarder.net/images/AdobeSign-2.gif" alt="Integration key-link" />
+                                    <a href="https://www.securedsigning.com/Account.aspx" target="_blank">Go to Secure Signing account</a>
+                                </span>
+                            </span>
+                        </span>
+                    </p>
+                </div>
+                <div class="input-wrap">
+                    <md-input-container class="employee-mobile-wrap required">
+                        <label>Add integration key</label>
+                        <input md-no-asterisk name="securedsignapi" ng-model="securedsign.apikey" required>
+                    </md-input-container>
+                    <md-input-container class="employee-mobile-wrap required">
+                        <label>Add secret key</label>
+                        <input md-no-asterisk name="securedsignsecret" ng-model="securedsign.secretkey" required>
+                    </md-input-container>
+                </div>
+                <div class="error" ng-if="securedsignError">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{securedsignErrorMsg}}</span>
+                </div>
+            </div>
+
+            <div ng-if="page==='createdocusign_test' || page==='updatedocusign_test' || page==='createdocusign_prod' || page==='updatedocusign_prod'" layout="column" layout-align="space-around center">
+                <div class="info-text" ng-if="page==='createdocusign_prod' || page==='updatedocusign_prod'">
+                    <p>
+                        To integrate a Docusign live-account, you will need to sign-up<br>for a <a href="https://www.docusign.com.au/products-and-pricing" target="_blank">Production account</a> subscription.
+                    </p>
+                    <p>
+                        When you have activated your production account, enter your<br>log-in details below to gain access to your templates.
+                    </p>
+                    <p>
+                        Enter your Docusign server loaction<br>and log-in details to integrate with Enboarder.
+                    </p>
+                    <md-radio-group class="radio-inline docuserver-radio" ng-model="docusign.server" required>
+                        <md-radio-button value="au">
+                            <div class="description">AU</div>
+                        </md-radio-button>
+                        <md-radio-button value="eu">
+                            <div class="description">EU</div>
+                        </md-radio-button>
+                        <md-radio-button value="na2">
+                            <div class="description">US</div>
+                        </md-radio-button>
+                        <md-radio-button value="www">
+                            <div class="description">Global</div>
+                        </md-radio-button>
+                    </md-radio-group>
+                </div>
+                <div class="info-text" ng-if="page==='createdocusign_test' || page==='updatedocusign_test'">
+                    <p>
+                        To integrate a Docusign test-account, you will need to sign-up<br>for a <a href="https://secure.docusign.com/signup/develop" target="_blank">FREE Developer Account</a>.
+                    </p>
+                    <p>
+                        When you have activated your test account, enter your log-in<br>details below to gain access to your templates.
+                    </p>
+                    <!-- <p>
+                        Then use your Docusign log-in details and Integration key to get direct access to your templates from here.
+                        <span class="more-action-wrap">
+                            <span class="more-action icon icon-tooltip"></span>
+                            <span class="action-popover">
+                                <span class="arrow"></span>
+                                <span class="icon close-popover icon-close-4"></span>
+                                <span class="content">
+                                    <img src="//static.enboarder.net/images/docusign-animation-1.gif" alt="Get API Key" />
+                                    <a href="https://admindemo.docusign.com/api-integrator-key" target="_blank">Go to Docusign integration key</a>
+                                </span>
+                            </span>
+                        </span>
+                    </p> -->
+                </div>
+                <div class="input-wrap">
+                    <md-input-container class="required">
+                        <label>Email address</label>
+                        <input md-no-asterisk ng-model="docusign.email" type="email" required>
+                    </md-input-container>
+                    <md-input-container class="required">
+                        <label>Password</label>
+                        <input md-no-asterisk ng-model="docusign.password" type="password" required autocomplete="off">
+                    </md-input-container>
+                    <!-- <md-input-container class="required">
+                        <label>Integrator Key</label>
+                        <input ng-model="docusign.apikey" required>
+                    </md-input-container> -->
+                </div>
+                <div class="error" ng-if="docusignError">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{docusignErrorMsg}}</span>
+                </div>
+            </div>
+
+            <div ng-if="page==='docusigninfo_prod'" layout="column" layout-align="space-around center">
+                <div class="info-text">
+                    <p>
+                        To integrate a live production account from Docusign you first need to have one of their <a href="https://www.docusign.com.au/products-and-pricing" target="_blank">account subscriptions</a> that allow API Integration.
+                    </p>
+                    <!-- <p>
+                        The rest of the integration is a little tricky. Once you have your valid Docusign account, we can take care of the certification and integration for you. Just press 'Get started' and we will get in contact with you.
+                        <span class="more-action-wrap">
+                            <span class="more-action icon icon-tooltip"></span>
+                            <span class="action-popover">
+                                <span class="arrow"></span>
+                                <span class="icon close-popover icon-close-4"></span>
+                                <span class="content">
+                                    <img src="//static.enboarder.net/images/docusign-animation-1.gif" alt="Get API Key" />
+                                    <a href="https://app2.docusign.com/home" target="_blank">Go to Docusign integration key</a>
+                                </span>
+                            </span>
+                        </span>
+                    </p> -->
+                </div>
+                <span class="checkbox-wrap">
+                    <md-checkbox ng-model="docusign.certifiedKeyAvailable" aria-label="I already have a certified integartor key" ng-true-value="'yes'" ng-false-value="'no'">
+                        I already have a certified integartor key
+                    </md-checkbox>
+                </span>
+            </div>
+
+            <div ng-if="page==='docusignstart_thanks'" layout="column" layout-align="space-around center">
+                <div class="info-text">
+                    We have been notified and will get in touch as soon as possible. If you have any questions please contact our Customer Success Team.
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row" ng-if="page==='selectprovider'">
+            <md-button aria-label="Cancel" class="md-default-theme" ng-click="cancel();">Cancel</md-button>
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="selectProvider();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="page==='selectprovider'">
+                <span>Next</span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="page==='createdocusign_test' || page==='createdocusign_prod'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();">Back</md-button>
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="createDocuSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus>
+                <span class="text">Integrate Now</span>
+        		<span class="text-save">Saving...</span>
+        		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="page==='updatedocusign_test' || page==='updatedocusign_prod'">
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="createDocuSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus>Update</md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="page==='docusigninfo_prod'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();">Back</md-button>
+            <md-button aria-label="Get Started" class="save md-default-theme" ng-click="getStartedDocusign();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="docusign.certifiedKeyAvailable ==='no'">Get Started</md-button>
+            <md-button aria-label="Get Started" class="save save-spinner md-default-theme" ng-click="startDocusignProdIntegration();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="docusign.certifiedKeyAvailable ==='yes'">
+                <span class="text">Integrate Now</span>
+        		<span class="text-save">Saving...</span>
+        		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="page==='docusignstart_thanks'">
+            <md-button aria-label="Cancel" class="save md-default-theme" ng-click="cancel();">Close and Go To Workflow</md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions layout="row" ng-if="page==='createhellosign'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();" ng-if="mode !=='update'">Back</md-button>
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="createHelloSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode !=='update'">
+                <span class="text">Integrate Now</span>
+        		<span class="text-save">Saving...</span>
+        		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="createHelloSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode ==='update'">Update</md-button>
+        </md-dialog-actions>
+
+        <div class="outer-link" ng-if="page==='createhellosign'">
+            Sign up for a <a href="https://www.hellosign.com/?display_login=1&on_login_redirect_url=aHR0cHM6Ly93d3cuaGVsbG9zaWduLmNvbS9ob21lL215QWNjb3VudA==#api" target="_blank">Free Test Account</a>
+        </div>
+
+        <md-dialog-actions layout="row" ng-if="page==='createechosign'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();" ng-if="mode !=='update'">Back</md-button>
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="createEchoSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode !=='update'">
+                <span class="text">Integrate Now</span>
+        		<span class="text-save">Saving...</span>
+        		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="createEchoSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode ==='update'">Update</md-button>
+        </md-dialog-actions>
+
+        <div class="outer-link" ng-if="page==='createechosign'">
+            Sign up for a <a href="https://acrobat.adobe.com/us/en/sign/free-trial-global.html" target="_blank">Free Test Account</a>
+        </div>
+
+        <md-dialog-actions layout="row" ng-if="page==='createsecuredsign'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();" ng-if="mode !=='update'">Back</md-button>
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="createSecuredSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode !=='update'">
+                <span class="text">Integrate Now</span>
+        		<span class="text-save">Saving...</span>
+        		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="createSecuredSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode ==='update'">Update</md-button>
+        </md-dialog-actions>
+
+        <!-- <md-dialog-actions layout="row">
+
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="createHelloSignConn();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="page==='createhellosign' && mode !=='update'">Sign in</md-button>
+
+
+            <md-button aria-label="Update" class="save md-default-theme" ng-click="updateESignConnParameters();" ng-disabled="EsignSelectForm.$invalid" md-autofocus ng-if="mode ==='update'">Update</md-button>
+        </md-dialog-actions> -->
+    </form>
+</div>

@@ -1,0 +1,130 @@
+<md-dialog aria-label="PROFILE MENU" class="prfmenu-modal md-default-theme">
+<form name="profileMenuForm" novalidate>
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <h2>PROFILE MENU</h2>
+        <span flex></span>
+        <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+            <span class="icon icon-close-2"></span>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:620px;max-width:620px">
+
+    <div layout="column">
+		<label class="heading heading-inside">
+            <span>
+                Select what menu tabs and features to activate
+            </span>
+        </label>
+
+        <div class="switch-wrap">
+            <md-switch ng-model="prflmenu.tasks" ng-true-value="'y'" ng-false-value="'n'" aria-label="Tasks to do">
+                Tasks to do
+            </md-switch>
+            <div class="tooltipwrp">
+                <span class="icon icon-tooltip"></span>
+                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                    <span class="copy">
+                        <h4 class="title">Tasks to do</h4>
+                        <p>
+                            Participants can access all tasks that are left to do.
+                        </p>
+                    </span>
+                </md-tooltip>
+            </div>
+        </div>
+        <div class="switch-wrap">
+            <md-switch ng-model="prflmenu.myprofile" ng-true-value="'y'" ng-false-value="'n'" aria-label="Tasks to do">
+                My profile
+            </md-switch>
+            <div class="tooltipwrp">
+                <span class="icon icon-tooltip"></span>
+                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                    <span class="copy">
+                        <h4 class="title">My profile</h4>
+                        <p>
+                            Participants can access their profile details.
+                        </p>
+                    </span>
+                </md-tooltip>
+            </div>
+        </div>
+        <!-- <md-checkbox aria-label="Allow participant to edit contact details" ng-model="prflmenu.caneditcontacts" ng-true-value="'y'" ng-false-value="'n'">
+            <span>Allow participant to edit contact details</span>
+        </md-checkbox> -->
+        <md-checkbox aria-label="Show 'About' tab" ng-model="prflmenu.abttab" ng-true-value="'y'" ng-false-value="'n'">
+            <span>Show 'About' tab</span>
+        </md-checkbox>
+        <div class="switch-wrap">
+            <md-switch class="myprg" ng-model="myprogress" ng-true-value="'y'" ng-false-value="'n'" aria-label="My progress" ng-change="switchProgress();">
+                My progress
+            </md-switch>
+            <div class="tooltipwrp">
+                <span class="icon icon-tooltip"></span>
+                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                    <span class="copy">
+                        <h4 class="title">MY progress</h4>
+                        <p>
+                            Employees get visibility of their progress.
+                        </p>
+                    </span>
+                </md-tooltip>
+            </div>
+        </div>
+        <div class="lblwrp" ng-if="myprogress === 'y'">
+            <span class="label">
+                Tasks shown on timeline:
+            </span>
+            <md-input-container>
+                <md-select aria-label="" ng-model="prflmenu.progress">
+                    <md-option value="all" ng-selected="!prflmenu.progress || prflmenu.progress === 'all'">All present + future tasks</md-option>
+                    <md-option value="curr" ng-selected="prflmenu.progress === 'curr'">Only show tasks to date</md-option>
+                </md-select>
+             </md-input-container>
+        </div>
+        <div class="switch-wrap">
+            <md-switch class="myemp" ng-model="prflmenu.myemployees" ng-true-value="'y'" ng-false-value="'n'" aria-label="My employees">
+                My {{(custlabels.Employees || 'employees') | lowercase}}
+            </md-switch>
+            <div class="tooltipwrp">
+                <span class="icon icon-tooltip"></span>
+                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                    <span class="copy">
+                        <h4 class="title">My {{(custlabels.Employees || 'employees') | lowercase}}</h4>
+                        <p>
+                            {{custlabels.Managers || 'Managers'}} with granted access to {{(custlabels.Employee || 'employee') | lowercase}} data receive limited visibility and management options of relevant workflows.
+                        </p>
+                    </span>
+                </md-tooltip>
+            </div>
+        </div>
+        <md-checkbox ng-if="prflmenu.myemployees === 'y'" aria-label="Show module breakdown in sequences" ng-model="prflmenu.myempseqbrkdown" ng-true-value="'y'" ng-false-value="'n'">
+            <span>Show module breakdown in sequences</span>
+        </md-checkbox>
+        <md-checkbox ng-if="prflmenu.myemployees === 'y'" aria-label="Allow 'Resend'" ng-model="prflmenu.myempresend" ng-true-value="'y'" ng-false-value="'n'">
+            <span>Allow 'Resend'</span>
+        </md-checkbox>
+
+        <md-checkbox ng-if="prflmenu.myemployees === 'y'" aria-label="Allow 'Forward'" ng-model="prflmenu.myempforward" ng-true-value="'y'" ng-false-value="'n'">
+            <span>Allow 'Forward'</span>
+        </md-checkbox>
+	</div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+    <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveProfileMenuConfig();" ng-disabled="profileMenuForm.$invalid" md-autofocus>
+        <span class="text">Save</span>
+        <span class="text-save">Saving...</span>
+        <span class="text-saved">Saved
+            <span class="icon-notification-ok"></span>
+        </span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+</md-dialog-actions>
+</form>
+</md-dialog>

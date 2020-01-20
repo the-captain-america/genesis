@@ -1,0 +1,178 @@
+<div class="container login">
+    <div class="logo">
+        <a href="https://www.enboarder.com" target="_blank" ng-if="lumlogo !== 'yes'">
+            <img src="//static.enboarder.net/images/enboarder-white-nhrs.png" alt="enboarder">
+        </a>
+        <a href="https://lumesse.com" target="_blank" ng-if="lumlogo === 'yes'">
+            <img src="//static.enboarder.net/images/lumesse1.png" alt="Lumesse">
+        </a>
+    </div>
+
+	<!-- Login  -->
+	<div class="login-content" ng-show="showloginbox === true">
+		<h5>sign in to your account</h5>
+		<form name="loginForm" novalidate>
+			<md-input-container class="required logininput" flex>
+				<label>Email address</label>
+				<input md-no-asterisk ng-model="username" type="email" required>
+			</md-input-container>
+			<md-input-container class="required logininput">
+				<label>Password</label>
+				<input md-no-asterisk ng-model="password" type="password" required autocomplete="off">
+			</md-input-container>
+			<div class="error login" ng-show="invalidlogin === true">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Sorry, your email or password is incorrect</span>
+			</div>
+			<div class="error login" ng-show="accountlocked === true">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Sorry, your account is locked</span>
+			</div>
+			<div layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<!-- <md-button class="md-raised custom md-default-theme" ng-click="loginToHome();" ng-disabled="loginForm.$invalid" md-autofocus>
+			    	sign in
+			    </md-button> -->
+                <input type="submit" class="loginbtn md-button md-raised custom md-default-theme" ng-disabled="loginForm.$invalid" ng-click="loginToHome();" name="name" value="sign in">
+			</div>
+		</form>
+		<h5 class="forgot-password">
+			<md-button ng-click="showforgotpassword();">forgot your password?</md-button>
+		</h5>
+	</div>
+
+    <!-- Upgrade Password -->
+	<div class="login-content" ng-show="showUpgradePassword === true">
+		<h5>sign in to your account</h5>
+		<form name="upgradepasswordForm" novalidate>
+			<md-input-container class="required" flex>
+				<label>Email address</label>
+				<input md-no-asterisk ng-model="username" type="email" required disabled="true">
+			</md-input-container>
+			<md-input-container class="required">
+				<label>Password</label>
+				<input md-no-asterisk ng-model="password" type="password" required autocomplete="off" disabled="true">
+			</md-input-container>
+			<div class="error upgrade">
+				<span class="text">Your password needs to be upgraded to comply with current security policy.</span>
+			</div>
+			<div layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+                <input type="submit" class="md-button md-raised custom md-default-theme" ng-disabled="upgradepasswordForm.$invalid" ng-click="upgradePasswordBtn();" name="name" value="upgrade password">
+			</div>
+		</form>
+        <h5 class="forgot-password">
+		</h5>
+	</div>
+
+    <!--Force change password -->
+    <div class="login-content" ng-show="showForcePasswordChange === true">
+        <h5>password expired</h5>
+        <br>
+        <form name="forcechangepasswordForm" novalidate>
+            <div class="error upgrade">
+                <span class="text">Your passord for '{{username}}' has expired. Don't worry, simply click the button below and follow the instructions.</span>
+            </div>
+            <div layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+                <input type="submit" class="md-button md-raised custom md-default-theme" ng-disabled="forcechangepasswordForm.$invalid" ng-click="forcePasswordChangeBtn(username);" name="name" value="new  password">
+            </div>
+        </form>
+        <h5 class="forgot-password">
+        </h5>
+    </div>
+
+	<!-- Forgot Password -->
+	<div class="login-content forgot-password-content" ng-show="showforgotpasswordbox === true">
+		<form name="forgotpasswordForm" ng-show="showforgotpasswordboxForm === true" novalidate>
+			<h5>forgot your password?</h5>
+			<md-input-container class="required" flex>
+				<label>Enter your email <span class="extra">so we can reset your password...</span></label>
+				<input md-no-asterisk ng-model="forgotpassword.email" type="email" required>
+			</md-input-container>
+			<div class="error"  ng-show="forgotPasswordError === true">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Sorry, your email address does not exist</span>
+			</div>
+			<div layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<md-button class="md-raised custom cancel md-default-theme" ng-click="showlogin();">
+			    	cancel
+			    </md-button>
+
+				<md-button class="md-raised custom md-default-theme" ng-click="forgetPassswordLink();" ng-disabled="forgotpasswordForm.$invalid" md-autofocus>
+			    	send email
+			    </md-button>
+			</div>
+		</form>
+		<div class="thankyou-message" ng-show="forgotPasswordSuccess === true">
+			<h5>Thank you</h5>
+			<span class="text">Check your email! If you are an existing user you will have an email with a link to reset your password momentarily.</span>
+			<!-- <md-button class="md-raised custom back-to-signin" ng-click="showlogin();" md-autofocus>
+		    	back to sign in
+		    </md-button> -->
+		</div>
+	</div>
+
+	<!--Reset Password	-->
+	<div class="login-content forgot-password-content reset-password-content" ng-show="showresetpasswordbox === true">
+		<h5>Change Your Password</h5>
+		<form name="changepasswordForm" novalidate ng-show="resetMsg !== 'no'">
+			<md-input-container flex>
+				<label>Enter new password</label>
+				<input md-no-asterisk ng-model="changePassword.newpassword" type="password" autocomplete="off" required>
+			</md-input-container>
+			<md-input-container flex>
+				<label>Re-enter new password</label>
+				<input md-no-asterisk ng-model="changePassword.confirmpassword" type="password" autocomplete="off" required>
+			</md-input-container>
+			<div class="error" ng-show="mismatcherror === true">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Entered passwords do not match. Please enter same passwords in both text boxes.</span>
+			</div>
+			<div layout="row" layout-sm="column" layout-align="center center" layout-wrap>
+				<md-button class="md-raised custom md-default-theme" ng-click="changePassword();" ng-disabled="changepasswordForm.$invalid" md-autofocus>
+			    	change password
+			    </md-button>
+			</div>
+		</form>
+		<div class="error reset-error"  ng-show="resetError!=='no'">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Sorry, Reset Passwork Link has either expired or is invalid. Please try to reset password again.</span>
+
+		</div>
+		<div class="error reset-error"  ng-show="resetPasswordError === 'yes'">
+				<span class="icon icon-notification-alert"></span>
+				<span class="text">Error reseting password - {{resetPasswordMsg}}</span>
+		</div>
+        <div class="error reset-error"  ng-show="upgPasswordError==='yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Error changing password - {{upgPasswordErrorMsg}}</span>
+
+        </div>
+        <div class="error reset-error"  ng-show="strengthError==='yes'">
+                <span class="icon icon-notification-alert"></span>
+                <ul class="error-list">
+                    <li ng-repeat="serror in strengthErrors">{{serror}}</li>
+                </ul>
+        </div>
+		<div class="thankyou-message" ng-show="resetPasswordSuccess === true">
+			<span class="text">Password changed successfully. Please login now with your new password.</span>
+		</div>
+		<md-button class="md-raised custom back-to-signin md-default-theme" ng-click="loginToHome('changepassword');" ng-show="BackToSignInButton === true" md-autofocus>
+	    	continue
+	    </md-button>
+	</div>
+
+    <!-- Account locked -->
+    <div class="login-content lckout" ng-show="showAccountLockedResetPassword === true">
+        <h5>Account has been locked!</h5>
+        <p>
+            Sorry, the max amount of password attempts has been exceeded.
+            <br>
+            For security reasons we have locked your account and sent a notification to your email with details of what to do next.
+            <br>
+        </p>
+    </div>
+
+    <div class="login-content lckout" ng-show="maintenance === true">
+        <h5>System under maintenance!</h5>
+    </div>
+
+</div>

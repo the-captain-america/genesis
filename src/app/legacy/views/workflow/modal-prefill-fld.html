@@ -1,0 +1,176 @@
+<md-dialog aria-label="Add recipient" class="embed-params-modal prefill-fld-modal md-default-theme">
+    <form name="PrefillFieldsForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>map fields</h2>
+                <span flex></span>
+                <md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:620px;max-width:620px">
+
+            <div layout="column">
+                <label class="heading heading-inside">
+                    <span>Map fields with relevant source/data in Enboarder</span>
+                </label>
+
+                <div layout="row" layout-align="start center" class="embdlbl-wrap">
+                    <div flex="50">
+                        <label>TEMPLATE FIELDS</label>
+                    </div>
+                    <div flex="50">
+                        <label class="new-val">ENBOARDER</label>
+                    </div>
+                </div>
+                <div ng-repeat="signer in localdata.docsigners track by $index">
+                        <span class="sgnlbl" ng-if="signer.ccrole !== 'yes' && signer.ds_tbflds && signer.ds_tbflds.length > 0">{{signer.ds_roleName}}:</span>
+                        <div ng-repeat="field in signer.ds_tbflds track by $index" class="embd-mainwrap prefllmdl-mainwrap">
+                            <div layout="row" layout-align="start center" class="embdfld-wrap">
+                                    <div flex="50" class="fldname">
+                                        <label class="mnlbl">{{field.tbtyp}} - {{field.tblbl}}</label>
+                                        <!-- <md-input-container md-no-float class="md-block">
+                                            <input type="text" placeholder="Enter Field Name" ng-model="field.tblbl" required>
+                                        </md-input-container> -->
+                                        <span class="connector"></span>
+                                    </div>
+                                    <div flex="50" class="fk-menu" ng-class="{req : !field.lbl}" ng-mouseover="shmn(field);" ng-hide="field.sm === 'yes'">
+                                        <span class="text plhldr" ng-if="!field.lbl">Select data</span>
+                                        <span ng-if="field.lbl.length > 0 && field.lbl.length < 46">{{field.lbl}}</span>
+                                        <!-- <span class="none" ng-if="field.lbl === 'None'">None</span> -->
+                                        <span ng-if="field.lbl.length > 45">...<a title="{{field.lbl}}">{{field.lbl.substring(field.lbl.length-45,field.lbl.length)}}</a></span>
+                                        <span class="icon icon-arrow-7"></span>
+                                    </div>
+                                    <md-menu-bar flex="50" ng-class="{required : !field.lbl}" ng-if="field.sm === 'yes'">
+                                        <md-menu>
+                                            <button ng-click="$mdMenu.open()">
+                                                <span ng-if="field.lbl.length > 0 && field.lbl.length < 46">{{field.lbl}}</span>
+                                                <span ng-if="field.lbl.length > 45">...
+                                                    <a title="{{field.lbl}}">{{field.lbl.substring(field.lbl.length-45,field.lbl.length)}}</a>
+                                                </span>
+                                                <!-- <span class="none" ng-if="field.lbl === 'None'">None</span> -->
+                                                <span class="text plhldr" ng-if="!field.lbl">Select data</span>
+                                                <span class="icon icon-arrow-7"></span>
+                                            </button>
+                                            <md-menu-content>
+                                                <md-menu-item>
+                                                    <md-button class="none" ng-click="prefillTokenSelected(field, 'none')">
+                                                        <span class="icon-dtype icon-f-none"></span>
+                                                        <span class="text">None</span>
+                                                    </md-button>
+                                                </md-menu-item>
+                                                <md-menu-item ng-repeat="l1tokenItem in localdata.tokendata track by l1tokenItem.id" ng-if="( ( field.tbtyp.indexOf('email') > -1 && l1tokenItem.dtype.indexOf('email') > -1) || ( field.tbtyp.indexOf('date') > -1 && l1tokenItem.dtype.indexOf('date') > -1) || (field.tbtyp.indexOf('email') < 0 && field.tbtyp.indexOf('date') < 0) )">
+                                                    <md-button ng-click="prefillTokenSelected(field,l1tokenItem)" ng-if="l1tokenItem.haschild ==='n' && (l1tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <span ng-if="l1tokenItem.lbl === 'Start date'">
+                                                            <span class="icon-dtype icon-sd icon-f-date"></span>
+                                                            {{l1tokenItem.lbl}}
+                                                        </span>
+                                                    </md-button>
+                                                    <md-menu ng-if="l1tokenItem.haschild==='y' && (l1tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <md-button ng-click="$mdMenu.open()">{{l1tokenItem.lbl}}</md-button>
+                                                        <md-menu-content>
+                                                            <md-menu-item ng-repeat="l2tokenItem in l1tokenItem.childlist track by $index" ng-if="l2tokenItem.haschild==='n' && (l2tokenItem.avail.indexOf('ut') !== -1) && ( ( field.tbtyp.indexOf('email') > -1 && l2tokenItem.dtype.indexOf('email') > -1) || ( field.tbtyp.indexOf('date') > -1 && l2tokenItem.dtype.indexOf('date') > -1) || (field.tbtyp.indexOf('email') < 0 && field.tbtyp.indexOf('date') < 0) )">
+                                                                <md-button ng-click="prefillTokenSelected(field,l2tokenItem)">
+                                                                    <span class="icon-dtype {{l2tokenItem.iconname}}"></span>
+                                                                    <span class="text">{{l2tokenItem.lbl}}</span>
+                                                                </md-button>
+                                                            </md-menu-item>
+                                                            <md-menu ng-repeat="l2tokenItem in l1tokenItem.childlist track by $index" ng-if="l2tokenItem.haschild==='y' && (l2tokenItem.avail.indexOf('ut') !== -1)">
+                                                                <md-button ng-click="$mdMenu.open()">
+                                                                    {{l2tokenItem.lbl}}
+                                                                </md-button>
+                                                                <md-menu-content>
+                                                                    <md-menu-item ng-repeat="l3tokenItem in l2tokenItem.childlist track by $index" ng-if="( ( field.tbtyp.indexOf('email') > -1 && l3tokenItem.dtype.indexOf('email') > -1) || ( field.tbtyp.indexOf('date') > -1 && l3tokenItem.dtype.indexOf('date') > -1) || (field.tbtyp.indexOf('email') < 0 && field.tbtyp.indexOf('date') < 0) )">
+                                                                        <md-button ng-click="prefillTokenSelected(field,l3tokenItem);">
+                                                                            <span class="icon-dtype {{l3tokenItem.iconname}}"></span>
+                                                                            <span class="text">{{l3tokenItem.lbl}}</span>
+                                                                        </md-button>
+                                                                    </md-menu-item>
+                                                                </md-menu-content>
+                                                            </md-menu>
+                                                        </md-menu-content>
+                                                    </md-menu>
+                                                </md-menu-item>
+                                                <md-button ng-click="prefillManuallyEntered(field);">
+                                                    <span class="icon-dtype icon-sd icon-f-shorttext"></span>
+                                                    Manual text entry
+                                                </md-button>
+                                            </md-menu-content>
+                                        </md-menu>
+                                    </md-menu-bar>
+                                </div>
+
+                            <div layout="row" ng-if="field.entry=== 'mnl'" class="embdtxt-wrap">
+                                    <div flex="100" class="textarea-wrap">
+                                        <md-input-container flex>
+                                            <input ng-if="field.tbid" name="Text" ng-model="field.mnltxt" required ng-click="getCursorPos($event, 'fdmltxt'+field.tbid)" ng-keyup="getCursorPos($event, 'fdmltxt'+field.tbid)">
+                                            <input ng-if="field.tbids[0]"name="Text" ng-model="field.mnltxt" required ng-click="getCursorPos($event, 'fdmltxt'+field.tbids[0])" ng-keyup="getCursorPos($event, 'fdmltxt'+field.tbids[0])">
+                                            <span class="label">Text:</span>
+                                        </md-input-container>
+                                    </div>
+                                    <md-menu-bar>
+                                        <md-menu>
+                                            <button class="instxt-btn" ng-click="$mdMenu.open()">
+                                                <span class="icon icon-dynamic-text"></span>
+                                                <span class="text">Insert text</span>
+                                                <span class="icon icon-arrow icon-arrow-7"></span>
+                                            </button>
+                                            <md-menu-content>
+                                                <md-menu-item ng-repeat="l1tokenItem in localdata.tokendata track by l1tokenItem.id">
+                                                    <md-button ng-click="manualEntrySelected(field,l1tokenItem);" ng-if="l1tokenItem.haschild ==='n' && (l1tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <span ng-if="l1tokenItem.lbl === 'Start date'" class="icon-dtype icon-sd icon-f-date"></span>
+                                                        {{l1tokenItem.lbl}}
+                                                    </md-button>
+                                                    <md-menu ng-if="l1tokenItem.haschild==='y' && (l1tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <md-button ng-click="$mdMenu.open()">{{l1tokenItem.lbl}}</md-button>
+                                                        <md-menu-content>
+                                                            <md-menu-item ng-repeat="l2tokenItem in l1tokenItem.childlist track by $index" ng-if="l2tokenItem.haschild==='n' && (l2tokenItem.avail.indexOf('ut') !== -1)">
+                                                                <md-button ng-click="manualEntrySelected(field,l2tokenItem)">
+                                                                    <span class="icon-dtype {{l2tokenItem.iconname}}"></span>
+                                                                    <span class="text">{{l2tokenItem.lbl}}</span>
+                                                                </md-button>
+                                                            </md-menu-item>
+                                                            <md-menu ng-repeat="l2tokenItem in l1tokenItem.childlist track by $index" ng-if="l2tokenItem.haschild==='y' && (l2tokenItem.avail.indexOf('ut') !== -1) && (l1tokenItem.avail.indexOf('ut') !== -1) ">
+                                                                <md-button ng-click="$mdMenu.open()">
+                                                                    {{l2tokenItem.lbl}}
+                                                                </md-button>
+                                                                <md-menu-content>
+                                                                    <md-menu-item ng-repeat="l3tokenItem in l2tokenItem.childlist track by $index">
+                                                                        <md-button ng-click="manualEntrySelected(field,l3tokenItem);">
+                                                                            <span class="icon-dtype {{l3tokenItem.iconname}}"></span>
+                                                                            <span class="text">{{l3tokenItem.lbl}}</span>
+                                                                        </md-button>
+                                                                    </md-menu-item>
+                                                                </md-menu-content>
+                                                            </md-menu>
+                                                        </md-menu-content>
+                                                    </md-menu>
+                                                </md-menu-item>
+                                            </md-menu-content>
+                                        </md-menu>
+                                    </md-menu-bar>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="ntmpd-wrap" ng-if="localdata.unmappedflds && localdata.unmappedflds.length > 0">
+                    <span class="text">These fields could not be mapped:</span>
+                    <ul>
+                        <li ng-repeat="field in localdata.unmappedflds track by $index">
+                            {{field.tbtyp}} - {{field.tblbl}} ({{field.ds_roleName}})
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button aria-label="Apply" class="save md-default-theme" ng-click="savePrefillFields();" ng-disabled="PrefillFieldsForm.$invalid"
+                md-autofocus>Apply</md-button>
+        </md-dialog-actions>
+
+    </form>
+</md-dialog>

@@ -1,0 +1,32 @@
+<md-dialog aria-label="New communication type" class="new-seq-modal md-default-theme">
+<form name="NewCommunicationForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>new communication module</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+
+	<div layout="column" class="select-group">
+		<label class="heading heading-inside">This communication is for:</label>
+
+		<md-radio-group ng-model="localdata.modfor" required>
+			<md-radio-button value="NH">Manager to Employee</md-radio-button>
+			<md-radio-button value="M">Employee to Manager</md-radio-button>
+		</md-radio-group>
+
+	</div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button aria-label="Save" class="save md-default-theme" ng-click="saveNewCommunication();" ng-disabled="NewCommunicationForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

@@ -1,0 +1,152 @@
+<!-- <div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Forms</a>
+    </span>
+</div>
+
+<div class="reports-wrap">
+    <div class="reports-wrap-inner">
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <img src="//static.enboarder.net/images/spinner-grey.gif" alt="">
+            </span>
+        </div>
+
+        <form name="reportForm" novalidate>
+            <div class="heading-panel">
+                <h4>people</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}" ng-if="serverCSV === 'no'">
+                            <span class="icon icon-download"></span>
+                            <span class="text">{{serverCSV}} Download Table Data (CSV)</span>
+                        </span>
+                        <span ng-click="sendCSVReportRequest(exportCSVFileName);" ng-if="serverCSV === 'yes'">
+                            <span class="icon icon-download"></span>
+                            <span class="text">{{serverCSV}} Download Table Data (CSV)</span>
+                        </span>
+                        <span ng-click="showDownloadFormDataDialog();">
+                            <span class="icon icon-download"></span>
+                            <span class="text">{{serverCSV}} Download Table Data (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+
+            <div class="search-panel detail-section" style="display:block">
+
+                <div layout="row" layout-align="center center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Form Name</label>
+                            <input ng-model="reportSearch.fnm">
+                        </md-input-container>
+                    </div>
+                    <div flex>
+                        <md-input-container>
+                            <label>Completed By</label>
+                            <input ng-model="reportSearch.crby">
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Completed date, From</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_from" md-placeholder="Select"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Completed date, To</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_to" md-placeholder="Select"></md-datepicker>
+                    </div>
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Form name</th>
+                        <th>Completed by</th>
+                        <th>Status</th>
+                        <th>Completed date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in displayedCollection track by $index">
+                        <td class="td-container">
+                            <div>{{row.modname155}}</div>
+                        </td>
+                        <td class="td-container">
+                            <div>{{row.crby155}}</div>
+                        </td>
+                        <td class="td-container" ng-click="showFormDataDialog(row);">
+                            <div class="form-link">
+                                <span class="text">{{row.status155}}</span>
+                                <span ng-if="row.attachment === 'no'" class="icon icon-attachment"></span>
+                            </div>
+                        </td>
+                        <td class="td-container">
+                            <div>{{row.crdt155}}</div>
+                        </td>
+                    </tr>
+                    <tr class="nohover" ng-if="displayedCollection.length == 0">
+                        <td colspan="6">
+                            <div>
+                                <p>
+                                    Hmmmm, can't find any relating data.
+                                </p>
+                                <div class="img-wrap">
+                                    <img src="//static.enboarder.net/images/error-bouble.gif" alt="Error" />
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr ng-if="displayedCollection.length > 0">
+                        <td colspan="6" class="text-center">
+                            <div class="pagination-wrap">
+
+                                <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                    <span class="icon icon-arrow-1"></span>
+                                    <span class="text">Back</span>
+                                </button>
+
+                                <div class="pagination-number-wrap">
+                                    <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                    <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                    <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                </div>
+
+                                <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                    <span class="text">Next</span>
+                                    <span class="icon icon-arrow-1"></span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+</div> -->

@@ -1,0 +1,15 @@
+<md-dialog aria-label="I9 Form Status" class="esign-status-modal senddata-status-modal form-status-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>I9 DATA: {{modname}}</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content class="status-wrap" aria-label="Form Status" style="min-width:570px;max-width:570px;max-height:810px;">
+        <ng-include src="'views/dashboard/div-i9data-status.html'"></ng-include>
+    </md-dialog-content>
+</md-dialog>

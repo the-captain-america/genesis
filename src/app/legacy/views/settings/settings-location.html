@@ -1,0 +1,85 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Locations</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','locations')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','locations')">
+	<h4>Add locations if you would like to use them in your workflow rules.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<div class="settings-wrap-inner locations">
+        <div class="clstwrap" ng-if="filter.show === 'yes'">
+            <span ng-repeat="schar in searchChars track by $index" ng-click="filterList(schar);" ng-class="{selfilter : schar === filter.selected}">
+                {{schar}}
+            </span>
+        </div>
+		<div class="table-responsive">
+			<table class="table table-hover location-table" st-table="displayedCollection" st-safe-src="rowCollection">
+				<thead>
+					<tr>
+						<th colspan="1">Name</th>
+						<th colspan="1">Timezone</th>
+						<th colspan="1">Country</th>
+						<th colspan="1">State</th>
+						<th colspan="1">City</th>
+						<th colspan="1">Postcode</th>
+						<th colspan="1">Address</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in displayedCollection track by $index">
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.name}}">{{row.name}}</a></div>
+						</td>
+                        <td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{getTimeZone(row.tz);}}">{{getTimeZone(row.tz);}}</a></div>
+						</td>
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.country}}">{{row.country}}</a></div>
+						</td>
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.state}}">{{row.state}}</a></div>
+						</td>
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.city}}">{{row.city}}</a></div>
+						</td>
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.postcode}}">{{row.postcode}}</a></div>
+						</td>
+						<td ng-click="showLocationModal($event,'update',$index);" class="td-container">
+							<div class="truncate"><a title="{{row.address}}">{{row.address}}</a></div>
+						</td>
+						<!-- <td class="td-container">
+							<div>
+								<md-button ng-disabled="false" class="md-warn md-raised md-primary" ng-click="showLocationModal($event,'update',$index);">Edit</md-button>
+							</div>
+						</td> -->
+						<td class="td-container delete-col">
+							<div>
+								<md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow($event,$index);">
+									<span class="icon icon-close-5"></span>
+								</md-button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="btnDiv">
+			<md-button class="md-raised" ng-click="showLocationModal($event,'add new');">
+				<span class="icon icon-plus"></span>
+				Add New
+			</md-button>
+		</div>
+
+	</div>
+</div>

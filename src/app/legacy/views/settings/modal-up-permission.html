@@ -1,0 +1,178 @@
+<!-- <md-dialog aria-label="{{action}} role" class="modal-up-user modal-up-permission md-default-theme">
+	<form name="detailsForm" novalidate>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{action}} role</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-dialog-content style="min-width:600px; max-width:600px;">
+			<div layout="row" layout-align="center" layout-wrap>
+                <md-input-container flex="100" class="required">
+                    <label>Role name</label>
+                    <input md-no-asterisk ng-model="newdata.rlnm" type="text" required focus="true">
+                </md-input-container>
+			</div>
+
+            <label class="heading">Select the permissions for this role</label>
+
+            <div class="blck-hdng">
+                <span class="nm">Tabs</span>
+                <span class="chc">No</span>
+                <span class="chc">Yes</span>
+            </div>
+            <div class="blck">
+                <span class="nm">Dashboard</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval1">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck">
+                <span class="nm">Workflow</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval2">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck">
+                <span class="nm">Reports</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval3">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck">
+                <span class="nm">Helpcenter</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval4">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck dsbl">
+                <span class="nm">Settings</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval5" disabled>
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+
+            <br><br><br>
+
+            <div class="blck">
+                <span class="nm">Demo URL</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval6">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck">
+                <span class="nm">Email integration</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval7">
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+            <div class="blck dsbl">
+                <span class="nm">API integration</span>
+                <md-radio-group class="rgrp" ng-model="newdata.chcval8" disabled>
+                    <span class="chc no">
+                        <md-radio-button value="No"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-cross"></span>
+                        </label>
+                    </span>
+                    <span class="chc">
+                        <md-radio-button value="Yes"></md-radio-button>
+                        <label class="lblc">
+                            <span class="icon icon-tick"></span>
+                        </label>
+                    </span>
+                </md-radio-group>
+            </div>
+
+            <md-button class="md-raised refresh" aria-label="delete this role" ng-click="">
+                <span class="text">delete this role</span>
+            </md-button>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row">
+			<md-button aria-label="Save" class="md-raised md-default-theme save" ng-disabled="detailsForm.$invalid" ng-click="save();" md-autofocus>
+				Save
+			</md-button>
+		</md-dialog-actions>
+	</form>
+</md-dialog> -->

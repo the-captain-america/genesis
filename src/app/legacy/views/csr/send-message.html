@@ -1,0 +1,82 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Send message</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('csrsettings','sendmsg')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('csrsettings','sendmsg')">
+    <h4>Send SMS to a user.</h4>
+	<div class="settings-wrap-inner send-msg">
+
+        <form class="sndmsgfm" name="sendMessageForm" novalidate>
+
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex="30" class="sms-from-block">
+                    <md-input-container class="required">
+                        <label>Name of sender</label>
+                        <input md-no-asterisk name="smsInput" ng-model="localData.smsfrom" ng-maxlength="11" md-maxlength="11" required>
+                        <div ng-messages="sendMessageForm.smsInput.$error" role="alert" multiple>
+                            <div ng-message="md-maxlength" class="my-message">
+                                Must be &lt; 11 characters.
+                            </div>
+                        </div>
+                    </md-input-container>
+                </div>
+            </div>
+            <hr>
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex="30" class="mobile cchannel">
+                    <md-input-container class="required">
+                        <label>SMS to <small>(mobile number)</small></label>
+                        <!-- <input md-no-asterisk ng-model="localData.smsto" required> -->
+                        <intl-tel placeholder="Mobile number" ng-model="localData.smsto" md-no-asterisk required></intl-tel>
+                    </md-input-container>
+                </div>
+
+				<md-button class="save verify-spinner md-raised" ng-click="validateNumber();" ng-disabled="!localData.smsto">
+					<span class="text">Verify Number</span>
+					<span class="text-save">Verify Number</span>
+					<span class="text-saved">Verify Number</span>
+                    <!-- <span class="icon-notification-ok"></span> -->
+					<span class="spinner">
+						<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+					</span>
+				</md-button>
+
+            </div>
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex>
+                    <md-input-container class="required md-block">
+                        <label>Text message</label>
+                        <textarea md-no-asterisk ng-model="localData.message" required></textarea>
+                    </md-input-container>
+                </div>
+            </div>
+
+            <div class="btnDiv">
+				<md-button class="save save-spinner md-raised" ng-click="sendMessage();" ng-disabled="sendMessageForm.$invalid">
+					<span class="text">Send Message</span>
+					<span class="text-save">Send Message</span>
+					<span class="text-saved">Send Message</span>
+                    <!-- <span class="icon-notification-ok"></span> -->
+					<span class="spinner">
+						<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+					</span>
+				</md-button>
+			</div>
+
+            <div class="ntf-msg" layout="row" layout-align="space-between start" layout-wrap ng-if="msg">
+                <div flex>
+                    <span class="iconx icon-notification-ok" ng-if="status === 'ok'"></span>
+                    <span class="iconx icon-close-5" ng-if="status === 'error'"></span>
+                    <span class="text">{{msg}}</span>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

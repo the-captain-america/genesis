@@ -1,0 +1,235 @@
+<md-dialog aria-label="auto bulk upload" class="add-new-people-modal auto-bulk-modal md-default-theme">
+    <form name="autoBulkUploadForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>auto bulk upload</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:640px;max-width:640px;max-height:810px;">
+            <div class="radio-wrap">
+                <span class="lbl">Upload method</span>
+                <md-radio-group ng-model="blkupld.method">
+                    <div class="rdwrp">
+                        <md-radio-button value="std">
+                            <span class="text">Standard upload</span>
+                        </md-radio-button>
+                        <span class="ttl-wrp">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip" md-direction="bottom">
+                                <span class="copy">
+                                    <h4 class="title">STANDARD UPLOAD</h4>
+                                    <p>
+                                        Workflows are updated or trigger based on data entered into a CSV table format.
+                                    </p>
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </div>
+                    <div class="rdwrp">
+                        <md-radio-button value="smart">
+                            <span class="text">Smart upload</span>
+                        </md-radio-button>
+                        <span class="ttl-wrp">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip" md-direction="bottom">
+                                <span class="copy">
+                                    <h4 class="title">SMART UPLOAD</h4>
+                                    <p>
+                                        Workflows are updated or triggered based on corelating data within a 'Shapshot' data/people registry.
+                                    </p>
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </div>
+                </md-radio-group>
+            </div>
+
+            <div class="select-group">
+                <div layout="row" layout-wrap>
+                    <div flex>
+                        <md-input-container md-no-float class="md-block">
+                            <label class="placeholder">Status</label>
+                            <md-select ng-model="blkupld.status" md-container-class="wfcat-dd" placeholder="Status">
+                                <md-option value="active">Active</md-option>
+                                <md-option value="inactive">In active</md-option>
+                                <md-option value="test">Test</md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container md-no-float class="md-block">
+                            <label class="placeholder">Bulk upload frequency</label>
+                            <md-select ng-model="blkupld.frequency" md-container-class="wfcat-dd" placeholder="Bulk upload frequency">
+                                <md-option value="daily" selected>Every day</md-option>
+                                <!--md-option value="weekly">Weekly</md-option>
+                                <md-option value="monthly">Monthly</md-option-->
+                            </md-select>
+                        </md-input-container>
+                    </div>
+
+                    <div flex>
+                        <md-input-container md-no-float class="md-block">
+                            <label class="placeholder">Preset mapping</label>
+                            <md-select ng-model="blkupld.premap" md-no-asterisk md-container-class="wfcat-dd" placeholder="Preset mapping" required>
+                                <md-option value="{{presetmapping.uid}}" ng-repeat="presetmapping in presetmappings | filter:{method:blkupld.method}">{{presetmapping.name}}</md-option>
+                            </md-select>
+                        </md-input-container>
+
+                        <md-input-container md-no-float class="md-block">
+                            <label class="placeholder">Import time ({{timezone}})</label>
+                            <md-select ng-model="blkupld.imptime" md-container-class="wfcat-dd" placeholder="Import time">
+                                <md-option ng-repeat="i in getNumber(24) track by $index" value="{{$index+1}}">
+                                    <span ng-if="$index < 9">0{{$index+1}}:00</span>
+                                    <span ng-if="$index > 8">{{$index+1}}:00</span>
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </div>
+            </div>
+
+            <label class="heading">Set up server properties for auto bulk upload.</label>
+
+            <div class="othrinpt-wrap">
+                <div layout="row" layout-wrap>
+                    <md-input-container class="required pr" flex="60">
+                        <input md-no-asterisk ng-model="blkupld.host" placeholder="SFTP server name/IP" required>
+                    </md-input-container>
+                    <md-input-container class="required" flex="40">
+                        <input md-no-asterisk ng-model="blkupld.port" placeholder="SFTP server port" required>
+                    </md-input-container>
+                </div>
+                <div layout="row" layout-align="space-between-center">
+                    <md-input-container class="required" flex="30">
+                        <input md-no-asterisk ng-model="blkupld.user" placeholder="User name" required>
+                    </md-input-container>
+                    <md-input-container md-no-float class="md-block" flex="30">
+                        <label class="placeholder">Authentication method</label>
+                        <md-select ng-model="blkupld.authmethod" md-container-class="wfcat-dd" placeholder="Authentication method">
+                            <md-option value="pass">Password</md-option>
+                            <md-option value="pk">Private key</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-input-container class="required" flex="30">
+                        <input type="password" md-no-asterisk ng-model="blkupld.passwd" placeholder="Password" ng-required="blkupld.authmethod === 'pass'" ng-disabled="blkupld.authmethod === 'pk'">
+                    </md-input-container>
+                </div>
+                <md-input-container class="required" ng-if="blkupld.authmethod === 'pk'">
+                    <label>Private key</label>
+                    <textarea ng-model="blkupld.pkey" md-no-asterisk required></textarea>
+                </md-input-container>
+
+                <div layout="row" layout-align="space-between-center">
+                    <md-input-container class="required" flex="30">
+                        <input md-no-asterisk ng-model="blkupld.inputdir" placeholder="Input folder" required>
+                    </md-input-container>
+                    <md-input-container class="required" flex="30">
+                        <input md-no-asterisk ng-model="blkupld.outputdir" placeholder="Output folder" required>
+                    </md-input-container>
+                    <md-input-container class="required" flex="30">
+                        <input md-no-asterisk ng-model="blkupld.errordir" placeholder="Error folder" required>
+                    </md-input-container>
+                </div>
+
+                <md-input-container ng-class="{required: blkupld.method === 'smart'}" ng-if="blkupld.method === 'smart'">
+                    <input md-no-asterisk ng-model="blkupld.snapnewprefix" placeholder="File name prefix - create 'Snapshot'">
+                </md-input-container>
+                <md-input-container ng-class="{required: blkupld.method === 'smart'}" ng-if="blkupld.method === 'smart'">
+                    <input md-no-asterisk ng-model="blkupld.snapupdateprefix" placeholder="File name prefix - add to 'Snapshot'">
+                </md-input-container>
+                <md-input-container ng-class="{required: blkupld.method === 'smart'}" ng-if="blkupld.method === 'smart'">
+                    <input md-no-asterisk ng-model="blkupld.snapincrprefix" placeholder="File name prefix - 'incremental'">
+                </md-input-container>
+                <md-input-container class="required">
+                    <input md-no-asterisk ng-model="blkupld.email" placeholder="Email for bulk upload reports" required type="email">
+                </md-input-container>
+                <div layout="row" layout-wrap>
+                    <md-input-container class="required pr" flex="50">
+                        <input md-no-asterisk ng-model="blkupld.maxrows" placeholder="Max rows allowed in CSV" required type="number">
+                    </md-input-container>
+                </div>
+                <div class="cbwrap">
+                    <md-checkbox class="tstcbox" aria-label="Do not process any workflows if a mapping error occur." ng-model="blkupld.stoponerr" ng-true-value="'y'" ng-false-value="'n'">
+                        <span>Do not process any workflows if a mapping error occur.</span>
+                    </md-checkbox>
+                    <md-checkbox class="tstcbox" aria-label="Scan across all workflows to find a match to unique ID" ng-model="blkupld.globalextidlookup" ng-true-value="'yes'" ng-false-value="'no'">
+                        <span>Scan across all workflows to find a match to unique ID</span>
+                    </md-checkbox>
+                    <md-checkbox class="tstcbox" aria-label="Do not launch a workflow if a duplicate 'Unique ID' is detected." ng-model="blkupld.stopdup" ng-true-value="'y'" ng-false-value="'n'">
+                        <span>Do not launch a workflow if a duplicate 'Unique ID' is detected.</span>
+                    </md-checkbox>
+                    <md-checkbox class="tstcbox" aria-label="Only allow one 'unique ID' per workflow, cancel active workflow to launch new." ng-model="blkupld.cancelactwf" ng-true-value="'y'" ng-false-value="'n'">
+                        <span>Only allow one 'unique ID' per workflow, cancel active workflow to launch new.</span>
+                    </md-checkbox>
+                    <md-checkbox class="tstcbox" aria-label="Cancel workflows on termination date." ng-model="blkupld.termnflg" ng-true-value="'yes'" ng-false-value="'no'" ng-if="blkupld.method === 'smart'">
+                        <span>Cancel workflows on termination date.</span>
+                    </md-checkbox>
+                    <md-checkbox class="tstcbox lst" aria-label="Use PGP decryption on imported CSV files." ng-model="blkupld.ispgp" ng-true-value="'yes'" ng-false-value="'no'">
+                        <span>Use PGP decryption on imported CSV files.</span>
+                    </md-checkbox>
+                    <div ng-if="blkupld.ispgp === 'yes'">
+                        <md-input-container class="required">
+                            <label>PGP Private key</label>
+                            <textarea ng-model="blkupld.pgpkey" md-no-asterisk required></textarea>
+                        </md-input-container>
+                        <md-input-container flex="100">
+                            <label>Pass phrase</label>
+                            <input md-no-asterisk ng-model="blkupld.passphrase" placeholder="Optional">
+                        </md-input-container>
+                        <div>
+                            <md-checkbox class="tstcbox asci" aria-label="Add ASCII armor encoding" ng-model="blkupld.isascii" ng-true-value="'yes'" ng-false-value="'no'">
+                                <span>Add 'ASCII armor' encoding</span>
+                            </md-checkbox>
+                        </div>
+                    </div>
+                    <!-- <md-checkbox class="tstcbox" aria-label="Look up 'unique ID' across workflows." ng-model="blkupld.globalextidlookup" ng-true-value="'yes'" ng-false-value="'no'">
+                        <span>Look up 'unique ID' across workflows.</span>
+                    </md-checkbox> -->
+                </div>
+                <div class="btn-wrap">
+                    <md-button class="md-raised tstauto refresh" ng-click="test();" ng-disabled="autoBulkUploadForm.$invalid">
+                       <span class="text">Test connection</span>
+                       <span class="icon icon-close-5"></span>
+                       <span class="icon icon-notification-ok"></span>
+                       <span class="spinner spnbtn">
+                          <md-progress-circular md-diameter="20px"></md-progress-circular>
+                       </span>
+                    </md-button>
+                    <span class="errmsg" ng-if="testerrAuto">
+                        {{testerrAuto}}
+                    </span>
+                </div>
+                <div class="btn-wrap ms">
+                    <md-button class="md-raised tstmanual refresh" ng-click="manual();" ng-disabled="autoBulkUploadForm.$invalid">
+                       <span class="text">manual start</span>
+                       <span class="icon icon-close-5"></span>
+                       <span class="icon icon-notification-ok"></span>
+                       <span class="spinner spnbtn">
+                          <md-progress-circular md-diameter="20px"></md-progress-circular>
+                       </span>
+                    </md-button>
+                    <span class="errmsg" ng-if="errManual">
+                        {{errManual}}
+                    </span>
+                    <span class="resmsg" ng-if="respManual">
+                        {{respManual}}
+                    </span>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button ng-click="save();" class="save save-spinner md-default-theme" aria-label="Save" md-autofocus ng-disabled="autoBulkUploadForm.$invalid">
+                <span class="text">Save</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

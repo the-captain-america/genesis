@@ -1,0 +1,168 @@
+<md-dialog aria-label="FORWARD SEQUENCE" class="dashlevel3-forward">
+	<form name="myForm" novalidate>
+
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2 ng-if="action !== 'resend'">{{action}} SEQUENCE</h2>
+                <h2 ng-if="action === 'resend'">RESEND SEQUENCE</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+
+		<md-dialog-content style="min-width:600px;max-height:810px;">
+
+			<div class="heading-wrap" layout="column" layout-align="start center">
+			  	<div ng-if="action === 'forward'" flex class="text">
+                    <span ng-if="seqlist.length > 1">Add details of the person you would like to forward the {{seqlist.length}} sequences to.</span>
+                    <span ng-if="seqlist.length === 1">Add details of the person you would like to forward <br>the sequence to.</span>
+				</div>
+                <div ng-if="action === 'resend'" flex class="text">
+                    Would you like to add an extra message<br>to your notification before resending it to
+                    <span ng-if="chnl ==='eml'">
+                        <span class="icn icon-mail-medium"></span>
+                        <span class="txt">Email?</span>
+                    </span>
+                    <span ng-if="chnl ==='mob'">
+                        <span class="icn icon-chip-phone"></span>
+                        <span class="txt">Mobile?</span>
+                    </span>
+				</div>
+                <div ng-if="action === 'complete'" flex class="text">
+                    Add the contact details to where you like to send the <br>'Welcome onboard' sequence.
+				</div>
+                <div class="img-wrap" ng-if="action === 'dismiss'" flex>
+                    <img alt="alert" src="//static.enboarder.net/images/warning.gif" />
+				</div>
+                <div ng-if="action === 'dismiss'" flex class="text">
+                    <span ng-if="seqlist.length > 1">Are you sure you want to dismiss {{seqlist.length}} alerts?</span>
+                    <span ng-if="seqlist.length === 1">Are you sure you want to dismiss {{seqlist.length}} alert?</span>
+
+				</div>
+
+                <div class="img-wrap" ng-if="action === 'clear'" flex>
+                    <img alt="alert" src="//static.enboarder.net/images/warning.gif" />
+                </div>
+                <div ng-if="action === 'clear'" flex class="text">
+                    <span ng-if="seqlist.length > 1">Are you sure you want to clear {{seqlist.length}} alerts?</span>
+                    <span ng-if="seqlist.length === 1">Are you sure you want to clear {{seqlist.length}} alert?</span>
+
+                </div>
+
+			</div>
+			<div layout="row" layout-align="space-around center" layout-wrap>
+			  	<div ng-if="action === 'forward'" flex class="adppl-chips required-autocomplete">
+                    <md-chips md-max-chips="2" ng-model="profilelist" md-autocomplete-snap="" md-require-match="true" md-on-remove="forwardChipRemoved()">
+                        <md-autocomplete ng-hide="profilelist.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="forwardTo.name"
+                            md-search-text="forwardTo.searchForwardTo" md-items="mgritem in getProfileList(forwardTo.searchForwardTo)"
+                            md-item-text="mgritem.name" md-min-length="0" placeholder="Full Name"
+                            md-delay='50' md-selected-item-change="selectedForwardToChange(mgritem, $index)" md-autoselect="true"
+                            md-floating-label="Full Name" md-autofocus="true" ng-class="{required : dmgr.req !== 'no'}">
+                            <span>
+                                <img alt="profile" ng-if="mgritem.attr && mgritem.attr.photo" ng-src="{{mgritem.attr.photo}}" class="md-avatar"></img>
+                                <img alt="profile" ng-if="!(mgritem.attr && mgritem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" class="md-avatar"/>
+                                <span class="txtwrp">
+                                    <span class="nmtxt" md-highlight-text="searchText">{{mgritem.name}}</span>
+                                    <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in mgritem.commlist">
+                                        <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                        <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                        <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                    </span>
+                                </span>
+                            </span>
+                        </md-autocomplete>
+                        <md-chip-template>
+                            <span>
+                                <img alt="profile" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}" class="md-avatar"></img>
+                                <img alt="profile" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                                <span md-highlight-text="searchText">{{$chip.name}}</span>
+                            </span>
+                        </md-chip-template>
+                    </md-chips>
+				</div>
+			  	<div ng-if="action === 'forward' || action === 'complete'" flex>
+                    <md-input-container class="employee-mobile-wrap required">
+                        <label>Mobile or Email</label>
+                        <input md-no-asterisk ng-model="forwardPerson.em" required ng-readonly="forwardPerson.nhprflid">
+                    </md-input-container>
+				</div>
+			</div>
+            <div ng-if="action === 'forward'" layout="row" class="message-wrap" layout-align="center start">
+                <md-input-container flex class="required" md-no-float class="md-block">
+                    <input placeholder="Extra message with notification (optional)" aria-label="Extra message with notification (optional)" name="messageInput" ng-model="forwardPerson.msg" ng-maxlength="80" md-maxlength="80">
+                    <div ng-messages="myForm.messageInput.$error" role="alert" multiple>
+                        <!-- <div ng-message="required" class="my-message">This is required.</div> -->
+                        <!-- <div ng-message="pattern" class="my-message">
+                            No spaces or numbers are allowed in sms names.
+                        </div> -->
+                        <div ng-message="md-maxlength" class="my-message">
+                            Must be &lt; 60 characters.
+                        </div>
+                    </div>
+                </md-input-container>
+            </div>
+            <div ng-if="action === 'resend'" layout="row" class="message-wrap" layout-align="center start">
+                <md-input-container flex class="required" md-no-float class="md-block">
+                    <input placeholder="Extra message with notification (optional)" aria-label="Extra message with notification (optional)" name="messageInput" ng-model="resend.msg" ng-maxlength="80" md-maxlength="80">
+                    <div ng-messages="myForm.messageInput.$error" role="alert" multiple>
+                        <div ng-message="md-maxlength" class="my-message">
+                            Must be &lt; 60 characters.
+                        </div>
+                    </div>
+                </md-input-container>
+            </div>
+
+            <!-- Error msgs -->
+            <div class="error" ng-if="forwardServerError === 'yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{forwardServerErrorMessage}}</span>
+            </div>
+
+		</md-dialog-content>
+
+		<md-dialog-actions ng-if="action === 'forward'" layout="row">
+			<md-button aria-label="forward" class="md-raised save save-spinner" ng-click="forwardSequence()" ng-disabled="myForm.$invalid" md-autofocus>
+                <span class="text">forward now</span>
+                <span class="text-save">forwarding...</span>
+                <span class="text-saved">forwarded <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+			</md-button>
+		</md-dialog-actions>
+        <md-dialog-actions ng-if="action === 'resend'" layout="row">
+			<md-button aria-label="forward" class="md-raised save save-spinner" ng-click="resendSequence()" ng-disabled="myForm.$invalid" md-autofocus>
+                <span class="text">send now</span>
+                <span class="text-save">sending...</span>
+                <span class="text-saved">sent <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+			</md-button>
+		</md-dialog-actions>
+		<md-dialog-actions ng-if="action === 'complete'" layout="row">
+            <md-button aria-label="Send" class="md-raised save" ng-click="sendSeq()" ng-disabled="myForm.$invalid" md-autofocus>
+				Send
+			</md-button>
+		</md-dialog-actions>
+		<md-dialog-actions ng-if="action === 'dismiss'" layout="row">
+			<md-button aria-label="Cancel" class="md-raised" ng-click="cancel()" ng-disabled="myForm.$invalid">
+				Cancel
+			</md-button>
+			<md-button aria-label="Dismiss" class="md-raised save" ng-click="dismissAlerts()" ng-disabled="myForm.$invalid" md-autofocus>
+				Dismiss
+			</md-button>
+		</md-dialog-actions>
+        <md-dialog-actions ng-if="action === 'clear'" layout="row">
+            <md-button aria-label="Cancel" class="md-raised" ng-click="cancel()" ng-disabled="myForm.$invalid">
+                Cancel
+            </md-button>
+            <md-button aria-label="Clear" class="md-raised save" ng-click="clearAlerts()" ng-disabled="myForm.$invalid" md-autofocus>
+                Clear
+            </md-button>
+        </md-dialog-actions>
+
+	</form>
+</md-dialog>

@@ -1,0 +1,1105 @@
+<div dnd-list="widgetList" class="content" ng-class="{nowgt : !widgetList.length}" dnd-drop="dropCallback(event, index, item, external, type, 'itemType')">
+
+    <span class="placeholder-text" ng-if="!widgetList.length">
+        Drag a widget to begin <span ng-if ="contentType === 'multi-page'">, or</span>
+        <md-button class="whtbtn imprtpdf md-raised" ng-if="contentType === 'multi-page' && pdfloading !== 'yes'" ngf-select="parseMultiPagePDF($file)" accept="application/pdf">
+            <span class="btntxt">
+                IMPORT PDF
+                <em> (Beta version)</em></span>
+        </md-button>
+        <span class="uploading" ng-if="pdfloading === 'yes'">
+            <span class="upldtxt">
+                <md-progress-circular md-diameter="35px"></md-progress-circular>
+                Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+            </span>
+        </span>
+    </span>
+    <div ng-if="multiPgErr === 'yes'" class="error">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">{{multiPgErrMsg}}</span>
+    </div>
+
+
+    <div ng-repeat="widget in widgetList track by $index" class="widget" dnd-disable-if="widget.type === 'multi-page-cover' || widget.type === 'embedlink' || widget.type === 'textSMS' || widget.type === 'embed-course' || widget.type === 'video-rec' || widget.type === 'event' || iconname === 'notification-small'" ng-init="widgetIdx = $index" dnd-draggable="widget" dnd-effect-allowed="move">
+
+        <div class="content-wrap sub-wrap" ng-if="iconname === 'notification-small'">
+            <label>Subject line (only used for email)</label>
+            <div>
+                <md-input-container flex class="sub-input md-block" md-no-float>
+                    <input aria-label="Subject" ng-model="widget.subject" placeholder="Write a subject" required>
+
+                    <div class="custom-dropdown-wrap">
+                        <span class="icond mm-dropdown icon-dynamic-text"></span>
+                        <ul class="list-wrap multi">
+                            <li ng-repeat="tokenItem in tokenList track by tokenItem.id">
+                                <span ng-if="tokenItem.iconname" class="icon-dtype {{tokenItem.iconname}}"></span>
+                                <span ng-if="tokenItem.haschild ==='n' && (tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(widgetIdx, tokenItem.tok);">{{tokenItem.lbl}}</span>
+                                <span class="truncate" ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)">{{tokenItem.lbl}}</span>
+                                <span class="more-arrow icon-arrow-6" ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)"></span>
+                                <ul class="list-wrap-inner" ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)">
+
+                                    <li ng-repeat="l2tokenItem in tokenItem.childlist track by $index">
+                                        <span ng-if="l2tokenItem.iconname" class="icon-dtype {{l2tokenItem.iconname}}"></span>
+                                        <span ng-if="l2tokenItem.haschild==='n' && (l2tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(widgetIdx, l2tokenItem.tok);">{{l2tokenItem.lbl}}</span>
+                                        <span class="truncate" ng-if="l2tokenItem.haschild==='y' && (l2tokenItem.avail.indexOf('s') !== -1)">{{l2tokenItem.lbl}}</span>
+                                        <span class="more-arrow icon-arrow-6" ng-if="l2tokenItem.haschild==='y' && (l2tokenItem.avail.indexOf('s') !== -1)"></span>
+                                        <ul class="list-wrap-inner" ng-if="l2tokenItem.haschild==='y'">
+                                            <li ng-repeat="l3tokenItem in l2tokenItem.childlist track by $index">
+                                                <span ng-if="l3tokenItem.iconname" class="icon-dtype {{l3tokenItem.iconname}}"></span>
+                                                <span ng-if="l3tokenItem.haschild==='n' && (l3tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(widgetIdx, l3tokenItem.tok);">{{l3tokenItem.lbl}}</span>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                 </md-input-container>
+            </div>
+        </div>
+
+        <!-- Text editor -->
+        <div class="editor notiedtr close-enabled-editor" ng-if="widget.type === 'text' && !(contentType === 'embed-course' && embedPopUp === 'no')" ng-class="{'linkbtn' : iconname === 'notification-small' && notifyLinkState !== 'no', 'errTxt' : iconname === 'notification-small' && textDataLength > 580}">
+            <span class="icon icon-close-4" ng-click="removeWidget($index);" ng-if="allowTextWidgetClose==='yes'"></span>
+            <span class="clrtlbr" dnd-nodrag ng-if="iconname !== 'notification-small'">
+                <span class="clrbtnwrp">
+                    <span class="text">Background:</span>
+                    <input class="dot" md-no-asterisk minicolors ng-model="widget.bgcolor" type="text">
+                </span>
+            </span>
+            <span class="bgclr" ng-style="{ background: widget.bgcolor || '' }" ng-if="iconname !== 'notification-small'"></span>
+            <textarea placeholder="Type your text into the box..." ng-change="updateHtmlText(widget.data)" ng-keyup="updateHtmlText(widget.data)" ng-trim="false" ui-tinymce="tinymceOptions" ng-model="widget.data"></textarea>
+            <span class="seqbtn" ng-if="iconname === 'notification-small' && notifyLinkState !== 'no'">
+                <span class="icnlnk icon-link"></span>
+                <span class="txt" ng-click="">
+                    Sequence link/button
+                </span>
+            </span>
+            <span class="alrt" ng-if="iconname === 'notification-small' && textDataLength > 580">
+                <strong>ALERT: </strong> You have exceeded the optimal SMS character limit.
+            </span>
+        </div>
+
+        <div class="editor sms-text close-enabled" ng-if="widget.type === 'textSMS'">
+
+            <div class="PhonecheckboxWrap" ng-class="{noborder: !widget.showphone}">
+
+                <div class="button-wrap">
+                    <span class="text">Show contact details:</span>
+                    <!-- <span class="text" ng-if="commType==='sms'">Show phone number:</span> -->
+                    <!-- <span class="text" ng-if="commType==='email'">Show email address:</span> -->
+                    <md-button ng-class="{active : widget.showphone }" ng-click="widget.showphone=true" class="md-raised">yes</md-button>
+                    <md-button ng-class="{active : !widget.showphone }" ng-click="widget.showphone=false;widget.showtextmessage='yes'" class="md-raised">no</md-button>
+                </div>
+
+                <span class="text">
+                    <label ng-if="widget.showphone">
+                        Here are
+                        <span>{{getParticipantLabel(widget.mgrid, 'yes');}} </span>
+                        <!-- <span ng-if="commType==='sms'">number:</span> -->
+                        <!-- <span ng-if="commType==='email'">email:</span> -->
+                        <span>contact details:</span>
+
+                    </label>
+                    <md-select ng-model="widget.mgrid" ng-change="changeConfigManager(widget.mgrid)" md-container-class="configmanager-list fixed-dd">
+                        <md-option ng-repeat="mgr in commManagers track by $index" value="{{mgr.uid}}">{{mgr.l}}
+                        </md-option>
+                    </md-select>
+                </span>
+            </div>
+
+            <!-- Text editor SMS-->
+            <div ng-if="widget.showtextmessage==='yes'">
+                <!-- <label class="widget-title-label" ng-if="commType==='sms' && widget.showphone ">Or if you prefer you can easily send a text.</label> -->
+                <!-- <label class="widget-title-label" ng-if="commType==='email' && widget.showphone ">Or you can send a message directly from here.</label> -->
+                <label class="widget-title-label" ng-if="widget.showphone ">Or you can send a message directly from here.</label>
+                <!-- <h4 class="widget-title" ng-if="commType==='sms'">SMS text:</h4> -->
+                <!-- <h4 class="widget-title" ng-if="commType==='email'">Email message:</h4> -->
+                <h4 class="widget-title">Message:</h4>
+            </div>
+            <div class="button-wrap">
+                <!-- <span class="text" ng-if="commType==='sms'">Show text message:</span> -->
+                <!-- <span class="text" ng-if="commType==='email'">Show email message:</span> -->
+                <span class="text">Show message:</span>
+                <md-button ng-class="{active : widget.showtextmessage==='yes' }" ng-click="widget.showtextmessage='yes'" class="md-raised" ng-disabled="!widget.showphone">yes</md-button>
+                <md-button ng-class="{active : widget.showtextmessage==='no' }" ng-click="widget.showtextmessage='no'" class="md-raised" ng-disabled="!widget.showphone">no</md-button>
+            </div>
+            <div ng-if="widget.showtextmessage==='yes'">
+                <div class="smswidget-wrap">
+                    <textarea placeholder="Type your text into the box..." ui-tinymce="tinymceOptionsSMS" ng-model="widget.data"></textarea>
+                </div>
+
+                <div class="smsbtnouter">
+                    <div class="sms-btn-wrap" ng-if="contentType === 'communication'">
+                        <!-- <md-button ng-if="commType==='sms'" disabled="disabled" class="md-raised">
+                            <span class="text">Send message</span>
+                        </md-button>
+                        <md-button ng-if="commType==='email'" disabled="disabled" class="md-raised">
+                            <span class="text">Send email</span>
+                        </md-button> -->
+                        <md-button disabled="disabled" class="md-raised">
+                            <span class="text">Send message</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Image -->
+        <div class="image close-enabled" ng-if="widget.type === 'image' && !(contentType === 'embed-course' && embedPopUp === 'no')">
+            <span class="icon icon-close-4" ng-click="removeWidget($index);"></span>
+            <div class="main-btn-wrap">
+                <div class="main-btn-wrap">
+                    <div class="button-wrap">
+                        <md-button ng-class="{active : widget.smallimage === 'yes'}" ng-click="smallimage(widget)" class="md-raised">Small</md-button>
+                        <md-button ng-class="{active : widget.mediumimage === 'yes'}" ng-click="mediumimage(widget)" class="md-raised">Medium</md-button>
+                        <md-button ng-class="{active : widget.fullimage === 'yes'}" ng-click="fullimage(widget)" class="md-raised">Large</md-button>
+                    </div>
+
+                    <div class="button-wrap upload-img-btn">
+                        <md-button ng-click="keepfocus($index)" ngf-select="showImageWidgetCropModal($file, $index, picfileBtn, 'fileDnd')"
+                            ngf-max-size="10MB" name="fileBtn{{$index}}" ng-model="picfileBtn" accept="image/*" class="active md-raised">
+                            <span class="upld icon-image-upload"></span>
+                        </md-button>                      
+                    </div>
+
+                    <!-- <div class="button-wrap anmt-box" ng-if="widget.fullimage === 'yes'">
+                        <md-checkbox ng-model="widget.animate" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Animate">
+                            Animate
+                        </md-checkbox>
+                    </div> -->
+                </div>
+            </div>
+
+            <!--
+            <md-input-container flex>
+                <div class="button" ngf-drop="upload($file, $index, widget)" ng-class="{smallsize : widget.smallimage === 'yes', mediumsize : widget.mediumimage === 'yes', fullsize : widget.fullimage === 'yes'}">
+                    <div class="placeholder" ng-show="!widget.data">
+                        <span class="img-icon icon-image-bigger"></span>
+                        <span class="text">Drag and drop image</span>
+                        <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                            <span class="upldtxt">
+                                <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                            </span>
+                        </span>
+                    </div>
+                    <img ng-class="{fullsize : widget.fullimage === 'yes'}" ng-hide="!widget.data" ng-src="{{widget.dataCdn||widget.data}}" ngf-drop="upload($file, $index, widget)" alt="">
+                </div>
+            </md-input-container>
+            -->
+            <md-input-container flex>
+                <div class="button fullsize" ngf-drop="showImageWidgetCropModal($file, $index, picFileDnd, 'fileBtn')" ngf-max-size="10MB"
+                    name="fileDnd{{$index}}" ng-model="picFileDnd" accept="image/*">
+                    <div class="placeholder" ng-show="!widget.data">
+                        <span class="img-icon icon-image-bigger"></span>
+                        <span class="text">Drag and drop image</span>
+                        <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                            <span class="upldtxt">
+                                <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                            </span>
+                        </span>
+                    </div>
+                    <img class="fullsize" ng-hide="!widget.data" ng-src="{{widget.dataCdn || widget.data}}"
+                        ngf-drop="upload($file, $index, widget)" alt="">
+                </div>
+            </md-input-container>
+            
+            <div ng-if="widget.invalidContentTypeError === 'yes'" class="error">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Wrong format, we accept .JPG .PNG &amp; .GIF</span>
+            </div>
+            <div class="error" ng-show="workflow3.fileBtn{{$index}}.$error.maxSize || workflow3.fileDnd{{$index}}.$error.maxSize">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Sorry, image file size can not be more than 10 MB.</span>
+            </div>
+        </div>
+
+        <!-- Cover Image Learn -->
+        <div class="image coverwgt close-enabled" ng-if="widget.type === 'multi-page-cover'">
+            <!-- <span class="icon icon-close-4" ng-click="removeWidget($index);"></span> -->
+            <div class="main-btn-wrap">
+                <div class="main-btn-wrap">
+                    <div class="switch-wrap">
+                        <md-switch ng-model="widget.showimg" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Show image">
+                            Show image
+                        </md-switch>
+                    </div>
+                    <div class="button-wrap upload-img-btn" ng-if="widget.showimg === 'yes'">
+                        <md-button ng-click="keepfocus($index)" ngf-select="showImageWidgetCropModal($file, $index, picFile)" ngf-max-size="10MB" name="file" ng-model="picFile" accept="image/*" class="active md-raised">
+                            <span class="upld icon-image-upload"></span>
+                            <span class="txt">Upload</span>
+                        </md-button>
+                        <md-button ng-click="keepfocus($index); removeImg($index);" class="active md-raised">
+                            <span class="upld icon-image-delete"></span>
+                            <span class="txt">Remove</span>
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+
+            <span class="cvrlbl">COVER</span>
+            <md-input-container flex ng-if="widget.showimg === 'yes'">
+                <div class="button fullsize" ngf-drop="showImageWidgetCropModal($file, $index, picFile)" ngf-max-size="10MB" name="file" ng-model="picFile" accept="image/*">
+                    <div class="placeholder" ng-show="!widget.data">
+                        <span class="img-icon icon-image-bigger"></span>
+                        <span class="text">Drag and drop image</span>
+                        <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                            <span class="upldtxt">
+                                <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                            </span>
+                        </span>
+                    </div>
+                    <img class="fullsize" ng-hide="!widget.data" ng-src="{{widget.dataCdn || widget.data}}" ngf-drop="upload($file, $index, widget)" alt="">
+                </div>
+            </md-input-container>
+            <div class="infowrp">
+                <h4>{{module.pagetitle}}</h4>
+                <ol>
+                    <li ng-repeat="topic in widget.topics track by $index">
+                        {{topic.name}} <span class="time">{{topic.time}} min</span>
+                    </li>
+                </ol>
+            </div>
+            <div ng-if="widget.invalidContentTypeError === 'yes'" class="error">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Wrong format, we accept .JPG .PNG &amp; .GIF</span>
+            </div>
+        </div>
+
+        <!-- Button-->
+        <div class="button-widget close-enabled" ng-if="widget.type === 'button'">
+            <span class="icon icon-close-4" ng-click="removeWidget($index);"></span>
+            <dnd-nodrag>
+                <input placeholder="Type button text here" focus="true" type="text" class="video-url" ng-model="widget.buttontext">
+                <input placeholder="Paste URL here" type="text" class="video-url" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getButtonUrl($index);">
+            </dnd-nodrag>
+            <md-button ng-if="!widget.buttontext" class="md-raised wigbtn" ng-disabled="true">
+                <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </md-button>
+            <md-button ng-if="widget.buttontext" class="md-raised wigbtn" ng-disabled="true" ng-click="gotoURL($index);">
+                <span>{{widget.buttontext}}</span>
+            </md-button>
+        </div>
+
+        <!-- File donwload -->
+        <div class="form-widget file-download close-enabled" ng-if="widget.type === 'filedownload'">
+            <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+
+            <div class="upld-inn" ng-class="{nh : widgetList[$parent.$index].attcharr.length > 0}">
+                <div class="drag-wrap" ng-model="uploadfile" name="uploadfile{{$index}}" ngf-max-size="10MB" ngf-select="uploadFileAttachment($file, $index, widget)" ng-if="(!widgetList[$parent.$index].attcharr || widgetList[$parent.$index].attcharr.length === 0) && widget.progress !== 'yes'">
+                    <span class="docicn icon-file"></span>
+                    <span class="text">Upload file</span>
+                </div>
+                <div class="list" ng-repeat="attachment in widgetList[$parent.$index].attcharr track by $index">
+                    <span class="docicn icon-file"></span>
+                    <span class="name">
+                        <a class="truncate" ng-class="{mtpg : contentType === 'multi-page'}" title="{{attachment.fnm}}" href="{{attachment.dwnurl}}">{{attachment.fnm}}</a>
+                        <div class="minstxt" ng-click="minutesClick($event, widget)" ng-if="contentType === 'multi-page'">
+                            Time est: <span class="min" ng-show="!widget.minsinput">{{attachment.timeest}}</span>
+                            <input ng-show="widget.minsinput" ng-blur="minutesBlur($event,widget)" class="mins" placeholder="Time est" type="number" min="1" max="999" ng-model="attachment.timeest">
+                            mins
+                        </div>
+                    </span>
+                    <span class="type">{{attachment.ext}}:</span>
+                    <span class="size">{{attachment.sz}} kb</span>
+                    <md-button class="delete-btn" ng-click="removeUploadedFile($parent.$index, $index);" aria-label="Delete">
+                        <span class="icon-close-5"></span>
+                    </md-button>
+                </div>
+                <div class="progress" ng-if="widget.progress === 'yes'">
+                    <span class="docicn icon-file"></span>
+                    <div class="text">
+                        Uploading
+                    </div>
+                    <span class="spinwrap">
+                        <md-progress-circular md-diameter="20px"></md-progress-circular>
+                    </span>
+                </div>
+            </div>
+
+            <div class="add-more-new-wrap" ng-if="widgetList[$parent.$index].attcharr && widgetList[$parent.$index].attcharr.length > 0" >
+                <md-button class="add-btn" ng-click="uploadFileAttachment($file, $index, widget)" aria-label="Add" ng-model="uploadfile" name="uploadfile{{$index}}" ngf-max-size="10MB" ngf-select="uploadFileAttachment($file, $index, widget)" ng-disabled="widget.progress === 'yes'">
+                    <span class="icon-plus"></span>
+                    <span class="text">add</span>
+                </md-button>
+            </div>
+            <div class="error error-form" ng-show="workflow3.uploadfile{{$index}}.$error.maxSize">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Sorry, attachment file size can not be more than 10 MB.</span>
+            </div>
+            <div class="error error-form" ng-if="widget.invalidContentTypeError === 'yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Sorry, this file is not supported, we accept: PNG, GIF, JPEG, BMP, XML, PDF, DOC, XLS, PPT, ZIP, CSV</span>
+            </div>
+            <div class="error error-form" ng-if="widget.virusDetectedError === 'yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Ouch! Looks like attachment file has a virus.</span>
+            </div>
+            <div class="error error-form" ng-if="widget.serverUploadError === 'yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">Sorry, attachment cannot be uploded.</span>
+            </div>
+        </div>
+
+        <!-- Horizontal rule -->
+        <div class="rule close-enabled" ng-if="widget.type === 'line' && !(contentType === 'embed-course' && embedPopUp === 'no')">
+            <hr><span class="icon icon-close-4" ng-click="removeWidget($index);"></span>
+        </div>
+
+        <!-- Delight VR video -->
+        <div class="rule close-enabled" ng-if="widget.type === 'VRvideo'">
+            <span class="icon icon-close-4" ng-click="removeWidget($index);"></span>
+            <span>360 Video</span>
+        </div>
+
+        <!-- Video -->
+        <div class="video close-enabled" ng-if="widget.type === 'video'">
+            <span class="icon icon-close-4" ng-click="removeWidget($index);"></span>
+            <dnd-nodrag>
+                <div class="vidinptwrp" ng-class="{mtpgvd : contentType === 'multi-page'}">
+                    <input placeholder="Video URL" focus="true" type="text" class="video-url" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getVideoUrl($index);">
+                    <span class="blrdv vdo"></span>
+                </div>
+                <div class="minstxt" ng-click="minutesClick($event, widget)" ng-if="contentType === 'multi-page'">
+                        Time est: <span class="min" ng-show="!widget.minsinput">{{widget.timeest}}</span>
+                        <input ng-show="widget.minsinput" ng-blur="minutesBlur($event, widget)" class="mins" placeholder="Time est" type="number" min="1" max="999" ng-model="widget.timeest">
+                        mins
+                    </div>
+            </dnd-nodrag>
+
+            <div ng-class="placeholder" ng-show="!widget.data">
+                <span class="text">
+                    Paste URL to embed video<br>(Youtube, Vimeo, Wistia)
+                </span>
+            </div>
+            <iframe title="EmbedFrame" class="video-iframe" width="420" height="315" ng-hide="!widget.data" ng-src="{{widget.safevideourl}}"></iframe>
+        </div>
+
+        <!-- Embed Link -->
+        <div class="video close-enabled" ng-if="widget.type === 'embedlink' && widget.popup === 'no'">
+            <div class="vidinptwrp">
+                <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getEmbedUrl($index);">
+                <span class="lbl-plhldr">URL:</span>
+                <span class="blrdv vdo"></span>
+            </div>
+            <div ng-class="placeholder" ng-show="!widget.data">
+                <span class="embd-icon icon-embed-bigger"></span>
+            </div>
+            <iframe title="EmbedFrame" ng-if="widget.fbembed !== 'yes'" class="video-iframe embed-frame" width="420" ng-hide="!widget.data" ng-src="{{widget.safeurl}}"></iframe>
+            <iframe title="EmbedFrame" ng-if="widget.fbembed === 'yes'" class="video-iframe embed-frame" width="420" ng-hide="!widget.data" ng-src="{{widget.safeurl}}" ng-style="{ height: widget.fbheight }"></iframe>
+        </div>
+
+        <div class="video embed-pop close-enabled-d" ng-if="widget.type === 'embedlink' && widget.popup === 'yes'">
+            <dnd-nodrag>
+                <div class="vidinptwrp">
+                    <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getEmbedUrl($index);">
+                    <span class="lbl-plhldr">URL:</span>
+                </div>
+            </dnd-nodrag>
+
+            <div class="preview-btn-wrap">
+                <md-button ng-click="embedPreviewModal(widget);" class="preview-btn md-raised" ng-if="widget.data.length > 0">
+                    <span class="pre-icon icon-preview-small"></span>
+                </md-button>
+            </div>
+        </div>
+        <div class="label-embed" ng-if="widget.type === 'embedlink' && widget.popup === 'yes'">
+            User-prompt
+        </div>
+        <div class="editor embed-pop close-enabled-editor" ng-if="widget.type === 'embedlink' && widget.popup === 'yes'">
+            <div class="button-wrap">
+                <md-button ngf-select="uploadEmbedBackgroud($file,widget)" accept="image/*" class="md-raised">
+                    <span class="upld-icon icon-image-upload"></span>
+                    <span class="text">
+                        Upload background
+                    </span>
+                </md-button>
+                <md-button ng-click="removeEmbedWidgetBg(widget)" class="md-raised" ng-if="widget.bgimage">
+                    <span class="upld-icon icon-image-delete"></span>
+                    <span class="text">
+                        Remove
+                    </span>
+                </md-button>
+            </div>
+            <div class="frame">
+                <div class="drkmsk"></div>
+                <!-- <img ng-src="{{widget.bgimage || '//:0'}}" class="embd-img" alt=""> -->
+                <img ng-if="widget.bgimage" ng-src="{{widget.bgimageCdn||widget.bgimage}}" class="embd-img" alt="">
+            </div>
+            <dnd-nodrag>
+                <textarea placeholder="Write a custom user-prompt to open pop-up" ui-tinymce="tinymceOptions" ng-model="widget.popuptext"></textarea>
+            </dnd-nodrag>
+        </div>
+
+        <!-- Embed course -->
+        <div class="video close-enabled" ng-if="widget.type === 'embed-course' && widget.popup === 'no'">
+            <div class="lblinfowrp">
+                <span class="icn icon-embed-link"></span>
+                <span class="txt" ng-if="widget.subtype === 'link'">Embed URL</span>
+                <span class="txt" ng-if="widget.subtype === 'h5p'">H5P URL</span>
+            </div>
+            <div ng-if="widget.subtype === 'link'" class="vidinptwrp">
+                <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getLearnEmbedUrl($index);">
+                <span class="lbl-plhldr">URL:</span>
+                <span class="blrdv vdo"></span>
+            </div>
+            <div ng-if="widget.subtype === 'h5p'" class="vidinptwrp h5p">
+                    <input placeholder="Paste H5P URL to embed" type="text" class="video-url h5pnopop embedinput" ng-model="widget.h5pdata" ng-model-options="{ updateOn: 'blur' }" ng-change="getLearnEmbedUrl($index);">
+                    <span class="lbl-plhldr">H5P URL:</span>
+                    <span class="blrdv vdo"></span>
+            </div>
+            <div ng-class="placeholder" ng-show="!widget.data">
+                <span class="embd-icon icon-embed-bigger"></span>
+            </div>
+            <iframe title="EmbedFrame" ng-if="widget.fbembed !== 'yes'" class="video-iframe embed-frame" width="420" ng-hide="(widget.subtype === 'link' && !widget.data) || (widget.subtype === 'h5p' && !widget.h5pdata) " ng-src="{{widget.safeurl}}"></iframe>
+            <iframe title="EmbedFrame" ng-if="widget.fbembed === 'yes'" class="video-iframe embed-frame" width="420" ng-hide="(widget.subtype === 'link' && !widget.data) || (widget.subtype === 'h5p' && !widget.h5pdata) " ng-src="{{widget.safeurl}}" ng-style="{ height: widget.fbheight }"></iframe>
+        </div>
+        <div class="editor embed-pop emdlnklvl3 close-enabled-editor" ng-if="widget.type === 'embed-course' && widget.popup === 'yes'">
+            <dnd-nodrag>
+                <div class="lblinfowrp">
+                    <span class="icn icon-embed-link"></span>
+                    <span class="txt" ng-if="widget.subtype === 'link'">Embed URL</span>
+                    <span class="txt" ng-if="widget.subtype === 'h5p'">H5P URL</span>
+                </div>
+                <div ng-if="widget.subtype === 'link'" class="vidinptwrp">
+                    <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getLearnEmbedUrl($index);">
+                    <span class="lbl-plhldr">URL:</span>
+                    <div class="preview-btn-wrap">
+                        <md-button ng-click="embedPreviewModal(widget);" class="preview-btn md-raised" ng-if="widget.data.length > 0">
+                            <span class="pre-icon icon-preview-small"></span>
+                        </md-button>
+                    </div>
+                </div>
+                <div ng-if="widget.subtype === 'h5p'" class="vidinptwrp h5p">
+                    <input placeholder="Paste URL to embed" type="text" class="video-url embedinput" ng-model="widget.h5pdata"
+                        ng-model-options="{ updateOn: 'blur' }" ng-change="getLearnEmbedUrl($index);">
+                    <span class="lbl-plhldr">H5P URL:</span>
+                    <div class="preview-btn-wrap">
+                        <md-button ng-click="embedPreviewModal(widget);" class="preview-btn md-raised" ng-if="widget.h5pdata.length > 0">
+                            <span class="pre-icon icon-preview-small"></span>
+                        </md-button>
+                    </div>
+                </div>
+                </dnd-nodrag>
+            <div class="button-wrap">
+                <md-button ngf-select="uploadEmbedBackgroud($file,widget)" accept="image/*" class="md-raised">
+                    <span class="upld-icon icon-image-upload"></span>
+                    <span class="text">
+                        Upload background
+                    </span>
+                </md-button>
+                <md-button ng-click="removeEmbedWidgetBg(widget)" class="md-raised" ng-if="widget.bgimage">
+                    <span class="upld-icon icon-image-delete"></span>
+                    <span class="text">
+                        Remove
+                    </span>
+                </md-button>
+            </div>
+            <div class="frame">
+                <div class="drkmsk"></div>
+                <span class="img-icn icon-image-bigger"></span>
+                <!-- <img ng-src="{{widget.bgimage || '//:0'}}" class="embd-img" alt=""> -->
+                <img ng-if="widget.bgimage" ng-src="{{widget.bgimageCdn || widget.bgimage}}" class="embd-img" alt="">
+            </div>
+            <dnd-nodrag>
+                <textarea placeholder="Add description or user prompt" ui-tinymce="tinymceOptionsEmbedCourse" ng-model="widget.popuptext"></textarea>
+                <div class="btnwrp">
+                    <input class="start-input" type="text" maxlength="37" placeholder="Start" ng-model="widget.btn">
+                </div>
+            </dnd-nodrag>
+        </div>
+
+        <!-- I9 widget -->
+        <div class="label-embed" ng-if="widget.type === 'I9'">
+            User-prompt
+        </div>
+        <div class="editor embed-pop close-enabled-editor" ng-if="widget.type === 'I9'">
+            <div class="button-wrap">
+                <md-button ngf-select="uploadEmbedBackgroud($file,widget)" accept="image/*" class="md-raised">
+                    <span class="upld-icon icon-image-upload"></span>
+                    <span class="text">
+                        Upload background
+                    </span>
+                </md-button>
+                <md-button ng-click="removeEmbedWidgetBg(widget)" class="md-raised" ng-if="widget.bgimage">
+                    <span class="upld-icon icon-image-delete"></span>
+                    <span class="text">
+                        Remove
+                    </span>
+                </md-button>
+            </div>
+            <div class="frame">
+                <div class="drkmsk"></div>
+                <!-- <img ng-src="{{widget.bgimage || '//:0'}}" class="embd-img" alt=""> -->
+                <img ng-if="widget.bgimage" ng-src="{{widget.bgimageCdn || widget.bgimage}}" class="embd-img" alt="">
+            </div>
+            <dnd-nodrag>
+                <textarea placeholder="Write a custom user-prompt to open pop-up" ui-tinymce="tinymceOptions" ng-model="widget.popuptext"></textarea>
+            </dnd-nodrag>
+        </div>
+
+        <!-- Video Recording Widget -->
+        <div class="editor embed-pop vrlvl3 close-enabled-editor" ng-if="widget.type === 'video-rec'">
+            <dnd-nodrag>
+            <div class="button-wrap">
+                <md-button ngf-select="uploadEmbedBackgroud($file,widget)" accept="image/*" class="md-raised">
+                    <span class="upld-icon icon-image-upload"></span>
+                    <span class="text">
+                        Upload background
+                    </span>
+                </md-button>
+                <md-button ng-click="removeEmbedWidgetBg(widget)" class="md-raised" ng-if="widget.bgimage">
+                    <span class="upld-icon icon-image-delete"></span>
+                    <span class="text">
+                        Remove
+                    </span>
+                </md-button>
+            </div>
+            <div class="frame">
+                <div class="drkmsk"></div>
+                <img ng-if="widget.bgimage" ng-src="{{widget.bgimageCdn || widget.bgimage}}" class="embd-img" alt="">
+            </div>
+            <textarea placeholder="Add description or user prompt" ui-tinymce="tinymceOptionsMyInterview" ng-model="widget.popuptext"></textarea>
+            <div class="btnwrp">
+                <md-button ng-click="" class="md-raised">
+                    <span class="text">
+                        Start
+                    </span>
+                </md-button>
+            </div>
+            <md-checkbox class="chckbx" aria-label="Allow recording to be reused again" ng-model="widget.allowrpt" ng-true-value="'y'" ng-false-value="'n'">
+                <span>Allow recording to be reused again</span>
+            </md-checkbox>
+            <span class="ttlwrp">
+                <span class="icn icon-tooltip"></span>
+                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                    <span class="copy">
+                        <p>
+                            Participants can reuse the same video recording across other workflows.
+                        </p>
+                    </span>
+                </md-tooltip>
+            </span>
+            </dnd-nodrag>
+        </div>
+
+        <!-- Event-->
+        <div class="event-widget close-enabled" ng-if="widget.type === 'event'">
+            <span class="dtwrap">
+                <span class="lbl">Date</span>
+                <div layout="row" layout-align="start center">
+                    <div flex="10">
+                        <md-input-container md-no-float class="sdd day">
+                            <span class="icon-arw icon-arrow-4" ng-if="widget.bfonaf === 'on'"></span>
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select period units" ng-model="widget.prdunt" ng-disabled="widget.bfonaf === 'on'">
+                                <md-option ng-repeat="day in eventDaysArr track by $index" value="{{day.value}}">{{day.value}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex="25">
+                        <md-input-container md-no-float class="sdd">
+                            <span class="icon-arw icon-arrow-4" ng-if="widget.bfonaf === 'on'"></span>
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select period type" ng-model="widget.prdtyp" ng-disabled="widget.bfonaf === 'on'">
+                                <md-option value="dy">Day(s)</md-option>
+                                <md-option value="wk">Week(s)</md-option>
+                                <md-option value="mh">Month(s)</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex="25">
+                        <md-input-container md-no-float class="sdd">
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select before/after" ng-model="widget.bfonaf">
+                                <md-option value="af">After</md-option>
+                                <md-option value="bf">Before</md-option>
+                                <md-option value="on">On</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <md-menu-bar class="lngmenu" flex="40" ng-class="{required : !widget.dtlbl}">
+                        <md-menu>
+                            <button ng-click="$mdOpenMenu()">
+                                <span ng-if="widget.dtlbl.length > 0 && widget.dtlbl.length < 21">{{widget.dtlbl}}</span>
+                                <span ng-if="widget.dtlbl.length > 20">...<a title="{{widget.dtlbl}}">{{widget.dtlbl.substring(widget.dtlbl.length-20,widget.dtlbl.length)}}</a></span>
+
+                                <span class="text plhldr" ng-if="!widget.dtlbl">Select date</span>
+                                <span class="icon icon-arrow-7"></span>
+                            </button>
+                            <md-menu-content>
+                                <md-button ng-click="setFixedDate($event,widget,'{{newhire_startdt}}', 'Start date')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Start date</span>
+                                </md-button>
+                                <md-button ng-click="setFixedDate($event,widget,'{{currentdt}}', 'Current date')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Current date</span>
+                                </md-button>
+                                <md-menu-item ng-if="widget.fielddata.cflist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Custom fields</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cf in widget.fielddata.cflist track by $index">
+                                                <md-button ng-click="setCustomFieldAnswer($event,widget,cf.uid)">
+                                                    <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                    <span class="text">{{cf.nm}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="widget.fielddata.formlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                        <md-menu-content>
+                                            <md-menu ng-repeat="formEntry in widget.fielddata.formlist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">{{formEntry.formname}}</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="formdtl in formEntry.formfields track by $index">
+                                                            <md-button ng-click="setformFieldAnswer($event,widget, formEntry.formid, formdtl.uid,formEntry.formname, formdtl.fnm);">
+                                                                <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                                <span class="text">{{formdtl.fnm}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-bar>
+                </div>
+            </span>
+            <span class="tmwrap">
+                <span class="lbl">Time</span>
+                <div layout="row" layout-align="start center">
+                    <div flex="50">
+                        <md-input-container md-no-float class="sdd">
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select time from" ng-model="widget.tmfrm" ng-change='onCalendarInviteStartTimeChange(widget)' ng-disabled="widget.ad==='y'">
+                                <md-option ng-repeat="time in eventTimeArr track by $index" value="{{time.value}}">{{time.value}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex="5" class="sep">
+                        -
+                    </div>
+                    <div flex="50">
+                        <md-input-container md-no-float class="sdd lst">
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select time to" ng-model="widget.tmto" ng-change='onCalendarInviteEndTimeChange(widget)' ng-disabled="widget.ad==='y'">
+                                <md-option ng-repeat="time in eventTimeArr track by $index" value="{{time.value}}">{{time.value}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                </div>
+            </span>
+            <div class="checkbox-container">
+                <md-checkbox class="adck" aria-label="All day" ng-model="widget.ad" ng-true-value="'y'" ng-false-value="'n'" ng-change="onCheckAllDayEvent(widget);">
+                    <span>All day</span>
+                </md-checkbox>
+                <md-checkbox aria-label="Repeat this event:" ng-model="widget.rpt" ng-true-value="'y'" ng-false-value="'n'">
+                    <span>Repeat this event:</span>
+                </md-checkbox>
+                <md-input-container flex>
+                <md-select ng-if="widget.rpt ==='y'" md-container-class="advopt-dd" aria-label="Repeat" ng-model="widget.rptfrq">
+                    <md-option value="wk">Weekly</md-option>
+                    <md-option value="mh">Monthly</md-option>
+                    <md-option value="qr">Quarterly</md-option>
+                    <md-option value="yr">Yearly</md-option>
+                </md-select>
+                </md-input-container>
+            </div>
+            <hr>
+            <dnd-nodrag>
+                <md-input-container class="required md-block">
+                    <label>Event title</label>
+                    <input md-no-asterisk ng-model="widget.nm" placeholder="Enter event name..." required ng-click="getCursorPos($event, 'widgetnm')" ng-keyup="getCursorPos($event, 'widgetnm')">
+                    <md-menu-bar>
+                        <md-menu>
+                            <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                <span class="icon icon-dynamic-text"></span>
+                                <span class="msk"></span>
+                            </button>
+                            <md-menu-content>
+                                <md-menu-item>
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Names</md-button>
+                                        <md-menu-content>
+                                            <md-button ng-click="updateEventField(widget, widget.nm, 'nm', '{{account_name}}')">
+                                                <span class="icon-dtype icon-f-shorttext"></span>
+                                                <span class="text">Account name</span>
+                                            </md-button>
+                                            <md-menu ng-repeat="nameEntry in namelist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">{{nameEntry.lbl}}</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.nm, 'nm', namedtl.key)">
+                                                                <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                                <span class="text">{{namedtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="catlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cat in catlist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.nm, 'nm', cat.key)">
+                                                    <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                    <span class="text">{{cat.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="cflist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cf in cflist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.nm, 'nm', cf.key)">
+                                                    <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                    <span class="text">{{cf.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="formlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                        <md-menu-content>
+                                            <md-menu ng-repeat="formEntry in formlist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">
+                                                    {{formEntry.lbl}}
+                                                </md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="formdtl in formEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.nm, 'nm', formdtl.key)">
+                                                                <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                                <span class="text">{{formdtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-button ng-click="updateEventField(widget, widget.nm, 'nm', '{{newhire_startdt}}')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Start date</span>
+                                </md-button>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-bar>
+                </md-input-container>
+                <md-input-container class="md-block">
+                    <label>Event location</label>
+                    <input ng-model="widget.loc" ng-click="getCursorPos($event, 'widgetloc')" ng-keyup="getCursorPos($event, 'widgetloc')">
+                    <md-menu-bar>
+                        <md-menu>
+                            <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                <span class="icon icon-dynamic-text"></span>
+                                <span class="msk"></span>
+                            </button>
+                            <md-menu-content>
+                                <md-menu-item>
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Names</md-button>
+                                        <md-menu-content>
+                                            <md-button ng-click="updateEventField(widget, widget.loc, 'loc', '{{account_name}}')">
+                                                <span class="icon-dtype icon-f-shorttext"></span>
+                                                <span class="text">Account name</span>
+                                            </md-button>
+                                            <md-menu ng-repeat="nameEntry in namelist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">{{nameEntry.lbl}}</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.loc, 'loc', namedtl.key)">
+                                                                <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                                <span class="text">{{namedtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="catlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cat in catlist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.loc, 'loc', cat.key)">
+                                                    <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                    <span class="text">{{cat.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="cflist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cf in cflist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.loc, 'loc', cf.key)">
+                                                    <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                    <span class="text">{{cf.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="formlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                        <md-menu-content>
+                                            <md-menu ng-repeat="formEntry in formlist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">
+                                                    {{formEntry.lbl}}
+                                                </md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="formdtl in formEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.loc, 'loc', formdtl.key)">
+                                                                <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                                <span class="text">{{formdtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-button ng-click="updateEventField(widget, widget.loc, 'loc', '{{newhire_startdt}}')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Start date</span>
+                                </md-button>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-bar>
+                </md-input-container>
+                <md-input-container class="md-block dscptn">
+                    <label>Event description</label>
+                    <textarea ng-model="widget.desc" ng-click="getCursorPos($event, 'widgetdesc')" ng-keyup="getCursorPos($event, 'widgetdesc')"></textarea>
+                    <md-menu-bar>
+                        <md-menu>
+                            <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                <span class="icon icon-dynamic-text"></span>
+                                <span class="msk"></span>
+                            </button>
+                            <md-menu-content>
+                                <md-menu-item>
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Names</md-button>
+                                        <md-menu-content>
+                                            <md-button ng-click="updateEventField(widget, widget.desc, 'desc', '{{account_name}}')">
+                                                <span class="icon-dtype icon-f-shorttext"></span>
+                                                <span class="text">Account name</span>
+                                            </md-button>
+                                            <md-menu ng-repeat="nameEntry in namelist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">{{nameEntry.lbl}}</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.desc, 'desc', namedtl.key)">
+                                                                <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                                <span class="text">{{namedtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="catlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cat in catlist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.desc, 'desc', cat.key)">
+                                                    <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                    <span class="text">{{cat.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="cflist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cf in cflist track by $index">
+                                                <md-button ng-click="updateEventField(widget, widget.desc, 'desc', cf.key)">
+                                                    <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                    <span class="text">{{cf.value}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="formlist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                        <md-menu-content>
+                                            <md-menu ng-repeat="formEntry in formlist track by $index">
+                                                <md-button ng-click="$mdOpenMenu()">
+                                                    {{formEntry.lbl}}
+                                                </md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="formdtl in formEntry.dtls track by $index">
+                                                            <md-button ng-click="updateEventField(widget, widget.desc, 'desc', formdtl.key)">
+                                                                <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                                <span class="text">{{formdtl.value}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                    </md-menu-content>
+                                            </md-menu>
+
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-button ng-click="updateEventField(widget, widget.desc, 'desc', '{{newhire_startdt}}')">
+                                    <span class="icon-dtype icon-f-date"></span>
+                                    <span class="text">Start date</span>
+                                </md-button>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-bar>
+                </md-input-container>
+                <div class="evt-input-wrap">
+                    <input class="evt-input" type="text" maxlength="37" ng-model="widget.btn">
+                </div>
+            </dnd-nodrag>
+        </div>
+
+        <!-- Acknowledgement -->
+        <div class="form-widget multiple-choice-widget ack-widget close-enabled" ng-if="widget.type === 'acknowledgement'">
+
+            <div class="control-popover ack-popover">
+                <div class="arrow"></div>
+                <div class="btm-wrap multiple">
+                    <md-input-container class="mc-dd">
+                        <md-select aria-label="Multiple Choice Type" placeholder="Select" ng-model="widget.dec_type" md-container-class="form-dd" ng-change="updateDecType(widget)">
+                            <md-option value="radio">
+                                <span class="icon-select icon-radio-small"></span>
+                                Radio button (single answer)
+                            </md-option>
+                            <md-option value="check">
+                                <span class="icon-select icon-ratetick2"></span>
+                                Check box (multiple answers)
+                            </md-option>
+                            <md-option value="text">
+                                <span class="icon-select icon-text-small"></span>
+                                Text  (declaration or statement)
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <div class="switch-wrap">
+                        <md-switch ng-model="widget.dec_show" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Show checklist/statement" ng-change="updateDecSwitch(widget, widget.dec_show);">
+                            Show checklist/statement
+                        </md-switch>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nm-input ack-nm-input">
+                <div ng-if="widget.dec_show==='yes'">
+                    <div class="editor focus" ng-if="widget.dec_type === 'text'">
+                        <textarea placeholder="Type your text into the box..." ui-tinymce="tinymceOptionsAck" ng-model="widget.dec_text"></textarea>
+                    </div>
+                    <div class="radio-wrap" ng-if="widget.dec_type === 'radio'">
+                        <md-radio-group ng-model="widget.dec_val" ng-repeat="opt in widget.dec_opt track by $index">
+                            <md-radio-button value="{{opt.val}}" aria-label="radio button">
+                            </md-radio-button>
+                            <input class="text-field" ng-model="opt.val" placeholder="Write a description" focused-on="$last">
+                            <md-button class="delete-btn" ng-click="widget.dec_opt.splice($index,1)" aria-label="Close">
+                                <span class="icon-del icon-close-5"></span>
+                            </md-button>
+                        </md-radio-group>
+                        <div class="add-more-new-wrap">
+                            <md-button class="add-more" ng-click="widget.dec_opt.push({val:''})">
+                                <span class="icon-plus"></span>
+                                <span class="text">add choice</span>
+                            </md-button>
+                        </div>
+                    </div>
+                    <div class="checkbox-wrap" ng-if="widget.dec_type === 'check'">
+                        <div class="checkbox-wrap-inner" ng-repeat="opt in widget.dec_opt track by $index">
+                            <md-checkbox ng-model="opt.sel" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Checkbox"></md-checkbox>
+                            <input class="text-field" placeholder="Write a description" ng-model="opt.val" required ng-if="$index===0">
+                            <input class="text-field" placeholder="Write a description" ng-model="opt.val" required ng-if="$index===1">
+                            <input class="text-field" placeholder="Write a description" ng-model="opt.val" required focused-on="$last" ng-if="$index > 1">
+                            <md-button class="delete-btn" ng-click="widget.dec_opt.splice($index,1)" aria-label="Close">
+                                <span class="icon-del icon-close-5"></span>
+                            </md-button>
+                        </div>
+                        <div class="add-more-new-wrap">
+                            <md-button class="add-more" ng-click="widget.dec_opt.push({val:'', sel:false})">
+                                <span class="icon-plus"></span>
+                                <span class="text">add choice</span>
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+                <div class="input-wrap">
+                    <input class="agree-input" type="text" maxlength="37" placeholder="Write a description" ng-model="widget.btn">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Profile widget -->
+        <div class="form-widget prfl-widget close-enabled" ng-if="widget.type === 'profile'">
+            <div class="control-popover">
+                <div class="arrow"></div>
+                <div class="btm-wrap">
+                    <md-input-container ng-class="{'type-mob' : widget.dtype === 'mobile'}" class="direct-dropdown">
+                        <md-select aria-label="Select profile option" ng-model="widget.mgrid" md-container-class="prof-dd form-dd" ng-change="onProfileRoleChange(widget)">
+                            <md-option ng-repeat="mgr in commManagers track by $index" value="{{mgr.uid}}">{{mgr.l}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <div class="switch-wrap">
+                        <md-switch ng-model="widget.dispnme" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Display name">
+                            Display name
+                        </md-switch>
+                        <md-switch ng-model="widget.link" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Link to profile info">
+                            Link to profile info
+                        </md-switch>
+                    </div>
+                    <div class="tltpwrp">
+                        <span class="icn icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">LINK TO PROFILE INFO</h4>
+                                <p>
+                                    Image links to participants contact information.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </div>
+                </div>
+            </div>
+            <div class="hdmsk"></div>
+            <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+            <span class="field-name-wrap">
+                <span class="field-name truncate">{{getParticipantLabel(widget.mgrid);}}</span>
+            </span>
+            <div class="nm-input">
+                <img class="prflicn" ng-class="{lnk : widget.link === 'yes'}" src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                <span class="dispnm" ng-if="widget.dispnme === 'yes'">
+                    {{getParticipantLabel(widget.mgrid);}} full name
+                </span>
+            </div>
+        </div>
+    </div>
+</div>

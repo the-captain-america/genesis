@@ -1,0 +1,551 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl" ng-if="wfid!= 'default'">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+<div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+    <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+    <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+    <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+</div>
+
+<div class="container content-editor">
+    <form name="sendDataWidgetForm" novalidate>
+    	<div class="content-editor-content senddata-editor" ng-class="{wider : sd_action === 'updateval'}" ng-cloak>
+            <div class="maskd" ng-if="locked === 'Y'"></div>
+    		<div class="heading">
+    			<md-input-container class="md-block">
+    				<label>Page title</label>
+    				<input class="heading-input" placeholder="Write a description" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();"></input>
+                    <span class="blrdv esgn"></span>
+    			</md-input-container>
+    		</div>
+
+            <!-- <div>
+                <md-input-container md-no-float flex>
+                    <md-select md-no-asterisk md-container-class="senddata-select" aria-label="Select action" placeholder="Select action" ng-model="sd_action" ng-change="updateDragList();" required>
+                        <md-option value="email">Send Email</md-option>
+                        <md-option value="webhook">Send Webhook</md-option>
+                        <md-option value="updateval">Update value</md-option>
+                    </md-select>
+                </md-input-container>
+            </div> -->
+
+            <!-- Email -->
+            <div ng-if="sd_action === 'email'" class="select-group">
+                <div class="content-wrap">
+                    <label>Email to</label>
+                    <div class="email-wrap" ng-repeat="selRecp in sd_email.recpList track by $index">
+                        <span ng-if="selRecp.t === 'r'">
+                            <md-input-container md-no-float class="md-block">
+                                <md-select md-no-asterisk md-container-class="senddata-select fixed-dd" aria-label="Email recipients" placeholder="Select" ng-model="selRecp.recp" required>
+                                    <md-option value="{{recp.uid}}" ng-repeat="recp in availableRecpList track by $index">{{recp.l}}</md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-button class="delete-btn sel-box" ng-click="deleteEmailRecp($index);" aria-label="Close">
+                                <span class="icon icon-close-5"></span>
+                            </md-button>
+                            <div class="delete-btn-cover"></div>
+                        </span>
+                        <span ng-if="selRecp.t === 's'">
+                            <md-input-container md-no-float class="md-block required">
+                                <input aria-label="Email address" placeholder="Enter email address" ng-model="selRecp.recp" type="email" required>
+                             </md-input-container>
+                            <md-button class="delete-btn" ng-click="deleteEmailRecp($index);" aria-label="Close">
+                                <span class="icon icon-close-5"></span>
+                            </md-button>
+                            <div class="delete-btn-cover"></div>
+                        </span>
+                    </div>
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="addMoreEmailRecp();">
+                            <span class="icon icon-plus"></span>
+                            <span class="text">add more</span>
+                        </md-button>
+                        <span class="seprator">/</span>
+                        <md-button class="add-more" ng-click="addMoreEmailParticipant();">
+                            <span class="text">participants</span>
+                        </md-button>
+                    </div>
+                    <hr>
+                </div>
+
+                <div class="content-wrap sub-wrap">
+                    <label>Subject</label>
+                    <div>
+                        <md-input-container flex class="sub-input">
+                            <input aria-label="Subject" ng-model="sd_email.subject" required>
+                            <!-- <div contenteditable="true" ng-model="sd_email.subject"></div> -->
+
+                            <div class="custom-dropdown-wrap">
+                                <span class="icon mm-dropdown icon-dynamic-text"></span>
+                                <ul class="list-wrap multi">
+                                    <li ng-repeat="tokenItem in tokenList track by tokenItem.id">
+
+                                        <span ng-if="tokenItem.haschild ==='n' && (tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(tokenItem.tok);" ng-class="{tempsd : tokenItem.lbl === 'Start date'}">
+                                            <span ng-if="tokenItem.iconname" class="icon-dtype {{tokenItem.iconname}}"></span>
+                                            {{tokenItem.lbl}}
+                                        </span>
+                                        <span class="truncate"  ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)">{{tokenItem.lbl}}</span>
+                                        <span class="more-arrow icon-arrow-6" ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)"></span>
+                                        <ul class="list-wrap-inner" ng-if="tokenItem.haschild==='y' && (tokenItem.avail.indexOf('s') !== -1)">
+
+                                            <li ng-repeat="l2tokenItem in tokenItem.childlist track by $index">
+
+                                                <span ng-if="l2tokenItem.haschild==='n' && (l2tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(l2tokenItem.tok);">
+                                                    <span ng-if="l2tokenItem.iconname" class="icon-dtype {{l2tokenItem.iconname}}"></span>
+                                                    {{l2tokenItem.lbl}}
+                                                </span>
+                                                <span class="truncate"  ng-if="l2tokenItem.haschild==='y'  && (l2tokenItem.avail.indexOf('s') !== -1)">{{l2tokenItem.lbl}}</span>
+                                                <span class="more-arrow icon-arrow-6" ng-if="l2tokenItem.haschild==='y'  && (l2tokenItem.avail.indexOf('s') !== -1)"></span>
+                                                <ul class="list-wrap-inner" ng-if="l2tokenItem.haschild==='y'">
+                                                    <li ng-repeat="l3tokenItem in l2tokenItem.childlist track by $index">
+
+                                                        <span ng-if="l3tokenItem.haschild==='n' && (l3tokenItem.avail.indexOf('s') !== -1)" ng-click="updateSubject(l3tokenItem.tok);">
+                                                            <span ng-if="l3tokenItem.iconname" class="icon-dtype {{l3tokenItem.iconname}}"></span>
+                                                            {{l3tokenItem.lbl}}
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </div>
+                         </md-input-container>
+                    </div>
+                </div>
+
+                <div class="content-wrap">
+                    <label>Message</label>
+                    <div class="editor close-enabled-editor focus">
+                        <textarea ui-tinymce="tinymceOptions" ng-model="sd_email.message"></textarea>
+                    </div>
+                </div>
+                <div class="atchfile-wrap">
+                    <div class="atchfile" ng-model="attachfile" name="attachfile" ngf-max-size="10MB" ngf-select="uploadEmailAttachment($file)">
+                        <span class="icon icon-attachement-small"></span>
+                        <span class="text">Attach file</span>
+                    </div>
+                    <div class="atchfile-list" ng-repeat="attachment in sd_email.attcharr track by $index">
+                        <span class="list">
+                            <span class="text">
+                                <a class="truncate" title="{{sd_email.attcharr[$index].fnm}}" href="{{sd_email.attcharr[$index].dwnurl}}">{{sd_email.attcharr[$index].fnm}}</a>
+                                ({{sd_email.attcharr[$index].sz}} KB)
+                            </span>
+                        <md-button class="delete-btn" ng-click="removeUploadedFile($index);" aria-label="Delete">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                        </span>
+                    </div>
+                    <div class="progress" ng-if="progress === 'yes'">
+                        <div class="text">
+                            Uploading
+                        </div>
+                        <span class="spinwrap">
+                            <md-progress-circular md-diameter="20px"></md-progress-circular>
+                        </span>
+                    </div>
+                    <div class="error error-form" ng-if="sendDataWidgetForm.attachfile.$error.maxSize">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Sorry, attachment file size can not be more than 10 MB.</span>
+                    </div>
+                    <div class="error error-form" ng-if="invalidContentTypeError === 'yes'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Sorry, this file is not supported, we accept: PNG, GIF, JPEG, BMP, XML, PDF, DOC, XLS, PPT, ZIP, CSV</span>
+                    </div>
+                    <div class="error error-form" ng-if="virusDetectedError === 'yes'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Ouch! Looks like attachment file has a virus.</span>
+                    </div>
+                    <div class="error error-form" ng-if="serverUploadError === 'yes'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Sorry, attachment cannot be uploaded.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Webhook -->
+            <div ng-if="sd_action === 'webhook'" class="webhook-wrap">
+                <div class="action-wrap" ng-class="{adwhk : !webhook.url}" layout="row" layout-align="center center" ng-controller="addWebhookController">
+                    <span class="icon-advanced icon-webhook"></span>
+                    <span class="info">Set up the receiver details</span>
+                    <md-button class="md-raised refresh" ng-click="addWebhookLink();">
+                        <span class="text" ng-if="!webhook.url">add webhook</span>
+                        <span class="text" ng-if="webhook.url">edit webhook</span>
+                    </md-button>
+                </div>
+                <div class="select-group">
+                    <label>Data to send via webhook</label>
+
+                    <div ng-class="{'placeholder-text' : (sd_webhook.itemlist.length === 0 && !sd_webhook.webhook.payload), 'token-holder' : sd_webhook.itemlist.length > 0, overlay : webhook_overlay === 'yes', duplicate : webhook_duperr === 'yes'}" dnd-list="sd_webhook.itemlist" dnd-drop="dropCallbackWebhokkItemDropped(event, index,item);" ng-if="!sd_webhook.webhook.payload">
+                        <span class="text" ng-if="sd_webhook.itemlist.length === 0 && !sd_webhook.webhook.payload">Drag the elements you would like to send</span>
+                        <div class="json-overlay" ng-if="sd_webhook.webhook.payload">
+                            <span class="text">When using JSON, you need to manage all your data through&nbsp;'Edit&nbsp;Webhook' above</span>
+                        </div>
+                        <div class="json-overlay" ng-if="webhook_duperr === 'yes'"></div>
+                        <span ng-class="{'tokens-wrap' : 1 === 1 , 'duplicate' : webhookItem.dupErr === 'yes'}" class="" ng-repeat="webhookItem in sd_webhook.itemlist track by $index">
+                            <span class="tokens" ng-style="{'background': webhookItem.bgcolor}">
+                                {{webhookItem.nestlbl}}
+                                <span class="rmv-tkn icon-close-3" ng-click="removeWebhookItem($index);"></span>
+                            </span>
+                            <span class="cnt" ng-click="" ng-if="webhookItem.dupErr === 'yes'">{{webhookItem.lbl}}</span>
+                        </span>
+
+                    </div>
+
+                    <div ng-class="{'placeholder-text' : (sd_webhook.itemlist.length === 0 && !sd_webhook.webhook.payload), 'token-holder' : sd_webhook.itemlist.length > 0, overlay : webhook_overlay === 'yes', duplicate : webhook_duperr === 'yes'}" ng-if="sd_webhook.webhook.payload">
+                        <span class="text" ng-if="sd_webhook.itemlist.length === 0 && !sd_webhook.webhook.payload">Drag the elements you like to send</span>
+                        <div class="json-overlay" ng-if="sd_webhook.webhook.payload">
+                            <span class="text">When using JSON, you need to manage all your data through&nbsp;'Edit&nbsp;Webhook' above</span>
+                        </div>
+                        <span ng-class="{'tokens-wrap' : 1 === 1 , 'duplicate' : webhookItem.dupErr === 'yes'}" class="" ng-repeat="webhookItem in sd_webhook.itemlist track by $index">
+                            <span class="tokens" ng-style="{'background': webhookItem.bgcolor}">
+                                {{webhookItem.nestlbl}}
+                                <span class="rmv-tkn icon-close-3" ng-click="removeWebhookItem($index);"></span>
+                            </span>
+                        </span>
+
+                    </div>
+
+
+                </div>
+            </div>
+
+            <!-- Update value -->
+            <div ng-if="sd_action === 'updateval'">
+                <div layout="row" layout-align="center center">
+                    <div class="content-wrap" flex="50">
+                        <label>UPDATE THIS FIELD</label>
+                    </div>
+                    <div class="content-wrap" flex="50">
+                        <label class="new-val">WITH THIS VALUE</label>
+                    </div>
+                </div>
+
+                <div ng-repeat="seldata in sd_updval.datalist track by $index" ng-init="outerIndex=$index" class="updvalwrap close-enabled" ng-class="{'focus':$last}">
+                    <div layout="row" layout-align="center center" class="select-group updateval-rpt">
+                        <span ng-if="sd_updval.datalist.length > 1" class="icon-remove icon-close-4" ng-click="deleteUpdValData($index);"></span>
+
+                        <div flex="45" class="sub-input field-update">
+                            <span class="fkmnu" ng-show="sourceMenuRowIndex !== $index" ng-mouseover="showSourceMenu($index);">
+                                <span class="text placeholder" ng-if="!seldata.target.nestlbl">Select field</span>
+                                <span class="text" ng-if="seldata.target.nestlbl">{{seldata.target.nestlbl}}</span>
+                                <span class="icon-dropdown icon-arrow-7"></span>
+                            </span>
+                            <md-menu-bar ng-if="sourceMenuRowIndex === $index">
+                                <md-menu>
+                                    <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                        <span class="mm-dropdown">
+                                            <span class="text placeholder" ng-if="!seldata.target.nestlbl">Select field</span>
+                                            <span class="text" ng-if="seldata.target.nestlbl">{{seldata.target.nestlbl}}</span>
+                                            <span class="icon-dropdown icon-arrow-7"></span>
+                                        </span>
+                                    </button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="tokenItem in ::tokenList track by tokenItem.id">
+
+                                            <md-button ng-click="selectTargetValue(outerIndex,tokenItem);" ng-if="::tokenItem.haschild ==='n' && (tokenItem.avail.indexOf('ut') !== -1)">
+                                                <span ng-if="::tokenItem.lbl === 'Start date'" class="icon-dtype icon-sd icon-f-date"></span>
+                                                {{::tokenItem.lbl}}
+                                            </md-button>
+
+                                            <md-menu ng-if="::tokenItem.haschild==='y' && (tokenItem.avail.indexOf('ut') !== -1)">
+                                                <md-button ng-click="$mdOpenMenu()">{{::tokenItem.lbl}}</md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='n' && (l2tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <md-button ng-click="selectTargetValue(outerIndex,l2tokenItem);">
+                                                            <span ng-if="::l2tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                            <span ng-if="::l2tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                            <span ng-if="::l2tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="::l2tokenItem.icon === 'picklist'" class="icon-dtype icon-f-choice"></span>
+                                                            <span class="text">{{::l2tokenItem.lbl}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                    <md-menu ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='y' && (l2tokenItem.avail.indexOf('ut') !== -1)">
+                                                        <md-button ng-click="$mdOpenMenu()">
+                                                            {{::l2tokenItem.lbl}}
+                                                        </md-button>
+                                                            <md-menu-content>
+                                                                <md-menu-item ng-repeat="l3tokenItem in ::l2tokenItem.childlist track by $index" >
+                                                                    <md-button ng-click="selectTargetValue(outerIndex, l3tokenItem);">
+                                                                        <span ng-if="::l3tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                                        <span ng-if="::l3tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                                        <span ng-if="::l3tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span ng-if="::l3tokenItem.icon === 'profile'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span class="text">{{::l3tokenItem.lbl}}</span>
+                                                                    </md-button>
+                                                                </md-menu-item>
+                                                            </md-menu-content>
+                                                    </md-menu>
+                                                </md-menu-content>
+                                            </md-menu>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-bar>
+                        </div>
+
+                        <div class="equal-sep" ng-class="{disabled : !seldata.target.id}" flex="5">
+                            <span class="icon icon-arrow-10"></span>
+                        </div>
+
+                        <md-input-container flex="45" class="sub-input valuemd md-block" md-no-float>
+                            <input aria-label="new value" ng-if="!seldata.target.id" ng-model="seldata.source.nestlbl" disabled required>
+                            <!-- <input aria-label="new value" ng-if="seldata.target.id" placeholder="Set value" ng-model="seldata.source.nestlbl" required> -->
+                            <span class="tokens-wrap" ng-if="seldata.target.id">
+                                <span class="tokens" ng-if="seldata.source.nestlbl.length > 0 || seldata.entry === 'manual'" ng-style="{'background': seldata.source.bgcolor}">
+                                    <span ng-if="seldata.entry === 'manual'">Manual text entry</span>
+                                    <span ng-if="seldata.entry !== 'manual' && seldata.source.nestlbl.length < 30">{{seldata.source.nestlbl}}</span>
+                                    <span ng-if="seldata.entry !== 'manual' && seldata.source.nestlbl.length > 29">...<a title="{{seldata.source.nestlbl}}">{{seldata.source.nestlbl.substring(seldata.source.nestlbl.length-24,seldata.source.nestlbl.length)}}</a></span>
+                                    <span class="rmv-tkn icon-close-3" ng-click="removeSourceLabel(outerIndex);"></span>
+                                </span>
+                            </span>
+                            <div class="custom-dropdown-wrap newvalue">
+                                <span class="fkwrp" ng-show="targetMenuRowIndex !== $index" ng-mouseover="showTargetMenu($index);">
+                                    <div class="msk" ng-if="!seldata.target.id"></div>
+                                    <span class="icon icon-dynamic-text"></span>
+                                </span>
+                                <md-menu-bar ng-if="targetMenuRowIndex === $index">
+                                    <div class="msk" ng-if="!seldata.target.id"></div>
+                                    <md-menu>
+                                        <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                            <span class="icon icon-dynamic-text"></span>
+                                        </button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="tokenItem in ::tokenList track by tokenItem.id" ng-if="(seldata.target.id && seldata.target.id !== tokenItem.id && tokenItem.haschild ==='y' && tokenItem.avail.indexOf('us') !== -1 && tokenItem.dtype.indexOf(seldata.target.dtype) > -1) || (tokenItem.lbl === 'Start date' && tokenItem.dtype.indexOf(seldata.target.dtype) > -1)">
+                                                <md-button ng-click="selectSourceValue(outerIndex,tokenItem);" ng-if="::tokenItem.lbl === 'Start date' && tokenItem.dtype.indexOf(seldata.target.dtype) > -1">
+                                                    <span class="icon-dtype icon-sd icon-f-date"></span>{{::tokenItem.lbl}}
+                                                </md-button>
+                                                <md-menu ng-if="::tokenItem.lbl !== 'Start date'">
+                                                    <md-button ng-click="$mdOpenMenu()">{{::tokenItem.lbl}}</md-button>
+                                                    <md-menu-content>
+                                                        <md-menu-item ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='n' && seldata.target.id !== l2tokenItem.id &&  l2tokenItem.avail.indexOf('us') !== -1 && (seldata.target.dtype.indexOf(l2tokenItem.dtype) > -1 || tokenItem.id === 'cflist' && l2tokenItem.icon === 'stext') ">
+                                                            <md-button ng-click="selectSourceValue(outerIndex,l2tokenItem);">
+                                                                <span ng-if="::l2tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                                <span ng-if="::l2tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                                <span ng-if="::l2tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                                <span ng-if="::l2tokenItem.icon === 'picklist'" class="icon-dtype icon-f-choice"></span>
+                                                                <span class="text">{{::l2tokenItem.lbl}}</span>
+                                                            </md-button>
+                                                        </md-menu-item>
+                                                        <!-- l2tokenItem.dtype.indexOf(seldata.target.dtype) > -1 to filter forms only with mappable widgets -->
+                                                        <md-menu ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='y' && seldata.target.id !== l2tokenItem.id &&  l2tokenItem.avail.indexOf('us') !== -1 && l2tokenItem.dtype.indexOf(seldata.target.dtype) > -1">
+                                                            <md-button ng-click="$mdOpenMenu()">
+                                                                {{l2tokenItem.lbl}}
+                                                            </md-button>
+                                                                <md-menu-content>
+                                                                    <md-menu-item ng-repeat="l3tokenItem in ::l2tokenItem.childlist track by $index" ng-if="::l3tokenItem.avail.indexOf('us') !== -1 && seldata.target.id !== l3tokenItem.id &&  seldata.target.dtype.indexOf(l3tokenItem.dtype) > -1">
+                                                                        <md-button ng-click="selectSourceValue(outerIndex, l3tokenItem);">
+                                                                            <span ng-if="::l3tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                                            <span ng-if="::l3tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                                            <span ng-if="::l3tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                                            <span ng-if="::l3tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                                            <span class="text">{{::l3tokenItem.lbl}}</span>
+                                                                        </md-button>
+                                                                    </md-menu-item>
+                                                                </md-menu-content>
+                                                        </md-menu>
+                                                    </md-menu-content>
+                                                </md-menu>
+                                            </md-menu-item>
+                                            <md-menu-item ng-if="seldata.target.id && seldata.target.dtype !== 'profile'">
+                                                <md-button ng-click="enterManuallySelected(outerIndex);">
+                                                    <span class="icon-dtype icon-f-shorttext"></span>
+                                                    <span class="text">Manual text entry</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-bar>
+                            </div>
+                         </md-input-container>
+                    </div>
+                    <div layout="row" layout-align="center center" class="select-group updateval-dys updateval-rpt" ng-if="seldata.target.lbl === 'Start date' && seldata.entry != 'manual'">
+                        <div flex="45">&nbsp;</div>
+                        <div flex="5">&nbsp;</div>
+                        <md-input-container md-no-float flex="10" class="actinpt">
+                            <md-select md-no-asterisk md-container-class="senddata-select" aria-label="Select action" ng-model="seldata.source.dateop" required>
+                                <md-option value="add" ng-selected="seldata.source.dateop !== 'subt'">
+                                    <span class="icn icon-plus"></span>
+                                </md-option>
+                                <md-option value="subt">
+                                    <span class="icn icon-tl-dismiss"></span>
+                                </md-option>
+                            </md-select>
+                        </md-input-container>
+                        <md-input-container flex="35" class="nmdays md-block" md-no-float>
+                            <input aria-label="Days" type="number" ng-model="seldata.source.nmdays" required>
+                            <span class="dyslbl">Days.</span>
+                        </md-input-container>
+                    </div>
+
+                    <div layout="row"  layout-align="center center" ng-if="seldata.entry=== 'manual'" class="embdtxt-wrap">
+                        <div flex="90" class="textarea-wrap">
+                            <md-input-container flex>
+                                <input name="Text" ng-model="seldata.manualtext" required>
+                                <span class="label">Text:</span>
+                             </md-input-container>
+                             <md-menu-bar>
+                                 <md-menu>
+                                     <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                         <span class="icon icon-dynamic-text"></span>
+                                     </button>
+                                     <md-menu-content>
+                                        <md-menu-item ng-repeat="tokenItem in ::tokenList track by tokenItem.id" ng-if="::tokenItem.haschild ==='y' &&  seldata.target.id && seldata.target.id !== tokenItem.id && tokenItem.avail.indexOf('us') !== -1 && tokenItem.dtype.indexOf(seldata.target.dtype) > -1">
+                                             <md-menu>
+                                                 <md-button ng-click="$mdOpenMenu()">{{::tokenItem.lbl}}</md-button>
+                                                 <md-menu-content>
+                                                     <md-menu-item ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='n' && seldata.target.id !== l2tokenItem.id &&  l2tokenItem.avail.indexOf('us') !== -1 && seldata.target.dtype.indexOf(l2tokenItem.dtype) > -1">
+                                                         <md-button ng-click="manualEntrySelected(outerIndex, l2tokenItem);">
+                                                             <span ng-if="::l2tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                             <span ng-if="::l2tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+
+                                                             <span ng-if="::l2tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                             <span ng-if="::l2tokenItem.icon === 'picklist'" class="icon-dtype icon-f-picklist"></span>
+                                                             <span class="text">{{::l2tokenItem.lbl}}</span>
+                                                         </md-button>
+                                                     </md-menu-item>
+                                                     <md-menu ng-repeat="l2tokenItem in ::tokenItem.childlist track by $index" ng-if="::l2tokenItem.haschild==='y' && seldata.target.id !== l2tokenItem.id &&  l2tokenItem.avail.indexOf('us') !== -1">
+                                                         <md-button ng-click="$mdOpenMenu()">
+                                                             {{::l2tokenItem.lbl}}
+                                                         </md-button>
+                                                             <md-menu-content>
+                                                                 <md-menu-item ng-repeat="l3tokenItem in ::l2tokenItem.childlist track by $index" ng-if="::l3tokenItem.avail.indexOf('us') !== -1 && seldata.target.id !== l3tokenItem.id &&  seldata.target.dtype.indexOf(l3tokenItem.dtype) > -1">
+                                                                     <md-button ng-click="manualEntrySelected(outerIndex, l3tokenItem);">
+                                                                         <span ng-if="::l3tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                                         <span ng-if="::l3tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+
+                                                                         <span ng-if="::l3tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                                         <span ng-if="::l3tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                                         <span class="text">{{::l3tokenItem.lbl}}</span>
+                                                                     </md-button>
+                                                                 </md-menu-item>
+                                                             </md-menu-content>
+                                                     </md-menu>
+                                                 </md-menu-content>
+                                             </md-menu>
+                                         </md-menu-item>
+                                     </md-menu-content>
+                                 </md-menu>
+                             </md-menu-bar>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="add-more-new-wrap">
+                    <md-button class="add-new-val" ng-click="addMoreUpdValData();">
+                        <span class="icon icon-plus"></span>
+                        <span class="text">add more</span>
+                    </md-button>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="formError" class="error error-form" ng-if="sd_error === 'yes'">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{sd_errorMsg}}</span>
+            </div>
+
+    	</div>
+
+        <!-- Exit button -->
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+    </form>
+</div>

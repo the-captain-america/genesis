@@ -1,0 +1,293 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active" ng-if="title === 'CSR | Users'">User list</a>
+        <a href="javascript:void(0)" class="active" ng-if="title === 'CSR | Users Archived'">User list (Archived)</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('csrsettings','userlist')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="container alerts-level2-wrap userlist" ng-if="canAccess('csrsettings','userlist')">
+	<div class="alerts-level2-content" ng-cloak>
+
+        <div class="reports-wrap">
+            <h4 class="title" ng-if="title === 'CSR | Users'">Manage active users and platform activity.</h4>
+            <h4 class="title" ng-if="title === 'CSR | Users Archived'">Manage archived users and platform activity.</h4>
+            <div class="reports-wrap-inner alerts-level-2">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+
+                <form name="reportForm" novalidate>
+
+                    <div class="heading-panel">
+                        <span class="show-more">
+                            <span class="more more-action icon-more-icon"></span>
+                            <div class="action-popover">
+                                <span class="icon close-popover icon-more-icon"></span>
+                                <span ng-csv="getCSVData('yes')" filename="{{exportCSVFileName}}">
+                                    <span class="icon icon-download"></span>
+                                    <span class="text">Download users</span>
+                                </span>
+                                <span ng-csv="getCSVData('no')" filename="{{exportCSVFileName}}">
+                                    <span class="icon icon-download"></span>
+                                    <span class="text">Download users, exclude "+" accounts</span>
+                                </span>
+                            </div>
+                        </span>
+                    </div>
+
+                    <div class="show-hide">
+                        <span class="arrow-toggle icon-arrow-1"></span>
+                        <span class="text">Advanced search / filter</span>
+                    </div>
+
+                    <div class="search-panel detail-section">
+
+                        <div layout="row" layout-align="center center">
+                            <div flex>
+                                <md-input-container>
+                                    <label>Name</label>
+                                    <input ng-model="reportSearch.name">
+                                </md-input-container>
+                            </div>
+                            <div flex>
+                                <md-input-container>
+                                    <label>Company</label>
+                                    <input ng-model="reportSearch.cname">
+                                </md-input-container>
+                            </div>
+                            <!-- <div flex>
+                                <md-input-container>
+                                    <label>Company Archived</label>
+                                    <md-select aria-label="Company Archived" ng-model="reportSearch.carch">
+                                        <md-option value="">Company Archived</md-option>
+                                        <md-option value="No">No</md-option>
+                                        <md-option value="Yes">Yes</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div> -->
+                            <div flex>
+                                <md-input-container>
+                                    <label>Role</label>
+                                    <md-select aria-label="Role" ng-model="reportSearch.role">
+                                        <md-option value="">Role</md-option>
+                                        <md-option value="Administrator">Administrator</md-option>
+                                        <md-option value="restrictedadmin">Restricted Admin</md-option>
+                                        <md-option value="reportingadmin">Reporting Admin</md-option>
+                                        <md-option value="restrictedcontentadmin">Restricted Content Admin</md-option>
+                                        <md-option value="Initiator">Initiator</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+                            <div flex>
+                                <md-input-container>
+                                    <label>Status</label>
+                                    <md-select aria-label="Status" ng-model="reportSearch.status">
+                                        <md-option value="">Status</md-option>
+                                        <md-option value="Active">Active</md-option>
+                                        <md-option value="Inactive">Inactive</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+                        </div>
+
+                        <div layout="row" layout-align="center center">
+                            <div flex="100" class="search-button">
+                                <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                                    <span class="icon"></span>
+                                    <span class="text">Clear</span>
+                                </md-button>
+                                <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                                    <span class="icon"></span>
+                                    <span class="text">Search</span>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="imp" ng-click="sortColumn('name');">Name
+                                    <span ng-if="sortcol === 'name'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="antf" ng-click="sortColumn('uname');">
+                                    User name
+                                    <span ng-if="sortcol === 'uname'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="alrtfor" ng-click="sortColumn('cname');">Company
+                                    <span ng-if="sortcol === 'cname'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <!-- <th class="alrtfor" ng-click="sortColumn('carch');">Company Archived
+                                    <span ng-if="sortcol === 'carch'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th> -->
+                                <th class="seq" ng-click="sortColumn('role');">Role
+                                    <span ng-if="sortcol === 'role'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="wf" ng-click="sortColumn('status');">Status
+                                    <span ng-if="sortcol === 'status'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="ntf" ng-click="sortColumn('crdt');">User Created ({{tz}})
+                                    <span ng-if="sortcol === 'crdt'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="ntf" ng-click="sortColumn('lastlogindt');">Last Sign in ({{tz}})
+                                    <span ng-if="sortcol === 'lastlogindt'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="ntf" ng-click="sortColumn('crbynm');">Created By
+                                    <span ng-if="sortcol === 'crbynm'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in displayedCollection track by $index">
+
+                                <td class="elps td-container">
+                                    <div>{{row.name}}</div>
+                                </td>
+                                <td class="elps td-container">
+                                    <div>
+                                        <a title="{{row.uname}}">{{row.uname}}</a>
+                                    </div>
+                                </td>
+                                <td class="elps wf td-container">
+                                    <div>{{row.cname}}</div>
+                                </td>
+                                <!-- <td class="elps wf td-container">
+                                    <div>{{row.carch}}</div>
+                                </td> -->
+                                <td class="elps wf td-container">
+                                    <div>{{row.role}}</div>
+                                </td>
+                                <td class="elps wf td-container">
+                                    <div>{{row.status}}</div>
+                                </td>
+                                <td class="elps wf td-container">
+                                    <div>{{row.crdt}}</div>
+                                </td>
+                                <td class="elps wf td-container">
+                                    <div>{{row.lastlogindt}}</div>
+                                </td>
+                                <td class="elps wf td-container">
+                                    <div>{{row.crbynm}}</div>
+                                </td>
+                            </tr>
+                            <tr class="nohover" ng-if="displayedCollection.length == '0'">
+                                <td colspan="8">
+                                    <div>
+                                        <p>
+                                            No users found
+                                        </p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr ng-if="displayedCollection.length > 0">
+                                <td colspan="6" class="text-center">
+
+                                    <div class="pagination-wrap">
+                                        <!-- <div class="pp-dropdown">
+                                            <label>Items per page: </label>
+                                            <md-select md-container-class="ppd" ng-model="itemcount" ng-change="updateRowDisplayCount(itemcount);">
+                                                <md-option value="10">10</md-option>
+                                                <md-option value="25">25</md-option>
+                                                <md-option value="50">50</md-option>
+                                            </md-select>
+                                        </div> -->
+
+                                        <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                            <span class="icon icon-arrow-1"></span>
+                                            <span class="text">Back</span>
+                                        </button>
+
+                                        <div class="pagination-number-wrap">
+                                            <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                            <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                            <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                        </div>
+
+                                        <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                            <span class="text">Next</span>
+                                            <span class="icon icon-arrow-1"></span>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

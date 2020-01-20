@@ -1,0 +1,98 @@
+<md-dialog aria-label="Learn details" class="modal-audit-learn md-default-theme">
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2>{{auditraw.modname}}</h2>
+			<span flex></span>
+			<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+				<span class="icon icon-close-2"></span>
+			</md-button>
+		</div>
+	</md-toolbar>
+	<md-dialog-content style="min-width:600px; max-width:600px;">
+        <div ng-if="seqaudit.seqfor === 'M'" class="ttlline">
+            <span class="icn icon-multi-page-small"></span>
+            <span class="txt">{{auditraw.modname}} | Delivered by:</span>
+            <span ng-if="seqaudit.seqfor === 'M' && level3data.managerMap[seqaudit.mgrid].mgrname" class="prflicn">
+                <img ng-if="!level3data.managerMap[seqaudit.mgrid].pic" class="prfimg" src="//static.enboarder.net/images/profile-placeholder.gif"
+                    alt="Profile">
+                <img ng-if="level3data.managerMap[seqaudit.mgrid].pic" class="prfimg" ng-src="{{level3data.managerMap[seqaudit.mgrid].pic}}{{level3data.refreshProfileToken}}"
+                    alt="Profile">
+            </span>
+            <span class="txt">{{level3data.managerMap[seqaudit.mgrid].mgrname}} (to:</span>
+            <span class="prflicn">
+                <img ng-if="!level3data.pic" class="prfimg" src="//static.enboarder.net/images/profile-placeholder.gif" alt="Profile">
+                <img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="Profile">
+            </span>
+            <span class="txt">{{level3data.hirenm}})</span>
+        </div>
+        <div ng-if="seqaudit.seqfor === 'NH'" class="ttlline">
+            <span class="txt">{{auditraw.modname}}| </span>
+            <span class="prflicn">
+                <img ng-if="!level3data.pic" class="prfimg" src="//static.enboarder.net/images/profile-placeholder.gif" alt="Profile">
+                <img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="Profile">
+            </span>
+            <span class="txt">{{level3data.hirenm}}</span>
+        </div>
+        <div ng-if="auditraw.status==='complete'" class="status complete">
+            <span class="icn icon-notification-ok"></span>
+            <span class="txt">Marked as complete: {{auditraw.compdt}}</span>
+        </div>
+        <div ng-if="auditraw.status==='v'" class="status inprogress">
+            <span class="icn icon-f-time"></span>
+            <span class="txt">Viewed {{auditproc.viewed}}/{{auditproc.total}}</span>
+        </div>
+        <div layout="row" layout-align="space-between center" class="dta">
+            <div class="ttl" flex="60">Page view</div>
+            <div class="time" flex="40">Time</div>
+        </div>
+        <div ng-repeat="page in auditproc.pagesaudit track by $index" layout="row" layout-align="space-between center" class="dta">
+            <div flex="60">{{page.ttl}}</div>
+            <div ng-if="page.dt!=='p'" flex="40">{{page.dt}}</div>
+            <div ng-if="page.dt==='p'" flex="40"><em>pending</em></div>
+        </div>
+
+        <hr>
+
+        <div ng-if="auditproc.assessment">
+            <div class="ttlline">
+                <span class="icn icon-flashcards"></span>
+                <span ng-if="auditproc.assessment.type ==='quiz'" class="txt">Flashcards | </span>
+                <span class="prflicn">
+                    <img ng-if="!level3data.pic" class="prfimg" src="//static.enboarder.net/images/profile-placeholder.gif" alt="Profile">
+                    <img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="Profile">
+                </span>
+                <span class="txt">{{level3data.hirenm}}</span>
+            </div>
+            <div ng-if="auditraw.status!=='complete' && auditproc.assessment.status==='pending'" class="status asse">
+                <span class="txt">Assessment starts when module is marked as complete</span>
+            </div>
+            <div ng-if="(auditraw.status==='complete' && auditproc.assessment.status==='pending') || auditproc.assessment.status==='inprogress'" class="status inprogress">
+                <span class="icn icon-f-time"></span>
+                <span class="txt">Assessment: In progress</span>
+            </div>
+            <div ng-if="auditproc.assessment.status==='complete'" class="status complete">
+                <span class="icn icon-notification-ok"></span>
+                <span class="txt">Assessment: {{auditproc.assessment.assmtstatus}}</span>
+            </div>
+            <div ng-if="auditproc.assessment.status!=='pending'" layout="row" layout-align="space-between center" class="dta">
+                <div class="ttl" flex="60">Test</div>
+                <div class="time" flex="40">Time</div>
+            </div>
+            <div ng-if="auditproc.assessment.status!=='pending'" ng-repeat="attempt in auditproc.assessment.resp"layout="row" layout-align="space-between center">
+                <div class="ttl" flex="60">{{attempt.result ==='p'? 'Pass': 'Fail'}}
+                    ({{attempt.correctans}}/{{attempt.totalqns}} correct)</div>
+                <div class="time" flex="40">{{attempt.dt}}</div>
+            </div>
+            <div ng-if="(auditraw.status==='complete' && auditproc.assessment.status==='pending')|| auditproc.assessment.assmtstatus==='Fail'" layout="row" layout-align="space-between center" class="dta">
+                <div flex="60"><em>Next assessment</em></div>
+                <div ng-if="auditproc.assessment.mintime==60" flex="40"><em>Pending 1 Minute</em></div>
+                <div ng-if="auditproc.assessment.mintime==1800" flex="40"><em>Pending 0.5 Hour</em></div>
+                <div ng-if="auditproc.assessment.mintime==3600" flex="40"><em>Pending 1 Hour</em></div>
+                <div ng-if="auditproc.assessment.mintime==10800" flex="40"><em>Pending 3 Hours</em></div>
+                <div ng-if="auditproc.assessment.mintime==21600" flex="40"><em>Pending 6 Hours</em></div>
+                <div ng-if="auditproc.assessment.mintime==86400" flex="40"><em>Pending 24 Hours</em></div>
+                <div ng-if="auditproc.assessment.mintime==172800" flex="40"><em>Pending 48 Hours</em></div>
+            </div>
+        </div>
+    </md-dialog-content>
+</md-dialog>

@@ -1,0 +1,154 @@
+<!-- <div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Profile field</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','profilefields')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','profilefields')">
+	<h4>Set up fields for profile pages</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<div class="settings-wrap-inner pfld">
+        <div layout="column" layout-align="center center">
+            <div flex="100" class="img-wrap">
+                <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+            </div>
+            <md-input-container flex="35">
+                <md-select aria-label="Name" ng-model="profileData.name">
+                    <md-option value="one" selected>Full name</md-option>
+                    <md-option value="two">tow</md-option>
+                    <md-option value="three">three</md-option>
+                </md-select>
+             </md-input-container>
+            <md-input-container flex="35" class="mltpl">
+                <md-select md-container-class="reports-dd" aria-label="Profile fields" ng-model="profileData.field" multiple>
+                    <md-option value="one" selected>Brand name</md-option>
+                    <md-option value="two" selected>Location</md-option>
+                    <md-option value="three">three</md-option>
+                    <md-option value="four">four</md-option>
+                    <md-option value="five">five</md-option>
+                    <md-option value="six">six</md-option>
+                </md-select>
+             </md-input-container>
+             <h4>This info is viewd in 'About' tab for each participant profile</h4>
+        </div>
+        <div layout="row" layout-align="center center">
+            <div flex="5" class="cbx clbl">Editable by participant</div>
+            <div flex="90"></div>
+            <div flex="5"></div>
+        </div>
+
+        <div layout="row" layout-align="center center" class="pnlwrp show-hide-wfl2">
+            <div flex="5" class="cbx">cb</div>
+            <div flex="90" class="pnl" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                <span class="icon folder-toggle icon-folder-closed"></span>
+                <span class="text">Dates</span>
+                <span class="drgicn icon-drag-small"></span>
+            </div>
+            <div flex="5" class="dbwrp">
+                <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                    <span class="icon icon-close-5"></span>
+                </md-button>
+            </div>
+        </div>
+
+        <div class="cntnwrap detail-section">
+            <div layout="row" layout-align="center center" class="pnlwrp">
+                <div flex="5" class="cbx">
+                    <md-checkbox ng-model="profileData.cbox1" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Edit field">
+                    </md-checkbox>
+                </div>
+                <div flex="90" class="pnl pnlinn" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                    <div class="shape"></div>
+                    <span class="icon icon-f-shorttext"></span>
+                    <span class="text">D.O.B.</span>
+                    <span class="drgicn icon-drag-small"></span>
+                </div>
+                <div flex="5" class="dbwrp">
+                    <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+            </div>
+            <div layout="row" layout-align="center center" class="pnlwrp">
+                <div flex="5" class="cbx">
+                    <md-checkbox ng-model="profileData.cbox2" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Edit field">
+                    </md-checkbox>
+                </div>
+                <div flex="90" class="pnl pnlinn" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                    <span class="icon icon-f-shorttext"></span>
+                    <span class="text">Start date</span>
+                    <span class="drgicn icon-drag-small"></span>
+                </div>
+                <div flex="5" class="dbwrp">
+                    <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="center center" class="pnlwrp show-hide-wfl2">
+            <div flex="5" class="cbx">cb</div>
+            <div flex="90" class="pnl" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                <span class="icon folder-toggle icon-folder-closed"></span>
+                <span class="text">Dates</span>
+                <span class="drgicn icon-drag-small"></span>
+            </div>
+            <div flex="5" class="dbwrp">
+                <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                    <span class="icon icon-close-5"></span>
+                </md-button>
+            </div>
+        </div>
+
+        <div class="cntnwrap detail-section">
+            <div layout="row" layout-align="center center" class="pnlwrp">
+                <div flex="5" class="cbx">
+                    <md-checkbox ng-model="profileData.cbox1" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Edit field">
+                    </md-checkbox>
+                </div>
+                <div flex="90" class="pnl pnlinn" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                    <div class="shape"></div>
+                    <span class="icon icon-f-shorttext"></span>
+                    <span class="text">D.O.B.</span>
+                    <span class="drgicn icon-drag-small"></span>
+                </div>
+                <div flex="5" class="dbwrp">
+                    <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+            </div>
+            <div layout="row" layout-align="center center" class="pnlwrp">
+                <div flex="5" class="cbx">
+                    <md-checkbox ng-model="profileData.cbox2" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Edit field">
+                    </md-checkbox>
+                </div>
+                <div flex="90" class="pnl pnlinn" dnd-draggable="models.pnl" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-canceled="dargcanceled(event)">
+                    <span class="icon icon-f-shorttext"></span>
+                    <span class="text">Start date</span>
+                    <span class="drgicn icon-drag-small"></span>
+                </div>
+                <div flex="5" class="dbwrp">
+                    <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow()">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+            </div>
+        </div>
+
+        <div class="btnDiv">
+            <md-button class="md-raised save" ng-click="showProfileFieldModal($event,'add new');">
+                <span class="icon icon-plus"></span>
+            </md-button>
+        </div>
+	</div>
+</div> -->

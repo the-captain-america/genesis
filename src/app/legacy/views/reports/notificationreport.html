@@ -1,0 +1,184 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Alerts</a>
+    </span>
+</div>
+
+<div class="reports-wrap">
+    <div class="reports-wrap-inner">
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <form name="reportForm" onsubmit="filterReport();" novalidate>
+            <div class="heading-panel">
+                <h4>notifications</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}" ng-if="serverCSV === 'no'">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download (CSV)</span>
+                        </span>
+                        <span ng-click="sendCSVReportRequest(exportCSVFileName);" ng-if="serverCSV === 'yes'">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+
+            <div class="search-panel detail-section" style="display:block">
+
+                <div layout="row" layout-align="center center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Name</label>
+                            <input ng-model="reportSearch.nm">
+                            <span class="blrdv rpt"></span>
+                        </md-input-container>
+                    </div>
+                    <div flex>
+                        <md-input-container>
+                            <label>Alert item</label>
+                            <input ng-model="reportSearch.alertItem">
+                            <span class="blrdv rpt"></span>
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Alert date, From</label>
+                    	<md-datepicker ng-model="reportSearch.dt_alert_from" md-placeholder="Select"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Alert date, To</label>
+                    	<md-datepicker ng-model="reportSearch.dt_alert_to" md-placeholder="Select"></md-datepicker>
+                    </div>
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button type="submit" class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Name</th>
+                        <th>Alert items</th>
+                        <th>Alert type</th>
+                        <th>Alert date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in displayedCollection track by $index">
+                        <td class="td-container notification-type">
+                            <div ng-if="row.seqfor === 'Manager'">
+                                <span class="profile-pic">
+                                    <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                    <img class="prfimg" src="{{row.photo}}" alt="">
+                                </span>
+                                <span class="text">{{custlabels.Manager || 'Manager'}}</span>
+                            </div>
+                            <div ng-if="row.seqfor === 'Employee'">
+                                <span class="profile-pic">
+                                    <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                    <img class="prfimg" src="{{row.photo}}" alt="">
+                                </span>
+                                <span class="text">{{custlabels.Employee || 'Employee'}}</span>
+                            </div>
+                        </td>
+                        <td class="td-container">
+                            <div>{{row.nm}}</div>
+                        </td>
+                        <td class="td-container">
+                            <div>{{row.item}}</div>
+                        </td>
+                        <td class="td-container status">
+                            <div class="overdue">
+                                Overdue
+                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top">
+                                    <p>Oh-no! Some tasks have been ignored or overlooked. We should take care this promptly if possible.</p>
+                                </md-tooltip>
+                            </div>
+                            <em class="days-due"> ({{row.days}} days)</em>
+                        </td>
+                        <td class="td-container">
+                            <div>{{row.dt}}</div>
+                        </td>
+                    </tr>
+                    <tr class="nohover" ng-if="displayedCollection.length == 0">
+                        <td colspan="6">
+                            <div>
+                                <p>
+                                    Hmmmm, can't find any relating data.
+                                </p>
+                                <div class="img-wrap">
+                                    <img src="//static.enboarder.net/images/error-bouble.gif" alt="Error" />
+                                </div>
+                                <!-- <md-button class="md-raised refresh" ng-disabled="reportForm.$invalid" ng-click="clearFilterRefresh();">
+                                    <span class="icon"></span>
+                                    <span class="text">refresh reports list</span>
+                                </md-button> -->
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr ng-if="displayedCollection.length > 0">
+                        <td colspan="6" class="text-center">
+                            <div class="pagination-wrap">
+
+                                <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                    <span class="icon icon-arrow-1"></span>
+                                    <span class="text">Back</span>
+                                </button>
+
+                                <div class="pagination-number-wrap">
+                                    <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                    <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                    <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                </div>
+
+                                <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                    <span class="text">Next</span>
+                                    <span class="icon icon-arrow-1"></span>
+                                </button>
+
+                                <!-- <span>Current Selected page >>>
+                                    {{currentSelPage}}</span>
+                                <span>
+                                    <md-input-container flex>
+                                        <label>Items to Display</label>
+                                        <input ng-model="visibleItems" ng-model-options="{ updateOn: 'blur' }" ng-change="updateTableDisplay();">
+                                    </md-input-container>
+                                </span> -->
+
+                            </div>
+                        </td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+    </div>
+</div>

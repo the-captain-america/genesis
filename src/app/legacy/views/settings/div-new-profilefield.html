@@ -1,0 +1,59 @@
+<div class="custom-field-modal" ng-controller="AddProfileFieldCtrl" ng-cloak>
+    <div layout="column">
+        <div flex>
+            <md-input-container class="required">
+                <label>Enter field name</label>
+                <input md-no-asterisk ng-model="newProfileFieldData.nm" focus="true" required>
+                <span class="blrdv"></span>
+            </md-input-container>
+        </div>
+
+        <label class="radio-title">Select the field type:</label>
+        <div flex layout="row" layout-align="space-between start" class="radio-wrap">
+            <div class="radio-group">
+                <md-radio-group class="radio-group" ng-model="newProfileFieldData.typ" ng-disabled="updProfilefield === 'yes'">
+                    <md-radio-button value="f-shorttext">
+                        Short text
+                        <span class="icon icon-f-shorttext"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-longtext">
+                        Long text
+                        <span class="icon icon-f-longtext"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-date">
+                        Date
+                        <span class="icon icon-f-date"></span>
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+        </div>
+        <div class="cbox-wrap">
+            <md-checkbox aria-label="Link field to integrated directory (App center)" ng-model="newProfileFieldData.lnk2ds" ng-true-value="'y'" ng-false-value="'n'" ng-disabled="newProfileFieldData.allowedit === 'y'">
+                <span>Link this field to an Azure Active Directory field</span>
+            </md-checkbox>
+            <md-checkbox aria-label="Allow field to be changed by participant" ng-model="newProfileFieldData.allowedit" ng-true-value="'y'" ng-false-value="'n'" ng-disabled="newProfileFieldData.lnk2ds === 'y'">
+                <span>Allow field to be changed by participant</span>
+            </md-checkbox>
+            <md-checkbox aria-label="Show field togather with profile name" ng-model="newProfileFieldData.showatop" ng-true-value="'y'" ng-false-value="'n'">
+                <span>Show field together with profile name</span>
+                <span class="dynamic-tooltip-wrap">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top">
+                        <span class="copy">
+                            <h4 class="title">
+                                Show field with name
+                            </h4>
+                            <p>
+                                Field is shown together with the profile name and picture to help identify participant.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </md-checkbox>
+        </div>
+    </div>
+    <div class="error" ng-if="profilefieldError">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">{{profilefieldErrorMessage}}</span>
+    </div>
+</div>

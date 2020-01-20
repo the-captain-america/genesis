@@ -1,0 +1,29 @@
+<md-dialog aria-label="Create New {{custlabels.Manager || 'Manager'}}" class="edit-workflow-modal modal-dashlvl3-prefchnl md-default-theme" ng-class="">
+    <form name="myForm" ng-submit="handleSubmit();" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="!updManager">Create New {{custlabels.Manager || 'Manager'}}</h2>
+                <h2 ng-if="updManager === 'yes'">Update {{custlabels.Manager || 'Manager'}}</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content aria-label="Add {{custlabels.Manager || 'Manager'}} Dialog" style="min-width:570px;max-width:570px;max-height:810px;">
+            <ng-include src="'views/settings/div-add-new-manager.html'"></ng-include>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button type="submit" aria-label="Save {{custlabels.Manager || 'Manager'}}" class="save save-spinner md-default-theme" ng-click="handleSubmit();" ng-disabled="myForm.$invalid" md-autofocus>
+                <span class="text">Save</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved
+                    <span class="icon-notification-ok"></span>
+                </span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

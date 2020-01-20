@@ -1,0 +1,30 @@
+<md-dialog aria-label="Disable Link" class="disablelink-modal md-default-theme">
+    <!-- <form name="myForm" novalidate> -->
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>&nbsp;</h2>
+                <span flex></span>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="max-height:810px">
+            <div layout="column" layout-align="space-around center" layout-wrap>
+                <div class="icon-wrap-warning">
+                    <!-- <span class="icon icon-warning"></span> -->
+                    <img src="//static.enboarder.net/images/warning.gif" alt="alert" />
+                </div>
+                <div class="info-text">
+                    <p>
+                        Are you sure you want to hide this link?<br> There are modules inside your sequences that will be disabled.
+                    </p>
+                </div>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button aria-label="Cancel" class="md-default-theme" ng-click="cancel();">Cancel</md-button>
+            <md-button aria-label="Yes, Hide Link" class="save md-default-theme" ng-click="disableLink();" md-autofocus>
+                <span>yes, hide link</span>
+            </md-button>
+        </md-dialog-actions>
+    <!-- </form> -->
+</md-dialog>

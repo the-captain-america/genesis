@@ -1,0 +1,83 @@
+<md-dialog aria-label="send sequence preview" class="send-seq-modal md-default-theme">
+<form name="SmsForm" novalidate>
+<md-toolbar>
+    <div class="md-toolbar-tools">
+        <h2>send sequence preview</h2>
+        <span flex></span>
+        <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+            <span class="icon icon-close-2"></span>
+        </md-button>
+    </div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+	<div layout="row" class="prevwrap" layout-align="space-around center" layout-wrap>
+        <div flex="25" class="sndto">
+            <md-input-container md-no-float>
+                <label>Send to</label>
+                <md-select md-no-asterisk ng-model="seqdata.channel" ng-change="channelChange();">
+                    <md-option value="sms" selected="true">Mobile</md-option>
+                    <md-option value="email">Email</md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+        <div flex="75" class="mblinpt-wrp" ng-if="seqdata.channel === 'sms'">
+            <md-input-container md-no-float class="intmbl md-block">
+                <intl-tel placeholder="Enter mobile number" ng-model="seqdata.telnr"></intl-tel>
+                <span class="blrdv prvinpt"></span>
+            </md-input-container>
+            <div class="icon-wrap">
+                <span class="icon icon-notification-ok"></span>
+                <span class="icon icon-close-5"></span>
+            </div>
+        </div>
+        <div flex="75" class="emlinpt-wrp" ng-if="seqdata.channel === 'email'">
+            <md-input-container md-no-float class="emlinpt md-block">
+    			<input md-no-asterisk placeholder="name@company.com" ng-model="seqdata.email">
+                <span class="emlicon icon-mail-medium"></span>
+                <span class="blrdv"></span>
+    		</md-input-container>
+            <div class="icon-wrap">
+                <span class="icon icon-notification-ok"></span>
+                <span class="icon icon-close-5"></span>
+            </div>
+        </div>
+        <div class="gw-error">
+            <span ng-if="mobileEmailErrType === 'INVALID_MOBILE'">Invalid number</span>
+            <span ng-if="mobileEmailErrType === 'INVALID_EMAIL'">Invalid email</span>
+            <span ng-if="mobileEmailErrType != 'INVALID_MOBILE' && mobileEmailErrType != 'INVALID_EMAIL'">SMS/Email gateway down</span>
+        </div>
+    </div>
+    <div layout="row" layout-align="start-center" layout-wrap>
+        <div flex="45">
+            <md-input-container md-no-float class="brand-dropd md-block">
+                <label class="placeholder">Branding</label>
+                <md-select md-container-class="prfcom-dd" placeholder="Select branding" ng-model="seqdata.brandtkey">
+                    <md-option value="{{brand.tkey}}" ng-repeat="brand in brands track by $index">{{brand.name}}</md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+    </div>
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button ng-if="seqdata.channel === 'sms'" aria-label="Save" class="save save-spinner md-default-theme" ng-click="previewSequence('sms');" ng-disabled="SmsForm.$invalid" md-autofocus>
+		<span class="text">send now</span>
+		<span class="text-save">sending...</span>
+		<span class="text-saved">sent <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+	</md-button>
+	<md-button ng-if="seqdata.channel === 'email'" aria-label="Save" class="save save-spinner md-default-theme" ng-click="previewSequence('email');" ng-disabled="SmsForm.$invalid" md-autofocus>
+		<span class="text">send now</span>
+		<span class="text-save">sending...</span>
+		<span class="text-saved">sent <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+	</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

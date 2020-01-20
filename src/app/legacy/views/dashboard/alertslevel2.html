@@ -1,0 +1,308 @@
+<div class="bread-crumb">
+    <span><a ng-href="#/dashboard">Dashboard</a></span>
+    <span>/</span>
+    <span>
+        <a href="javascript:void(0)" class="active" ng-if="alertfor === 'employee'">{{custlabels.Employee || 'Employee'}} Alerts</a>
+        <a href="javascript:void(0)" class="active" ng-if="alertfor === 'manager'">{{custlabels.Manager || 'Manager'}} Alerts</a>
+    </span>
+</div>
+
+<div class="container alerts-level2-wrap">
+	<div class="alerts-level2-content" ng-cloak>
+
+        <div class="reports-wrap">
+            <div class="reports-wrap-inner alerts-level-2">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+
+                <form name="reportForm" novalidate>
+
+                    <div class="heading-panel">
+                        <h4 ng-if="alertfor === 'employee'">{{custlabels.Employee || 'Employee'}} Alerts</h4>
+                        <h4 ng-if="alertfor === 'manager'">{{custlabels.Manager || 'Manager'}} Alerts</h4>
+                    </div>
+
+                    <div class="show-hide">
+                        <span class="arrow-toggle icon-arrow-1"></span>
+                        <span class="text">Advanced search / filter</span>
+                    </div>
+                    <div class="search-panel detail-section">
+
+                        <div layout="row" layout-align="center center">
+                            <div flex>
+                                <md-input-container>
+                                    <label>Name</label>
+                                    <input ng-model="reportSearch.nm">
+                                </md-input-container>
+                            </div>
+                            <div flex>
+                                <md-input-container>
+                                    <label>Sequence name</label>
+                                    <input ng-model="reportSearch.seqname">
+                                </md-input-container>
+                            </div>
+                            <div flex>
+                                <md-input-container>
+                                    <label>Workflow name</label>
+                                    <md-select aria-label="Workflow name" ng-model="reportSearch.wfid">
+                                        <md-option value="">Select Workflow</md-option>
+                                        <md-option ng-repeat="wf in wflist | orderBy:['name']" value="{{wf.uid}}">{{wf.name}}</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+                        </div>
+
+                        <div layout="row" layout-align="center center">
+                            <div flex="100" class="search-button">
+                                <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                                    <span class="icon"></span>
+                                    <span class="text">Clear</span>
+                                </md-button>
+                                <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                                    <span class="icon"></span>
+                                    <span class="text">Search</span>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div class="cp-btnwrap">
+                    <div class="cp-in" ng-cloak ng-if="isAnyRowSelected() === 'yes'">
+                        <md-button class="md-raised refresh" ng-click="resendMultiSeqModal($event, displayedCollection)" ng-controller="changeWfDetailsCtrl">
+                            <span class="text">re-send</span>
+                        </md-button>
+                        <md-button class="md-raised refresh" ng-click="forwardMultipleSeqModal($event, displayedCollection)" ng-controller="changeWfDetailsCtrl">
+                            <span class="text">FORWARD</span>
+                        </md-button>
+                        <md-button class="md-raised refresh" ng-click="dismissMultipleSeqModal($event, displayedCollection)" ng-controller="changeWfDetailsCtrl">
+                            <span class="text">DISMISS ALERT</span>
+                        </md-button>
+                        <md-button class="md-raised refresh" ng-click="clearMultipleSeqModal($event, displayedCollection)" ng-controller="changeWfDetailsCtrl">
+                            <span class="text">CLEAR ALERT</span>
+                        </md-button>
+                        <span class="dynamic-tooltip-wrap">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip alrts-tooltip" md-delay="100" md-direction="top">
+                                <span class="copy">
+                                    <p>
+                                        <span class="title">RE-SEND:</span>The sequence notification will be <br>re-sent to the assigned participant.
+                                    </p>
+                                    <p>
+                                        <span class="title">FORWARD:</span>The sequence notification will be <br>re-assigned to a new participant.
+                                    </p>
+                                    <p>
+                                        <span class="title">DISMISS ALERT:</span>The sequence will proceed as if it had been completed by a participant.
+                                    </p>
+                                    <p>
+                                        <span class="title">CLEAR ALERT:</span>Clears the alert item from list but the sequence overdue status still remains.
+                                    </p>
+                                    <!-- <p>
+                                        <span class="title">COMPLETE NOW:</span>You can complete the sequence on behalf of the participant.
+                                    </p> -->
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th class="center check">
+                                    <md-checkbox ng-model="allsel" ng-true-value="'yes'" ng-false-value="'no'" ng-change="selectAll(allsel);" aria-label="Select All">
+                                    </md-checkbox>
+                                </th>
+                                <th class="alrtfor" ng-click="sortColumn('nm');">{{alertforNm}}
+                                    <span ng-if="sortcol === 'nm'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="imp center" ng-click="sortColumn('imp');">Importance
+                                    <span ng-if="sortcol === 'imp'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="overdue" ng-click="sortColumn('dt');">Overdue
+                                    <span ng-if="sortcol === 'dt'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="wf" ng-click="sortColumn('wfname');">Workflow
+                                    <span ng-if="sortcol === 'wfname'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="seq" ng-click="sortColumn('seqname');">Sequence
+                                    <span ng-if="sortcol === 'seqname'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="ntf" ng-click="sortColumn('acttaken');">Actions by admin
+                                    <span ng-if="sortcol === 'acttaken'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th class="antf center" ng-click="sortColumn('adminalert');">
+                                    Notify admin
+                                    <span ng-if="sortcol === 'adminalert'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="row in displayedCollection track by $index">
+                                <td class="td-container center">
+                                    <div>
+                                        <md-checkbox ng-model="row.sel" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Select">
+                			            </md-checkbox>
+                                    </div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="elps td-container">
+                                    <div>
+                                        <span class="profile-pic">
+                                            <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                            <img ng-if="!row.photo" class="prfimg" src="" alt="">
+                                            <img ng-if="row.photo" class="prfimg" ng-src="{{row.photo}}" alt="">
+                                        </span>
+                                        <span class="text">{{row.nm}}</span>
+                                    </div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="center imp td-container">
+                                    <div>
+                                        <!-- Default -->
+                                        <div class="harvey" ng-if="row.imp == 1"></div>
+
+                                        <!-- 25 -->
+                                    	<div class="harvey" ng-if="row.imp == 2">
+                                            <div class="upper-right"></div>
+                                        </div>
+
+                                        <!-- half -->
+                                    	<div class="harvey half-right" ng-if="row.imp == 3"></div>
+
+                                        <!-- 75 -->
+                                    	<div class="harvey full" ng-if="row.imp == 4">
+                                            <div class="three-quarters"></div>
+                                        </div>
+
+                                        <!-- Full -->
+                                    	<div class="harvey full" ng-if="row.imp == 5"></div>
+                                    </div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="status-txt td-container">
+                                    <!-- <div class="overdue">{{row.dt_disp}} ({{row.days}} days overdue)</div> -->
+                                    <div class="overdue">{{row.days}} days</div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="elps wf td-container">
+                                    <div>{{row.wfname}}</div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="elps td-container">
+                                    <div>{{row.seqname}}</div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="elps wf td-container">
+                                    <div>{{row.acttaken}}</div>
+                                </td>
+                                <td ng-click="level3Dashboard($index);" class="center antf td-container">
+                                    <div>
+                                        <span class="icon icon-tl-complete" ng-if="row.adminalert==='y'"></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr class="nohover" ng-if="displayedCollection.length == '0'">
+                                <td colspan="8">
+                                    <div>
+                                        <p>
+                                            Awesome!<br>
+                                            No overdue alerts in sight.
+                                        </p>
+                                        <div class="img-wrap">
+                                            <img src="//static.enboarder.net/images/whooops-bouble-1.gif" alt="Error" />
+                                        </div>
+                                        <!-- <md-button class="md-raised refresh" ng-disabled="reportForm.$invalid" ng-click="clearFilterRefresh();">
+                                            <span class="icon"></span>
+                                            <span class="text">refresh reports list</span>
+                                        </md-button> -->
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                        <tfoot>
+                            <tr ng-if="displayedCollection.length > 0">
+                                <td colspan="6" class="text-center">
+
+                                    <div class="pagination-wrap">
+                                        <div class="pp-dropdown">
+                                            <label>Items per page: </label>
+                                            <md-select md-container-class="ppd" ng-model="itemcount" ng-change="updateRowDisplayCount(itemcount);">
+                                                <md-option value="10">10</md-option>
+                                                <md-option value="25">25</md-option>
+                                                <md-option value="50">50</md-option>
+                                            </md-select>
+                                        </div>
+
+                                        <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                            <span class="icon icon-arrow-1"></span>
+                                            <span class="text">Back</span>
+                                        </button>
+
+                                        <div class="pagination-number-wrap">
+                                            <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                            <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                            <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                        </div>
+
+                                        <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                            <span class="text">Next</span>
+                                            <span class="icon icon-arrow-1"></span>
+                                        </button>
+
+                                    </div>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

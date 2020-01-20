@@ -1,0 +1,77 @@
+<md-dialog aria-label="Action location" class="locations-modal md-default-theme">
+    <form name="LocationsModalForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>{{action}}
+                    location</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:570px;max-width:570px;">
+            <div layout layout-sm="column">
+                <md-input-container flex class="required">
+                    <label>Location Name</label>
+                    <input md-no-asterisk ng-model="localData.data.name" required>
+                </md-input-container>
+            </div>
+            <div class="info-block">
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex class="long md-block" md-no-float>
+                            <label class="placeholder">Timezone</label>
+    						<md-select aria-label="Timezone" ng-model="localData.data.tz">
+    							<md-option ng-repeat="tzone in timezones track by $index" value="{{tzone.k}}">{{tzone.v}}</md-option>
+    						</md-select>
+    					</md-input-container>
+    				</span>
+                </span>
+			</div>
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Country</label>
+                    <input md-no-asterisk ng-model="localData.data.country">
+                </md-input-container>
+            </div>
+
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>State</label>
+                    <input ng-model="localData.data.state">
+                    <!-- 	<md-select ng-model="localData.data.state">
+          <md-option ng-repeat="state in states" value="{{state.abbrev}}">{{state.abbrev}}</md-option>
+      </md-select> -->
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>City</label>
+                    <input ng-model="localData.data.city">
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Postcode</label>
+                    <input ng-model="localData.data.postcode">
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Address</label>
+                    <input ng-model="localData.data.address">
+                </md-input-container>
+            </div>
+            <div class="error" ng-if="locationSaveError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{locationSaveErrorMsg}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button class="save md-default-theme" aria-label="Save" ng-click="saveLocation();" ng-disabled="LocationsModalForm.$invalid" md-autofocus>Save</md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

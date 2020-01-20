@@ -1,0 +1,106 @@
+.icon__adjustment {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .icnfld {
+        color: #666;
+    }
+    &.icon__position {
+        position: absolute;
+        right: 5px;
+    }
+    &.icon__row {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        flex-direction: row-reverse;
+    }
+    &.icon__dynamic {
+        display: none;
+        &.is-active {
+            display: block;
+        }
+    }
+}
+
+// Various adjustments
+// Refactor into independent file
+.icon__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    &:nth-child(1) {
+        margin-right: 8px;
+    }
+    &.icon__datepicker {
+        right: 35px;
+        top: 24px;
+        position: absolute;
+    }
+}
+
+.basic__mask {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: none;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+    z-index: 5;
+    background: #f7f7f7;
+    &.is-upper {
+        top: -6px;
+    }
+    &.is-active {
+        display: block;
+    }
+}
+
+.md-datepicker-calendar-icon {
+    margin-top: 5px;
+
+    svg {
+        height: 16px;
+    }
+}
+
+.date__adjustment {
+    .md-datepicker-calendar-icon {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        svg {
+            widows: 16px;
+            height: 16px;
+        }
+    }
+}
+
+.modal-dashlvl3-prefchnl {
+    md-tabs {
+        .datepicker-wrap {
+            &.date__adjustment {
+                md-datepicker md-icon {
+                    width: 24px !important;
+                    height: 24px !important;
+                    position: absolute !important;
+                    right: 13px;
+                    top: 8px !important;
+                }
+            }
+        }
+    }
+}
+
+.datepicker-wrap {
+    &.select-start.adjustment {
+        .md-datepicker-calendar-icon {
+            display: inline-block !important;
+            position: relative;
+            top: 6px;
+        }
+    }
+}

@@ -1,0 +1,405 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Dashboard</a>
+    </span>
+</div>
+
+<div class="fltr-box" ng-if="showSigninAs===false">
+    <div class="fltbox-in">
+        <md-input-container md-no-float>
+            <md-select md-container-class="flt-dd fixed-dd" md-no-asterisk aria-label="Filter" ng-model="dashfilter.selfilterid" placeholder="Filter" ng-change="applyFilter();">
+                <md-option value="none">
+                    <span class="truncate">
+                        None
+                    </span>
+                </md-option>
+                <md-option value="{{userfilter.filterid}}" ng-repeat="userfilter in dashfilter.filters">
+                    <span class="truncate">
+                        {{userfilter.name}}
+                    </span>
+                </md-option>
+                <md-option value="new" ng-if="dashfilter.filters.length < 10">
+                    <span class="truncate">
+                        + New filter
+                    </span>
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
+    <span ng-click="filterModal();" class="dashIcn icon-filter"></span>
+</div>
+
+<div class="container dashboard">
+
+	<div class="dashboard-content" ng-cloak>
+		<div class="content-block-wrap top">
+			<div class="long">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+				<div class="inner-wrap">
+
+					<h4>workflows in progress</h4>
+
+					<div class="chart-wrap" layout="row" layout-wrap>
+						<div flex>
+							<div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<!-- <th>Workflow name</th> -->
+                                            <th class="total">
+                                                Total
+                                                <div class="chart-num">{{chartTotal}}</div>
+                                            </th>
+											<th>
+                                                Pre phase
+                                                <div class="chart-num">{{preTotal}}</div>
+                                            </th>
+											<th>
+                                                Start phase
+                                                <div class="chart-num">{{startTotal}}</div>
+                                            </th>
+											<th>
+                                                Post phase
+                                                <div class="chart-num">{{postTotal}}</div>
+                                            </th>
+										</tr>
+									</thead>
+								</table>
+							</div>
+                            <hr>
+                            <div class="table-responsive">
+								<table class="table table-hover">
+									<thead>
+										<tr>
+											<!-- <th>Workflow name</th> -->
+                                            <th>&nbsp;</th>
+											<th>&nbsp;</th>
+                                            <th>&nbsp;</th>
+                                            <th>&nbsp;</th>
+										</tr>
+									</thead>
+									<tbody>
+										<!-- <tr ng-repeat="row in l1data  | orderBy:['-act','ord']"> -->
+										<tr ng-repeat="row in l1data">
+											<td class="td-container wf-name nohover">
+                                                <div class="circle-legend" ng-style="{'background': row.color}"></div>
+                                                <div class="wfname-text" ng-class="{inactive : row.act == 'N' }">
+                                                    {{row.wfname}}
+                                                    <md-tooltip>{{row.wfname}}</md-tooltip>
+                                                </div>
+											</td>
+											<td ng-click="level2Dashboard($event, row.wfname, row.wfid, row.pre, 'pre', row.stph);" class="td-container" ng-class="{nohover : !row.pre }">
+												<div>{{row.pre}}</div>
+											</td>
+											<td ng-click="level2Dashboard($event, row.wfname, row.wfid, row.start, 'start',row.stph);" class="td-container" ng-class="{nohover : !row.start }">
+												<div>{{row.start}}</div>
+											</td>
+											<td ng-click="level2Dashboard($event, row.wfname, row.wfid, row.post, 'post', row.stph);" class="td-container" ng-class="{nohover : !row.post }">
+												<div>{{row.post}}</div>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+
+                            <div class="empty-data" ng-if="chartTotal == '0'">
+                                <p class="fancy title">
+                                    <span>Feels a little empty here</span>
+                                </p>
+                                <a href="/#workflow">
+                                    <span>Try to <em>'Add new people'</em> into your workflow.</span>
+                                </a>
+                            </div>
+
+                            <!-- <md-button class="add-new-people">
+                                <span class="icon icon-plus"></span>
+                                <span class="text">add new people</span>
+                            </md-button> -->
+						</div>
+					</div>
+
+				</div>
+			</div>
+            <div class="long notification">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+				<div class="inner-wrap">
+                    <div class="heading-wrap">
+                        <h4>Alerts</h4>
+                        <span class="notification-info">
+                            <!-- <span class="icon icon-notification-alert"></span> -->
+                            <span class="text">You have {{alerts.employeealert + alerts.manageralert + alerts.erroralert}} unattended alerts</span>
+                        </span>
+                    </div>
+                    <div class="numbers-wrap">
+                        <div layout="row" layout-align="space-around center">
+                            <div class="num-wrap">
+                                <div ng-if="alerts.employeealert > 0" class="num pending" ng-click="gotoAlertsLevel2('employee');">
+                                    <div class="dig">
+                                        {{alerts.employeealert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div ng-if="alerts.employeealert == '0'" class="num">
+                                    <div class="dig">
+                                        {{alerts.employeealert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div class="text">
+                                    {{custlabels.Employee || 'Employee'}}
+                                </div>
+                            </div>
+                            <div class="num-wrap">
+                                <div class="num pending" ng-if="alerts.manageralert > 0" ng-click="gotoAlertsLevel2('manager');">
+                                    <div class="dig">
+                                        {{alerts.manageralert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div class="num" ng-if="alerts.manageralert == '0'">
+                                    <div class="dig">
+                                        {{alerts.manageralert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div class="text">
+                                    {{custlabels.Manager || 'Manager'}}
+                                </div>
+                            </div>
+                            <div class="num-wrap">
+                                <div class="num pending" ng-if="alerts.erroralert > 0" ng-click="gotoErrorReport();">
+                                    <div class="dig">
+                                        {{alerts.erroralert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div class="num" ng-if="alerts.erroralert == '0'">
+                                    <div class="dig">
+                                        {{alerts.erroralert}}
+                                    </div>
+                                    <div class="smlrnd-wrap">
+                                        <span class="smlrnd icon-tl-alert"></span>
+                                    </div>
+                                </div>
+                                <div class="text">
+                                    Error
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+					<!-- <div class="table-responsive">
+						<table class="table">
+							<thead>
+								<tr>
+                                    <th class="second-heading name-notification">Name</th>
+                                    <th class="second-heading">Item</th>
+									<th class="second-heading alerts">
+                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        &nbsp;
+                                        Alert
+                                    </th>
+                                    <th class="second-heading date">Date</th>
+								</tr>
+							</thead>
+
+							<tbody>
+                                <tr>
+                                    <td class="td-container">
+                                        Manager Alerts
+                                    </td>
+                                    <td class="td-container">
+                                        <span ng-click="gotoAlertsLevel2('manager');">{{alerts.manageralert}}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-container">
+                                        Employee Alerts
+                                    </td>
+                                    <td class="td-container">
+                                        <span ng-click="gotoAlertsLevel2('employee');">{{alerts.employeealert}}</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="td-container">
+                                        Error Alerts
+                                    </td>
+                                    <td class="td-container">
+                                        <span ng-click="gotoErrorReport();">{{alerts.erroralert}}</span>
+                                    </td>
+                                </tr>
+								<tr ng-repeat="row in alerts track by $index" ng-class="{ overduerow : row.rdisp === 'o', readrow : row.rdisp === 'r' , errorrow : row.rdisp === 'e' }">
+                                    <td class="td-container">
+										<div>
+                                            <span ng-if="row.seqfor==='M'">
+                                                <span class="icon icon-manager">
+                                                    <md-tooltip md-direction="bottom">Manager</md-tooltip>
+                                                </span>
+                                                <span class="text">{{row.nm}}</span>
+                                            </span>
+                                            <span ng-if="row.seqfor==='NH'">
+                                                <span class="icon icon-newhire">
+                                                    <md-tooltip md-direction="bottom">Employee</md-tooltip>
+                                                </span>
+    											<span class="text">{{row.nm}}</span>
+                                            </span>
+										</div>
+									</td>
+                                    <td class="td-container">
+										<div>
+											{{row.item}}
+										</div>
+									</td>
+                                    <td class="td-container">
+										<div ng-if="row.rtype === 'od'">
+                                            <span class="alert-block">
+                                                Overdue
+                                            </span>
+                                            <i class="days-due">({{row.days}} days)</i>
+										</div>
+                                        <div ng-if="row.rtype === 'e'">
+                                            <span class="alert-block">
+                                                Error
+                                            </span>
+										</div>
+									</td>
+                                    <td class="td-container">
+										<div>
+											{{row.dt}}
+										</div>
+									</td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div> -->
+
+                    <div class="empty-data" ng-if="alerts.length == '0'">
+                        <p class="fancy title">
+                            <span>Great - No unattended notifications!</span>
+                        </p>
+                    </div>
+
+				</div>
+			</div>
+        </div>
+        <div class="content-block-wrap bottom">
+            <div class="short bar-chart" ng-class="{wthmrinfo : sfdata}">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+				<div class="inner-wrap">
+					<h4>workflows launched</h4>
+                    <div class="filter">
+                        Total <span class="nmbr">{{chart2Total}}</span>
+                    </div>
+					<div class="chart-wrap" ng-if="showChart2 === true">
+						<div class="bar-chart" google-chart chart="chart2BarObject"></div>
+					</div>
+                    <div class="empty-data" ng-if="showChart2 === false">
+                        <p class="fancy title">
+                            <span>There are no started workflows yet - As soon as you "Add new people" this chart should come alive.</span>
+                        </p>
+                    </div>
+                    <div class="slfinfo" ng-if="sfdata">
+                        <span class="info"><strong>SUBSCRIPTION:</strong> <a title="{{sfdata.substdt || 'N.A.'}} - {{sfdata.subenddt || 'N.A.'}}">{{sfdata.substdt || 'N.A.'}} - {{sfdata.subenddt || 'N.A.'}}</a></span>
+                        <span class="info"><strong>WORKFLOWS USED:</strong>
+                            <span ng-if="sfdata.unlimitedwf === true">Unlimited</span>
+                            <span ng-if="sfdata.unlimitedwf !== true"><a title="{{sfdata.wfstarted || 'N.A.'}} / {{sfdata.wfpurchased || 'N.A.'}}">{{sfdata.wfstarted || 'N.A.'}} / {{sfdata.wfpurchased || 'N.A.'}}</a></span>
+                        </span>
+                    </div>
+				</div>
+			</div>
+            <div class="short manager-leaderboard">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+				<div class="inner-wrap">
+					<h4>
+                        {{custlabels.Manager || 'Manager'}} leaderboard 
+                        <span class="lstmnth">(last 6 months)</span>
+                    </h4>
+
+					<div class="table-responsive">
+						<table class="table">
+							<thead>
+								<tr>
+									<th class="second-heading">Name</th>
+									<th class="second-heading">Total</th>
+									<th class="second-heading">On time</th>
+									<th class="second-heading">Late</th>
+									<th class="second-heading">Percent</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr ng-repeat="row in leaders track by $index">
+									<td class="td-container">
+										<div>
+											<span class="profile-pic">
+												<img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+												<img class="prfimg" ng-src="{{row.photoCdn||row.photo}}" alt="">
+											</span>
+											<span class="text">{{row.name}}</span>
+										</div>
+									</td>
+									<td class="td-container">
+										<div>
+											<span class="text">{{row.total}}</span>
+										</div>
+									</td>
+									<td class="td-container">
+										<div>
+											<span class="text">{{row.ontime}}</span>
+										</div>
+									</td>
+									<td class="td-container">
+										<div>
+											<span class="text">{{row.late}}</span>
+										</div>
+									</td>
+									<td class="td-container">
+										<div>
+											<span class="text">{{row.per}}%</span>
+										</div>
+									</td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div>
+
+                    <div class="empty-data" ng-if="leaders.length == '0'">
+                        <p class="fancy title">
+                            <span>Your managers' performance gets ranked here</span>
+                        </p>
+                    </div>
+
+				</div>
+			</div>
+        </div>
+	</div>
+</div>

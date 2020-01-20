@@ -1,0 +1,204 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Admins</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','users')">
+    <h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','users')">
+    <h4>Add and manage the administrators</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+    <div class="settings-wrap usrper-mainwrap" ng-controller="userDetailsCtrl">
+        <div class="settings-wrap-inner usrper-wrap">
+            <md-tabs md-dynamic-height md-border-bottom>
+                <md-tab label="Admins">
+                    <md-content class="soon">
+                        <div class="table-responsive">
+                            <table class="table users-table table-adjustment" ng-class="{nofltr : dfdisabled === 'yes'}"
+                                ng-cloak st-table="displayedCollection" st-safe-src="rowCollection">
+                                <thead>
+                                    <tr>
+                                        <th class="nm" st-sort="name" st-skip-natural="true" st-sort-default="true">Name
+                                        </th>
+                                        <th class="role">
+                                            Role
+                                            <span class="tooltip-wrap">
+                                                <span class="icon icon-tooltip"></span>
+                                                <md-tooltip class="manager-tooltip status-tooltip" md-direction="left">
+                                                    <span class="copy">
+                                                        <h4 class="title">
+                                                            ADMINISTRATOR
+                                                        </h4>
+                                                        <p>
+                                                            Has rights to all features and pages.
+                                                        </p>
+                                                        <p>&nbsp;</p>
+                                                        <h4 class="title">
+                                                            RESTRICTED ADMIN
+                                                        </h4>
+                                                        <p>
+                                                            Has rights to all features and pages, <em>exempting admins,
+                                                                child accounts, integration and security.</em>
+                                                        </p>
+                                                        <p>&nbsp;</p>
+                                                        <h4 class="title">
+                                                            REPORTING ADMIN
+                                                        </h4>
+                                                        <p>
+                                                            Has rights to all features and pages, exempting settings
+                                                            (only CSV upload), child accounts, integration, security
+                                                            <em>+ can not change any content in workflows.</em>
+                                                        </p>
+                                                        <p>&nbsp;</p>
+                                                        <h4 class="title">
+                                                            RESTRICTED CONTENT ADMIN
+                                                        </h4>
+                                                        <p>
+                                                            Has rights to all features and pages, exempting settings
+                                                            (only CSV upload), child accounts, integration, security,
+                                                            can not change any content in workflows <em>+ can not see
+                                                                forms-related data.</em>
+                                                        </p>
+                                                        <p>&nbsp;</p>
+                                                        <h4 class="title">
+                                                            INITIATOR
+                                                        </h4>
+                                                        <p>
+                                                            Can only launch people into workflows manually and through
+                                                            'Upload CSV' in settings.
+                                                        </p>
+                                                    </span>
+                                                </md-tooltip>
+                                            </span>
+                                        </th>
+                                        <th class="fltr" ng-if="dfdisabled !== 'yes'">Visible workflow data</th>
+                                        <th class="stts">Status</th>
+                                        <!-- <th class="eml" st-sort="uname" st-skip-natural="true">Email address (identification)</th> -->
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in displayedCollection track by $index"
+                                        class="table-adjustment__row"
+                                        ng-class="row.active === 'N' ? 'is-inactive' : 'is-active'"
+                                        ng-class="{'sso-pro' : row.sso === 'yes'}"
+                                        ng-click="showUserModal($event,'update',row);">
+                                        <td class="hover">
+                                            <div>
+                                                <span class="profile-pic">
+                                                    <img ng-if="row.photo_s" ng-src="{{row.photoCdn_s || row.photo_s}}"
+                                                        alt="Profile Pic">
+                                                    <img ng-if="!row.photo_s"
+                                                        src="//static.enboarder.net/images/profile-placeholder.gif"
+                                                        alt="">
+                                                </span>
+                                                {{row.name}} <span ng-if="currentuser === row.uname">(You)</span>
+                                            </div>
+                                        </td>
+                                        <td class="hover">
+                                            <div>
+                                                <span ng-if="!row.role">Administrator</span>
+                                                <span ng-if="row.role==='csr'">Administrator</span>
+                                                <span ng-if="row.role==='admin'">Administrator</span>
+                                                <span ng-if="row.role==='restrictedadmin'">Restricted Admin</span>
+                                                <span ng-if="row.role==='initiator'">Initiator</span>
+                                                <span ng-if="row.role==='restrictedcontentadmin'">Restricted Content
+                                                    Admin</span>
+                                                <span ng-if="row.role==='reportingadmin'">Reporting Admin</span>
+                                                <span class="is-sso" ng-if="row.sso === 'yes'">(SSO)</span>                                                
+                                            </div>
+                                        </td>
+                                        <!-- <td class="hover">
+                							<div>{{row.uname}}</div>
+                						</td> -->
+                                        <td class="hover" ng-if="dfdisabled !== 'yes'">
+                                            <div class="bubblewrp">
+                                                <span class="bblorwrp"
+                                                    ng-repeat="dfilter in row.userdatafilters track by dfilter.uid">
+                                                    <span class="bubble">
+                                                        {{dfilter.name}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip"
+                                                            md-direction="bottom">
+                                                            <span class="copy">
+                                                                <p>
+                                                                    {{dfilter.qry}}
+                                                                </p>
+                                                            </span>
+                                                        </md-tooltip>
+                                                    </span>
+                                                    <span class="or" ng-if="!$last">or</span>
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td class="hover">
+                                            <div>
+                                                <span class="status is-active" ng-if="row.active === 'Y'">Active</span>
+                                                <span class="status inact is-inactive"
+                                                    ng-if="row.active === 'N'">Inactive</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="btnDiv">
+                            <md-button class="md-raised" ng-click="showUserModal($event,'add new');">
+                                <span class="icon icon-plus"></span>
+                                Add New
+                            </md-button>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <!-- <md-tab label="Roles & permissions" ng-disabled="true">
+                    <md-content class="soon">
+                        <div class="table-responsive">
+                			<table class="table users-table" ng-cloak st-table="displayedCollection" st-safe-src="rowCollection">
+                				<thead>
+                					<tr>
+                						<th st-sort="name" st-skip-natural="true" st-sort-default="true">Name</th>
+                						<th st-sort="uname"  st-skip-natural="true">User name / Email</th>
+                						<th>Role</th>
+                					</tr>
+                				</thead>
+                				<tbody>
+                					<tr ng-repeat="row in displayedCollection track by $index" ng-class="{'sso-pro' : row.sso === 'yes'}" ng-if="row.active==='N'" ng-click="showUserModal($event,'update',row);">
+                                        <td class="hover">
+                							<div>
+                                                <span class="profile-pic">
+                                                    <img ng-if="row.photo_s" ng-src="{{row.photoCdn_s || row.photo_s}}" alt="Profile Pic">
+                                                    <img ng-if="!row.photo_s" src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                                </span>
+                                                {{row.name}}
+                                            </div>
+                						</td>
+                						<td class="hover">
+                							<div>{{row.uname}}</div>
+                						</td>
+                                        <td class="hover">
+                                            <div>
+                                                <span ng-if="!row.role">Administrator</span>
+                                                <span ng-if="row.role==='csr'">Administrator</span>
+                                                <span ng-if="row.role==='admin'">Administrator</span>
+                                                <span ng-if="row.role==='restrictedadmin'">Restricted Admin</span>
+                                                <span ng-if="row.role==='initiator'">Initiator</span>
+                                                <span ng-if="row.role==='restrictedcontentadmin'">Restricted Content Admin</span>
+                                                <span ng-if="row.role==='reportingadmin'">Reporting Admin</span>
+                                            </div>
+                                        </td>
+                					</tr>
+                				</tbody>
+                			</table>
+                		</div>
+                    </md-content>
+                </md-tab> -->
+            </md-tabs>
+        </div>
+    </div>
+</div>

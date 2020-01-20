@@ -1,0 +1,70 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Operations</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('csrsettings','sendmsg')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('csrsettings','sendmsg')">
+    <h4>Send operations request</h4>
+	<div class="settings-wrap-inner send-msg">
+
+        <form class="sndmsgfm" name="sendMessageForm" novalidate>
+
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex="30" class="sms-from-block">
+                    <md-input-container class="required">
+                        <label>Method</label>
+                        <input md-no-asterisk name="smsInput" ng-model="localData.method" required>
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex="30">
+                    <md-input-container class="required">
+                        <label>URL</label>
+                        <input md-no-asterisk ng-model="localData.url" required>
+                    </md-input-container>
+                </div>
+            </div>
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex>
+                    <md-input-container class="md-block">
+                        <label>Request Body</label>
+                        <textarea md-no-asterisk ng-model="localData.body"></textarea>
+                    </md-input-container>
+                </div>
+            </div>
+
+            <div layout="row" layout-align="space-between start" layout-wrap>
+                <div flex>
+                    <md-input-container class="md-block">
+                        <label>Response Body</label>
+                        <textarea md-no-asterisk ng-model="msg"></textarea>
+                    </md-input-container>
+                </div>
+            </div>
+
+            <div class="btnDiv">
+				<md-button class="save save-spinner md-raised" ng-click="sendRequest();" ng-disabled="sendMessageForm.$invalid">
+                    <span class="text">send</span>
+					<span class="spinner">
+						<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+					</span>
+				</md-button>
+			</div>
+
+            <div class="ntf-msg" layout="row" layout-align="space-between start" layout-wrap ng-if="msg">
+                <div flex>
+                    <span class="iconx icon-notification-ok" ng-if="status === 'ok'"></span>
+                    <span class="iconx icon-close-5" ng-if="status === 'error'"></span>
+                    <!-- <span class="text">{{msg}}</span> -->
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

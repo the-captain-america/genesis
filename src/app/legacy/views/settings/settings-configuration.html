@@ -1,0 +1,535 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Configuration</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','configurations')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','configurations')">
+	<h4>Configure general workflow behaviour.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<form name="configForm" novalidate>
+	<div class="settings-wrap-inner config">
+
+		<div class="config-top">
+            <div class="info-block" ng-class="{wtherrmsg : invalidCSVError === 'yes' || labelUploadError}" ng-if="configData.features && configData.features.labels === 'yes'">
+				<span class="label long">
+					Custom labels:
+				</span>
+                <span class="content-wrap lblupldwrp">
+    				<span class="content">
+                        <span ng-if="custlabelcrdtdisplay">
+                            <span class="icon icon-notification-ok"></span>
+                            <span class="txt">
+                                Added {{custlabelcrdtdisplay}}
+                            </span>
+                        </span>
+                        <span class="ntusd" ng-if="!custlabelcrdtdisplay">
+                            <span class="icon icon-close-5"></span>
+                            <span class="txt">
+                                Not used
+                            </span>
+                        </span>
+                        <md-button class="drkbtn" ng-click="downloadLabels();">
+                            <span class="btn-icon icon-download"></span>
+                            <span class="text">Download</span>
+                        </md-button>
+                        <md-button class="drkbtn" ngf-select="uploadLabels($file)">
+                            <span class="btn-icon icon-upload-small"></span>
+                            <span class="text">Upload</span>
+                        </md-button>
+    				</span>
+                    <div ng-if="invalidCSVError === 'yes'" class="errormsg">
+                        <span class="icon icon-close-5"></span>
+                        <span class="text">Wrong format, we accept .csv</span>
+                    </div>
+                    <div ng-if="labelUploadError" class="errormsg">
+                        <span class="icon icon-close-5"></span>
+                        <span class="text">{{labelUploadError}}</span>
+                    </div>
+                </span>
+ 			</div>
+            <div class="info-block">
+				<span class="label long">
+					Date display format:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex>
+    						<md-select aria-label="Date format" ng-model="configData.attr.dateformat">
+    							<md-option ng-repeat="dateformatdata in dateformats" value="{{dateformatdata.value}}"><a title="Dates will display like this: {{dateformatdata.tooltip}}">{{dateformatdata.display}}</a></md-option>
+    						</md-select>
+    					 </md-input-container>
+    				</span>
+                    <span class="label small"><small>(eg. {{dateformats[configData.attr.dateformat].tooltip}})</small></span>
+                </span>
+ 			</div>
+            <div class="info-block">
+				<span class="label long">
+					Default timezone:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex class="long">
+    						<md-select md-container-class="advopt-dd" aria-label="Timezone" ng-model="configData.attr.notifyTimeZone">
+    							<md-option ng-repeat="tzone in timezones track by $index" value="{{tzone.k}}">{{tzone.v}}</md-option>
+    						</md-select>
+    					</md-input-container>
+    				</span>
+                </span>
+			</div>
+			<div class="info-block">
+				<span class="label long">
+					Length of start phase:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex>
+    						<md-select md-container-class="advopt-dd" aria-label="Start phase days" ng-model="configData.attr.induction">
+    							<md-option ng-repeat="i in getNumber(200) track by $index" value="{{$index+1}}">{{$index+1}}</md-option>
+    						</md-select>
+    					</md-input-container>
+    				</span>
+    				<span class="label small">Days</span>
+                </span>
+			</div>
+			<div class="info-block">
+				<span class="label long">
+					Notification send - time:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex>
+    						<md-select md-container-class="advopt-dd" aria-label="Notification time" ng-model="configData.attr.notifyTime">
+    							<md-option ng-repeat="i in getNumber(24) track by $index" value="{{$index+1}}">
+                                    <span ng-if="$index < 9">0{{$index+1}}:00</span>
+                                    <span ng-if="$index > 8">{{$index+1}}:00</span>
+                                </md-option>
+    						</md-select>
+    					 </md-input-container>
+    				</span>
+                </span>
+ 			</div>
+			<!--
+            <div class="info-block checkbox-block">
+                <span class="label long">
+                    Notification send - days:
+                </span>
+                <span class="content-wrap">
+                    <span class="content">
+                        <md-checkbox ng-model="configData.attr.dnd" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Do not send any notifications after hours">
+                        </md-checkbox>
+                    </span>
+                </span>
+            </div>
+
+            <div class="info-block checkbox-block notification-hours" ng-if="configData.attr.dnd === 'yes'">
+                <span class="label long">
+                </span>
+                <span class="content-wrap">
+                    <div layout="row" layout-align="start center">
+                        <span class="label small"><small>From:&nbsp;&nbsp;&nbsp;</small></span>
+                        <md-input-container flex="15" class="dnd-time-dd">
+                            <md-select aria-label="Time from" ng-model="configData.attr.dndfrom">
+                                <md-option ng-repeat="i in getNumber(24) track by $index" value="{{$index+1}}">
+                                    <span ng-if="$index < 9">0{{$index+1}}:00</span>
+                                    <span ng-if="$index > 8">{{$index+1}}:00</span>
+                                </md-option>
+                            </md-select>
+                         </md-input-container>
+                         <span class="label small"><small>To:&nbsp;&nbsp;&nbsp;</small></span>
+                         <md-input-container flex="15" class="dnd-time-dd">
+                             <md-select aria-label="Time to" ng-model="configData.attr.dndto">
+                                 <md-option ng-repeat="i in getNumber(24) track by $index" value="{{$index+1}}">
+                                     <span ng-if="$index < 9">0{{$index+1}}:00</span>
+                                     <span ng-if="$index > 8">{{$index+1}}:00</span>
+                                 </md-option>
+                             </md-select>
+                          </md-input-container>
+                    </div>
+                </span>
+            </div>
+			-->
+
+            <div class="info-block dnd-wrap">
+				<span class="label long">
+					Notification send - days:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex class="long">
+    						<md-select md-selected-text="shortenDaysText()" aria-label="Date format" ng-model="configData.attr.notifyDays" multiple required>
+    							<md-option value="1">Monday</md-option>
+    							<md-option value="2">Tuesday</md-option>
+    							<md-option value="3">Wednesday</md-option>
+    							<md-option value="4">Thursday</md-option>
+    							<md-option value="5">Friday</md-option>
+    							<md-option value="6">Saturday</md-option>
+    							<md-option value="0">Sunday</md-option>
+    						</md-select>
+    					 </md-input-container>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">SENDING NOTIFICATION, DAYS:</h4>
+                                <p>
+                                    Notifications will only send on selected days. All notifications due to send on days not selected will be postponed sending until reaching the following selected day for sending notifications.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </span>
+ 			</div>
+            <div class="info-block" ng-if="configData.allownotifcontrol === 'yes'">
+				<span class="label long">
+					Messaging gateway mode:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex class="long">
+    						<md-select aria-label="..." ng-model="configData.notifcontrol">
+    							<md-option value="n">Send notifications as normal</md-option>
+    							<md-option value="s">Stop all notifications</md-option>
+    							<md-option value="d">Redirect all notifications to...</md-option>
+    						</md-select>
+    					 </md-input-container>
+    				</span>
+                </span>
+ 			</div>
+            <div class="info-block" ng-if="configData.allownotifcontrol === 'yes' && configData.notifcontrol === 'd'">
+				<span class="label long">&nbsp;</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <md-input-container class="long notimast required" flex>
+                            <label>Mobile</label>
+                            <input md-no-asterisk ng-model="configData.notifcontrolmob" required>
+                        </md-input-container>
+    				</span>
+                </span>
+ 			</div>
+            <div class="info-block" ng-if="configData.allownotifcontrol === 'yes' && configData.notifcontrol === 'd'">
+				<span class="label long">&nbsp;</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <md-input-container class="long notimast required" flex>
+                            <label>Email</label>
+                            <input md-no-asterisk ng-model="configData.notifcontroleml" type="email" required>
+                        </md-input-container>
+    				</span>
+                </span>
+ 			</div>
+
+            <div class="info-block esctime-block">
+                <span class="label long">
+                    Mark sequence 'overdue' if not complete after:
+                </span>
+                <span class="content-wrap">
+                    <span class="content">
+                        <md-input-container flex>
+                            <md-select md-container-class="ovrdudys-dd" aria-label="Admin escalation time" ng-model="configData.attr.escalation">
+                                <md-option ng-if="$index == 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Day</md-option>
+                                <md-option ng-if="$index > 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Days</md-option>
+                            </md-select>
+                         </md-input-container>
+                    </span>
+                </span>
+			</div>
+
+            <div ng-if="configData.learnapp ==='yes'" class="info-block">
+                <span class="label long">
+                    Learn assessment time frame:
+                </span>
+                <span class="content-wrap">
+                    <span class="content">
+                        <md-input-container class="dtype-inpt">
+    						<md-select aria-label="Minimum time" ng-model="configData.lrnassmttmfrmmin">
+								<md-option ng-value="60">1 minute</md-option>
+    							<md-option ng-value="1800">0.5 hour</md-option>
+    							<md-option ng-value="3600">1 Hour</md-option>
+    							<md-option ng-value="10800">3 Hours</md-option>
+    							<md-option ng-value="21600">6 Hours</md-option>
+    							<md-option ng-value="86400">24 Hours</md-option>
+    							<md-option ng-value="172800">48 Hours</md-option>
+    						</md-select>
+    					</md-input-container>
+                        <span class="text da-txt small"><small>Minimum</small></span>
+                        <!-- <md-input-container class="dtype-inpt">
+    						<md-select aria-label="Maximum time" ng-model="configData.def">
+                                <md-option value="FF" selected>10 Days</md-option>
+                                <md-option value="DD">BB</md-option>
+    							<md-option value="EE">CC</md-option>
+    						</md-select>
+    					</md-input-container>
+                        <span class="text da-txt small"><small>Maximum</small></span> -->
+                    </span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">Assessment Timeframe</h4>
+                                <p>
+                                    The minimum time determines the window from when an assesment can be either manually or automatically trigger for completion.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </span>
+            </div>
+
+            <div class="info-block security-block">
+				<span class="label long">
+					Send daily reminders until sequence is marked 'overdue':
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-checkbox ng-model="configData.attr.sendreminder" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Send daily notification reminders">
+    			        </md-checkbox>
+    				</span>
+                </span>
+ 			</div>
+            <div class="info-block security-block">
+				<span class="label long">
+					Send 'overdue' escalation email to admin:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-checkbox ng-model="configData.attr.sendescalate" aria-label="Send escalation emails to admin">
+    			        </md-checkbox>
+    				</span>
+                    <span class="label small dnr"><small>When a sequence is marked 'overdue'</small></span>
+    			</span>
+ 			</div>
+            <div class="info-block">
+				<span class="label long">
+					Default escalation email:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container md-no-float class="md-block long" flex>
+    						<input ng-model="configData.escalationemail" ng-pattern="/^.+@.+\..+$/" placeholder="No escalation email address" type="email" name="escemail" required>
+                            <span class="blrdv scnfg"></span>
+                            <div ng-messages="configForm.escemail.$error" role="alert" multiple>
+                                <div ng-message="required" class="my-message">Email address required.</div>
+                                <div ng-message="pattern" class="my-message">
+                                    Invalid email address.
+                                </div>
+                            </div>
+    					</md-input-container>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">DEFAULT ESCALATION EMAIL</h4>
+                                <p>
+                                    Escalation emails notify Admin of errors and alerts that occur during a workflow.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block security-block config-links wthtxt gdpr" ng-if="configData.enblprflmenu ==='yes'">
+				<span class="label long">
+					Profile menu for workflows:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-checkbox ng-model="configData.prflmenu.show" aria-label="Access profile menu for workflows:" ng-true-value="'yes'" ng-false-value="'no'" ng-change="showProfileMenuModal()"></md-checkbox>
+                        <span class="link" ng-click="showProfileMenuModal()" ng-if="configData.prflmenu.show === 'yes'">
+    						Profile menu
+    					</span>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">Profile-menu</h4>
+                                <p>
+                                    Participants can access tasks and workflow-related features from a menu tab.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block" ng-if="configData.config.email.trkcode && (configData.config.email.trkcode === 'yes')">
+				<span class="label long">
+					Email tracking code:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container md-no-float class="md-block long" flex>
+    						<input ng-model="configData.config.email.trkcodeurl" placeholder="No email tracking" type="url">
+                            <span class="blrdv scnfg"></span>
+    					</md-input-container>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">WHAT EMAIL ARE TRACKED?</h4>
+                                <p>
+                                    The tracking code is added to all notifications and send data emails.
+                                </p><br/>
+                                <h4 class="title">HOW TO ADD TOKENS?</h4>
+                                <p>
+                                    Contact Enboader Support team if you want some dynamic Tokens in Links.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+
+ 			<!-- <div class="info-block sms-from-block">
+				<span class="label long sms-from">
+					SMS notification sent from:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex>
+    						<input name="smsInput" ng-model="configData.smsfrom" ng-pattern="/^[a-zA-Z]*$/" ng-maxlength="11" md-maxlength="11" required>
+    						<div ng-messages="configForm.smsInput.$error" role="alert" multiple>
+    							<div ng-message="required" class="my-message">This is required.</div>
+    							<div ng-message="pattern" class="my-message">
+    								No spaces or numbers are allowed.
+    							</div>
+    							<div ng-message="md-maxlength" class="my-message">
+    								Max 11 characters.
+    							</div>
+    						</div>
+    					</md-input-container>
+    				</span>
+                    <span class="label small"><small>(max 11 characters)</small></span>
+                </span>
+ 			</div> -->
+
+ 		 	<!-- <div class="info-block">
+				<span class="label long">
+					Email notification sent from:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex class="long">
+    						<input ng-model="configData.emailfrom" required>
+    					 </md-input-container>
+    				</span>
+                </span>
+ 			</div> -->
+
+            <div class="info-block" ng-if="configData.showsmsgateway === 'yes'">
+				<span class="label long">
+					SMS Gateway:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-input-container flex>
+    						<md-select aria-label="..." ng-model="configData.smsgateway">
+    							<md-option value="b-t">Burst-Twilio</md-option>
+    							<md-option value="t">Twilio</md-option>
+                                <md-option value="esendex">Esendex</md-option>
+    						</md-select>
+    					 </md-input-container>
+    				</span>
+                </span>
+ 			</div>
+			<div class="info-block config-links" ng-if="configData.features && configData.features.fonts === 'yes'">
+				<span class="label long">
+					Custom fonts:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<span class="link" ng-click="showCustomFontsModal();">
+    						Setup custom fonts
+						</span>
+                        <span class="fontwrp" ng-if="fontavailable === 'yes'">
+                            <span class="icn icon-fonts-on"></span>
+                            <span class="text">Active</span>
+                        </span>
+                        <span class="fontwrp" ng-if="fontavailable !== 'yes'">
+                            <span class="icn icon-fonts-off"></span>
+                            <span class="text">Inactive</span>
+                        </span>
+
+    				</span>
+    			</span>
+			</div>
+			<div class="info-block config-links">
+				<span class="label long">
+					Default messages:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<span class="link" ng-click="gotoLevel3('Manager Notification', 'defaultmanagernotify');">
+                            {{custlabels.Manager || 'Manager'}} Notification
+    					</span>
+    					<br>
+    					<span class="link" ng-click="gotoLevel3('Employee Notification', 'defaultnewhirenotify');">
+                            {{custlabels.Employee || 'Employee'}} Notification
+    					</span>
+    					<br>
+    					<span class="link" ng-click="gotoLevel3('Thank You', 'defaultthankyou');">
+    						Finish page
+    					</span>
+    				</span>
+    			</span>
+			</div>
+
+		</div>
+
+		<div class="config-bottom">
+
+            <div layout="row" layout-align="center center" class="bg-set-wrap">
+                <div flex="10" class="bgfl">
+                    <label>Background filter:</label>
+                </div>
+                <div flex="15" class="bgtnd">
+                    <md-input-container>
+                        <md-select aria-label="Theme name" ng-model="configData.attr.overlay">
+                            <md-option ng-repeat="theme in overlay.themes" value="{{theme.value}}">{{theme.display}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div flex="5" class="bglbl">
+                    <label>Image:</label>
+                </div>
+                <div class="bgthmb">
+                    <md-input-container>
+                        <div class="button" ngf-drop="upload($file)" ngf-select="upload($file)" accept="image/*">
+                            <img ng-src="{{configData.attr.bgimageCdn || configData.attr.bgimage}}" ng-if="configData.attr.bgimage" ngf-resize="{width: 200, height: 200, quality: 1.0}" alt="">
+                            <div class="plshldr" ng-if="!configData.attr.bgimage">
+                                <span class="flupld icon-fileupload-small"></span>
+                            </div>
+                        </div>
+                    </md-input-container>
+                    <div ng-if="invalidContentTypeError === 'yes'" class="error">
+                        <span class="text">Wrong format, we accept .JPG &amp; .PNG</span>
+                    </div>
+                </div>
+            </div>
+
+			<div class="btnDiv">
+				<md-button class="save save-spinner-cnfg md-raised" ng-click="saveData();" ng-disabled="configForm.$invalid">
+					<span class="text">Save</span>
+					<span class="text-save">Saving...</span>
+					<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+					<span class="spinner">
+						<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+					</span>
+				</md-button>
+			</div>
+
+		</div>
+	</div>
+	</form>
+</div>

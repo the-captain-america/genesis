@@ -1,0 +1,80 @@
+<md-dialog aria-label="CUSTOM FONTS" class="csfnts-modal md-default-theme">
+    <form name="customfontsForm" novalidate>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>SET UP CUSTOM FONTS</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content style="min-width:620px;max-width:620px">
+        <label class="heading heading-inside">
+            Add URL destinations where fonts are located (in CSS),<br>
+            Then type the name of each font to add them from destination.
+        </label>
+        <div class="inputwrp">
+            <md-input-container class="required">
+                <label>Online font URL</label>
+                <input md-no-asterisk ng-model="localdata.url" type="text" ng-keyup="validateFontUrl($event)" required>
+            </md-input-container>
+            <span class="adbtnwrp">
+                <md-input-container>
+                    <label>Type font-name to add</label>
+                    <input md-no-asterisk ng-model="fontnm" type="text">
+                </md-input-container>
+                <md-button class="addbtn" ng-click="addCustomFont()" ng-disabled="!fontnm">
+                    <span class="text">add</span>
+                </md-button>
+            </span>
+            <div ng-if="errormsg" class="errormsg">
+                <span class="icn icon-close-5"></span>
+                <span class="text">{{errormsg}}</span>
+            </div>
+        </div>
+        <div layout="row" layout-align="start center" class="cboxlblwrp">
+            <div flex="80">
+                <label>Fonts Allowed</label>
+            </div>
+            <div flex="20" class="sysfnt">
+                <label class="new-val">System Font</label>
+            </div>
+        </div>
+        <div layout="row" layout-align="start start" class="cboxwrp" ng-repeat="font in localdata.fonts track by $index">
+            <div flex="80">
+                <md-checkbox aria-label="{{font.nm}}"
+                    ng-checked="font.sel === 'yes' || $index === 0"
+                    ng-disabled="$index === 0"
+                    ng-true-value="'yes'" ng-false-value="'no'"
+                    ng-model="font.sel">
+                    {{font.nm}}
+                </md-checkbox>
+            </div>
+            <div flex="20" class="sysfnt">
+                <md-radio-group class="rdgrp" ng-model="localdata.def">
+                    <md-radio-button value="{{$index}}"/>
+                </md-radio-group>
+            </div>
+        </div>
+        <div class="btnDiv" ng-if="localdata.fonts.length > 1">
+            <md-button class="md-raised" ng-click="deleteCustomFonts();">
+                <span class="text">DELETE CUSTOM FONTS</span>
+            </md-button>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveCustomFonts();" ng-disabled="isvalid !== 'yes'" md-autofocus>
+            <span class="text">Save</span>
+            <span class="text-save">Saving...</span>
+            <span class="text-saved">Saved
+                <span class="icon-notification-ok"></span>
+            </span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+    </md-dialog-actions>
+    </form>
+</md-dialog>

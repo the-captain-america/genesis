@@ -1,0 +1,37 @@
+<div class="collapse-wrap">
+    <div class="show-hide-dashboard">
+        <span class="text">I9 Form</span>
+        <span class="arrow-toggle icon-arrow-2"></span>
+    </div>
+    <div class="detail-section-dashboard show-row">
+        <!-- <span class="info">{{RemoteAccessLink}}</span> -->
+        <span class="status received" ng-if="action==='I9_complete'">
+            <span class="icon icon-notification-ok"></span>
+            <span class="text">Complete</span>
+        </span>
+
+        <span class="status received" ng-if="action==='I9_inprogress'">
+            <span class="icon icon-notification-ok"></span>
+            <span class="text">In progress</span>
+        </span>
+        <span class="status wait" ng-if="action==='I9_inprogress'">
+            <span class="text"><strong>Next action:</strong> </span>
+            <span class="text">{{details.resp.I9s.next_action}}</span>
+        </span>
+        <span class="status wait" ng-if="action==='I9_inprogress'">
+            <span class="text"><strong>Next action due date:</strong> </span>
+            <span class="text">{{details.resp.I9s.next_action_date}}</span>
+        </span>
+
+        <span ng-if="action==='I9_error'">
+            <span class="status err">
+                <span class="icon icon-close-5"></span>
+                <span class="text">Whoops, Error</span>
+            </span>
+            <span class="info i9info">
+                <strong>TrackerCorp response:</strong><br>
+                {{details.resp}}
+            </span>
+        </span>
+    </div>
+</div>

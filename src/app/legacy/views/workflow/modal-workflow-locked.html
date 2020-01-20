@@ -1,0 +1,38 @@
+<md-dialog aria-label="Locked Workflow" class="edit-workflow-modal md-default-theme modal-adjustment">
+  <form name="myForm" novalidate>
+    <md-toolbar>
+      <div class="md-toolbar-tools">
+        <h2>Locked Workflow</h2>
+        <span flex></span>
+        <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+          <span class="icon icon-close-2"></span>
+        </md-button>
+      </div>
+    </md-toolbar>
+    <md-dialog-content aria-label="Locked Workflow" style="min-width:600px;max-width:600px;max-height:810px;">
+      <div class="modal-adjustment__content">
+        <img ng-src="//static.enboarder.net/images/locked-workflow.svg" class="content-image" alt="locked item" />
+        <span class="content-text">You need permission from the owners to get access to '{{workflow.name}}'</span>
+
+
+        <div class="chip-adjustment__wrapper">
+          <div class="chip-adjustment__row">
+            <div class="chip-adjustment" ng-repeat="(index, admin) in allowedAdmins">
+
+              <span class="chip-adjustment__avatar"><img ng-src="{{admin.photoCdn_s}}" class="md-avatar"
+                  alt="{{admin.name}}" /></span>
+              <span class="chip-adjustment__content">{{admin.name}}</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+      <md-button aria-label="Close" class="save md-default-theme" ng-click="cancel();" md-autofocus>
+        <span class="text">Close</span>
+      </md-button>
+    </md-dialog-actions>
+  </form>
+</md-dialog>

@@ -1,0 +1,80 @@
+<ul ng-controller="WorkflowSideNavCtrl" ng-if="hasPermission('permissions.createWF')">
+
+	<li class="maskd" ng-if="locked === 'Y'"></li>
+
+	<li class="header">
+		<h4>Workflow Manager</h4>
+	</li>
+
+	<!-- New Workflow Tab -->
+	<li ng-repeat="item in models.templates" dnd-draggable="item" dnd-effect-allowed="copy"
+		dnd-copied="item.id = item.id + 1" dnd-dragstart="dargstartnew(event)" dnd-dragend="dargend(event)"
+		class="drag-holder">
+		<a>
+			<span class="icon icon-addnew-big left"></span>
+			<span class="text">New workflow</span>
+			<span class="drag icon-handles"></span>
+		</a>
+	</li>
+
+	<!-- Repeated Workflow Tab -->
+	<li ng-repeat="item in workflowlist | filter:{act: 'N'}| orderBy:['ord','name']" dnd-draggable="item"
+		dnd-effect-allowed="copy" dnd-copied="item.id = item.id + 1" dnd-dragstart="dargstart(event)"
+		dnd-dragend="dargend(event)" dnd-disable-if="item.hide === 'Y'">
+		<!-- REFACTORED: <a ng-class="{'active' : item.act === 'Y'}"></a> -->
+
+
+		<div class="workflow-nav" ng-if="item.hide !=='Y'">
+			<!-- layout -->
+			<div class=" block-content" ng-click="level2Editor(item.name, item.uid, item.hide);">
+				<span title="{{ item.name }}" class="content-text truncate">{{ item.name }}</span>
+			</div>
+
+			<!-- control -->
+			<div class="block-control">
+				<!-- is-handle -->
+				<span class="block-control__item is-handle grabbable">
+					<span class="icon drag icon-handles"></span>
+				</span>
+				<!-- is-unlocked -->
+				<div class="block-control__item is-unlocked" ng-if="lockedWf === 'yes' && item.controlaccess === 'yes'">
+					<span class="icon icon-security-unlock"></span>
+				</div>
+				<!-- is action -->
+				<span class="block-control__item is-action more-action" ng-if="item.hide !== 'Y'">
+					<span class="icon-more-icon"></span>
+					<div class="action-popover">
+						<span class="icon close-popover icon-more-icon"></span>
+						<span ng-click="showRenameWorkflowModal(item);">
+							<span class="icn icon-rename"></span>
+							Rename
+						</span>
+						<span ng-click="duplicateWorkflow(item);">
+							<span class="icn icon-duplicate"></span>
+							Duplicate
+						</span>
+						<span ng-if="item.wfcriteria" ng-click="showDeleteWorkflowModal(item.uid, item.name)">
+							<span class="icn icon-close-5"></span>
+							Delete
+						</span>
+					</div>
+				</span>
+
+			</div>
+		</div>
+		<div class="workflow-nav is-locked" ng-class="{'active' : item.hide === 'Y' && lockedWf === 'yes' }"
+			ng-if="item.hide === 'Y' && lockedWf === 'yes'">
+			<!-- layout -->
+			<div class="block-content" ng-click="level2Editor(item.name, item.uid, item.hide);">
+				<span title="{{ item.name }}" class="content-text truncate">{{ item.name }}</span>
+			</div>
+			<!-- control -->
+			<div class="block-control">
+				<!-- is-locked -->
+				<div class="block-control__item is-locked">
+					<span class="icon icon-security-lock"></span>
+				</div>
+			</div>
+		</div>
+	</li>
+</ul>

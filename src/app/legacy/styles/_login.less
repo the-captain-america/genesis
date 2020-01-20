@@ -1,0 +1,206 @@
+.login{
+	.logo{
+        width: 620px;
+		margin: 0 0 20px;
+
+        img{
+            max-width: 50%;
+        }
+
+		a{
+			display: inline-block;
+		}
+	}
+
+    .error-list{
+        padding: 0 0 0 25px;
+    }
+}
+
+.login-content{
+	background: darken(@white, 5%);
+	width: 570px;
+	position: relative;
+    text-align: left;
+    padding: 0 25px;
+    border-radius: 5px;
+
+    input:-webkit-autofill{
+        -webkit-box-shadow: 0 0 0px 1000px #f2f2f2 inset;
+        border-color: #CCCCCC;
+    }
+
+    .error{
+    	margin: 0 0 40px;
+
+        &.login{
+            &.hidethis{
+                display: none;
+            }
+        }
+
+        &.upgrade{
+            .text{
+                padding: 0;
+                text-align: center;
+            }
+        }
+    }
+
+    h5{
+    	display: inline-block;
+	    font-weight: 700;
+	    text-transform: uppercase;
+	    margin: 15px 0;
+	    text-align: center;
+	    width: 100%;
+	    color: lighten(@black, 30%);
+
+	    &.forgot-password{
+	    	text-align: right;
+
+	    	span{
+	    		color: lighten(@black, 30%);
+	    		cursor: pointer;
+	    		font-weight: 600;
+	    	}
+
+            .md-button{
+                border-radius: 20px;
+                padding: 0;
+                margin: 6px 0px;
+                .transition(all, 120ms, ease);
+
+                &:hover{
+                    background: none;
+
+                    span{
+                        color: @brand-color;
+                    }
+                }
+            }
+	    }
+    }
+
+    md-input-container{
+
+		&.md-default-theme .md-input{
+			border-color: @black;
+		}
+		&.md-default-theme label, &.md-default-theme .md-placeholder{
+			color: lighten(@black, 40%);
+			border-color: lighten(@black, 40%);
+		}
+		&.md-default-theme.md-input-focused{
+			label{
+				color: @brand-color;
+			}
+			.md-input{
+				border-color: rgba(250, 57, 91, 1);
+			}
+		}
+	}
+
+    &.lckout{
+        p{
+            text-align: center;
+            padding: 0 0 45px;
+        }
+    }
+
+	&.forgot-password-content{
+		padding: 0 25px 35px;
+
+		md-input-container{
+			padding: 10px 2px 40px;
+
+			.extra{
+				visibility: visible;
+				opacity: 1;
+				.transition(all, 100ms, ease-in);
+			}
+
+			&.md-input-focused{
+				label{
+					.extra{
+						visibility: hidden;
+						opacity: 0;
+					}
+				}
+			}
+		}
+
+		&.reset-password-content{
+			md-input-container{
+				padding: 10px 2px 5px;
+			}
+			.md-button.custom{
+				width: 100%;
+				margin: 45px 0 0;
+			}
+			.error{
+				margin: 40px 0 0;
+
+				&.reset-error{
+					margin: 20px 0 0;
+				}
+			}
+			.thankyou-message{
+				.text{
+					padding: 10px 55px 0;
+				}
+			}
+		}
+
+		.md-button.custom{
+            width: 275px;
+			padding: 0;
+			margin: 0;
+
+			&.back-to-signin{
+	    		width: 100%;
+	    	}
+
+			&.cancel{
+				background: @white;
+				// color: lighten(@black, 30%)!important;
+				margin: 0 10px 0 0;
+
+				&:hover:not([disabled]) {
+					background: @white;
+					.box-shadow(0px, 2px, 5px, 0.26);
+				}
+			}
+
+			&.md-button.md-default-theme[disabled], &.md-button.md-default-theme[disabled]{
+				background: darken(@white, 15%);
+			}
+
+			&:hover:not([disabled]) {
+				background: lighten(@brand-color, 5%);
+				.box-shadow(0px, 4px, 8px, 0.40);
+			}
+		}
+
+		.thankyou-message{
+	    	padding: 10px 0 0;
+
+	    	h5{
+	    		margin: 0 0 25px;
+	    	}
+
+	    	.icon{
+	    		float: left;
+	    		position: relative;
+	    		top: 3px;
+	    	}
+	    	.text{
+	    		display: block;
+	    		padding: 0 55px 0;
+	    		font-size: 16px;
+	    		color: lighten(@black, 20%);
+	    		text-align: center;
+	    	}
+		}
+	}
+}

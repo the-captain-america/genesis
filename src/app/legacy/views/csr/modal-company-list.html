@@ -1,0 +1,646 @@
+<md-dialog aria-label="{{action}} Account" class="comp-list-modal md-default-theme">
+<form name="companyForm" novalidate>
+    <md-toolbar ng-if="showPurgeConfirm !== 'yes' && showNewAcctMsg !== 'yes'">
+        <div class="md-toolbar-tools">
+            <h2>{{action}} Account</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-toolbar ng-if="showPurgeConfirm === 'yes'">
+        <div class="md-toolbar-tools">
+            <h2>Confirm clear test data</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-toolbar ng-if="showNewAcctMsg === 'yes'">
+        <div class="md-toolbar-tools">
+            <h2>Creating account</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content style="min-width:570px;max-width:570px;" ng-if="showNewAcctMsg === 'yes'">
+        <div>
+            <p class="cntralgn">
+                Your account will be ready within 5 min.<br>
+                Please refresh the page for the new account to appear in the list.
+            </p>
+        </div>
+    </md-dialog-content>
+    <md-dialog-content style="min-width:570px;max-width:570px;" ng-if="showPurgeConfirm !== 'yes' && showNewAcctMsg !== 'yes'">
+        <div ng-if="showPurgeConfirm !== 'yes'">
+            <div ng-if="createError" layout layout-sm="column">
+                <div flex class="required">
+                    <label class="lbl">Something went wrong: {{createError}}</label>
+                </div>
+            </div>
+            <div layout layout-sm="column">
+                <md-input-container flex class="required">
+                    <label>Account Name</label>
+                    <input md-no-asterisk ng-model="localData.data.name" required>
+                </md-input-container>
+            </div>
+            <div ng-if="isparent !== 'yes'" layout="row" layout-align="space-around center" layout-wrap ng-class="{ namewrap : mm === 'yes' && localdata.seqfor === 'M'}" class="hide">
+                <div flex>
+                    <md-input-container class="smsfrom">
+                        <label>SMS From</label>
+                        <input ng-model="localData.data.smsfrom">
+                    </md-input-container>
+                </div>
+                <div flex>
+                    <md-input-container>
+                        <label>Email From</label>
+                        <input ng-model="localData.data.emailfrom">
+                    </md-input-container>
+                </div>
+            </div>
+            <div ng-if="isparent !== 'yes'" layout="row" layout-align="space-around center" layout-wrap>
+                <div flex ng-if="isparent !== 'yes'">
+                    <md-input-container flex class="smsfrom">
+                        <label>Account Id (Salesforce)</label>
+                        <input ng-model="localData.data.sfacctid">
+                    </md-input-container>
+                </div>
+                <div flex>
+                    <md-input-container md-no-float class="contdd">
+                        <label>Company based in</label>
+                        <md-select md-container-class="contdd fixed-dd" ng-model="localData.data.cntry" placeholder="Select country" ng-change="changeCountry(localData.data.cntry);">
+                            <md-option ng-repeat="country in countryList track by $index" value="{{country.cd}}">
+                                <span class="text">{{country.nm}}</span>
+                                <!-- <img src="//static.enboarder.net/images/logo.gif" alt="Country"> -->
+                            </md-option>
+                        </md-select>
+                        <div class="msk" ng-if="action === 'update'"></div>
+                    </md-input-container>
+                </div>
+            </div>
+            <div ng-if="isparent !== 'yes'" layout layout-sm="column">
+                <!-- <md-checkbox ng-model="localData.data.archived" ng-true-value="'no'" ng-false-value="'yes'" aria-label="Active account" flex="30">
+                    Active account
+                </md-checkbox>
+                <md-checkbox ng-model="localData.data.demoacct" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Demo account" flex="70">
+                    Demo account
+                </md-checkbox>  -->
+                <md-switch ng-if="action === 'update'" ng-model="localData.data.archived" ng-true-value="'no'" ng-false-value="'yes'" aria-label="Active account" flex="35">
+                    Active account
+                </md-switch>
+                <md-switch ng-if="action === 'update'" ng-model="localData.data.demoacct" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Demo account" flex>
+                    Demo account
+                </md-switch>
+                <!-- Disabled if it is a child account or parent account with active accounts -->
+                <md-switch flex ng-if="action === 'update' && isparent !== 'yes'" ng-disabled="localData.data.parentckey || (localData.data.childaccts && localData.data.childaccts.length > 0)"
+                    ng-model="localData.data.isparent"
+                    ng-true-value="'yes'"
+                    ng-false-value="'no'"
+                    aria-label="Parent account">
+                    Parent account
+                </md-switch>
+
+                <!-- <md-radio-group ng-model="localData.data.archived" class="md-primary">
+                    <md-radio-button value="{{option.val}}">Active</md-radio-button>
+                </md-radio-group>
+                <md-radio-group ng-model="localData.data.inactive" class="md-primary">
+                    <md-radio-button value="{{option.val}}">In-active</md-radio-button>
+                </md-radio-group>
+                <md-radio-group ng-model="localData.data.demoacct" class="md-primary">
+                    <md-radio-button value="{{option.val}}">Demo</md-radio-button>
+                </md-radio-group> -->
+            </div>
+            <div ng-if="action === 'update' && isparent !== 'yes'" class="swtchinfowrp" layout layout-sm="column">
+                <div flex="35"></div>
+                <div flex></div>
+                <div flex>
+                    <span class="info" ng-if="localData.data.parentckey && !(localData.data.childaccts && localData.data.childaccts.length > 0)">
+                        This is a child account
+                    </span>
+                    <span class="info" ng-if="!localData.data.parentckey && (localData.data.childaccts && localData.data.childaccts.length > 0)">
+                        Active child accounts
+                    </span>
+                </div>
+            </div>
+            <div layout layout-sm="column" ng-if="localData.data.isparent === 'yes'">
+                <div flex="50">
+                    <md-input-container flex class="smsfrom">
+                        <label>Account allowance</label>
+                        <md-select md-container-class="contdd fixed-dd"
+                            ng-model="localData.data.maxchildaccts"
+                            ng-required="localData.data.isparent === 'yes'">
+                            <md-option value="5" ng-selected="!localData.data.maxchildaccts || localData.data.maxchildaccts == 5">Max 5 accounts</md-option>
+                            <md-option value="10">Max 10 accounts</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+            <div ng-if="isparent !== 'yes'" layout layout-sm="column" class="clrdatawrap smsacc">
+                <span class="infoclr">
+                    SMS provider account:
+                </span>
+                <span class="infoclr" ng-if="!localData.data.smsdisp && !localData.data.smsgateway">
+                    &nbsp;&nbsp;Not provisioned
+                </span>
+                <span class="infoclr" ng-if="localData.data.smsdisp">
+                    &nbsp;&nbsp;{{localData.data.smsdisp}}
+                </span>
+                <span class="infoclr" ng-if="!localData.data.smsdisp && localData.data.smsgateway">
+                    &nbsp;&nbsp;{{localData.data.smsgateway}}
+                </span>
+            </div>
+            <div ng-if="isparent !== 'yes'" layout layout-sm="column" class="clrdatawrap smsacc">
+                <span class="infoclr">
+                    Email provider account:
+                </span>
+                <span class="infoclr" ng-if="!localData.data.esp">
+                    &nbsp;&nbsp;Not provisioned
+                </span>
+                <span class="infoclr" ng-if="localData.data.esp === 'mailjet'">
+                    &nbsp;&nbsp;Mailjet
+                </span>
+                <span class="infoclr" ng-if="localData.data.esp === 'custio'">
+                    &nbsp;&nbsp;Customer IO
+                </span>
+            </div>
+            <div layout layout-sm="column" class="clrdatawrap" ng-if="isparent !== 'yes' && action !== 'add'">
+                <md-button class="clrtsdt md-raised" ng-click="purgeTestWorkflows()" ng-if="localData.data.testwfcount">
+                    <span class="text">clear test data</span>
+                </md-button>
+                <span class="infoclr">
+                    Test workflows launched:
+                    <span class="nmbr">{{localData.data.testwfcount}}</span>
+                </span>
+                <md-button class="ldta md-raised" ng-click="fetchTestWorkflowsCount()" ng-if="!localData.data.testwfcount && localData.data.testwfcount != 0">
+                    <span class="text">Load data</span>
+                </md-button>
+            </div>
+            <div layout="column" ng-if="showPurgeConfirm === 'yes'">
+                <label class="heading">Are you sure you want to clear the test workflow data?<br><br></label>
+            </div>
+            <!-- <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Custom URL Prefix (https://enboarder.company.com)</label>
+                    <input ng-model="localData.data.custurl">
+                </md-input-container>
+            </div> -->
+            <!-- <div layout layout-sm="column">
+                <md-input-container flex>
+                    <label>Customer IO Key (Site Id:ApiKey)</label>
+                    <input ng-model="localData.data.custio">
+                </md-input-container>
+            </div> -->
+            <label class="lbl">BASIC FEATURES</label>
+            <!-- <div layout layout-sm="column">
+                <md-checkbox ng-model="localData.data.emailintegrate" aria-label="Email Integration" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Email integration
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">EMAIL INTEGRATION</h4>
+                            <p>
+                                Allow workflows to launch via email trigger. For more details on how to set up the content structure in the email, contact the support team.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div> -->
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.wflangsel === 'yes' || compdata.wflangsel === 'yes'">
+                <md-checkbox ng-model="localData.data.wflangsel" aria-label="Language list" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Language list
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">LANGUAGE LIST</h4>
+                            <p>
+                                Enables the change of the language for a workflow, from advanced settings.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.de === 'yes' || compdata.de === 'yes'">
+                <md-checkbox ng-model="localData.data.de" aria-label="Demo page" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Sales demo page
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">EXPIRE SEQUENCE LINKS</h4>
+                            <p>
+                                Adds a web URL to a Landing page that allows external users to launch people into the Default workflow for the account. (Great to use for internal company demo-purposes)
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.enblprflmenu === 'yes' || compdata.enblprflmenu === 'yes'">
+                <md-checkbox ng-model="localData.data.enblprflmenu" aria-label="Profile menu" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Profile menu
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Profile menu</h4>
+                            <p>
+                                Enables a range of profiles-related features to action tasks, access resources and get overview or their progress.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.reactui === 'yes' || compdata.reactui === 'yes'">
+                <md-checkbox ng-model="localData.data.reactui" aria-label="Use new user interface" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Use new user interface
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Use new user interface</h4>
+                            <p>
+                                Uses new react based UI for client.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" class="inptsml">
+                <md-input-container flex="5">
+                    <input md-no-asterisk ng-model="localData.data.autocompdays" type="number" required>
+                </md-input-container>
+                <label>Days workflow remains 'In progress' after last sequence</label>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">DAYS WORKFLOW REMAINS...</h4>
+                            <p>
+                                Selection of days before a workflow is labels as 'Complete' after the last sequence has triggered.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+
+            <label class="lbl">Advanced FEATURES</label>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.bulkhire === 'yes' || compdata.bulkhire === 'yes'">
+                <md-checkbox ng-model="localData.data.bulkhire" aria-label="Bulk employees (bulk process)" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Bulk employees (bulk process)
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">BULK EMPLOYEES (BULK PROCESS)</h4>
+                            <p>
+                                Enables the feature of bulk employees (bulk process) for the account. Activation of this feature is set for each workflow in the Advanced options.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features.labels === 'yes') || (compdata.features && compdata.features.labels) === 'yes'">
+                <md-checkbox ng-model="localData.data.features.labels" aria-label="Custom labels" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Custom labels
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Custom labels</h4>
+                            <p>
+                                Add ability to customise the standard labels like 'Employee' and 'Manager'
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features.fonts === 'yes') || (compdata.features && compdata.features.fonts) === 'yes'">
+                <md-checkbox ng-model="localData.data.features.fonts" aria-label="Custom fonts" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Custom fonts
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Custom fonts</h4>
+                            <p>
+                                Allow custom online fonts via CSS to be added and used.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.ceinteg === 'yes' || compdata.ceinteg === 'yes'">
+                <md-checkbox ng-model="localData.data.ceinteg" aria-label="App centre (Cloud Elements)" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    App centre (Cloud Elements)
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">APP CENTRE (CLOUD ELEMENTS)</h4>
+                            <p>
+                                Enables all the integration options serviced by Cloud Elements within the Enboarder App Centre. Once enabled the Cloud Elements integrations, located under Settings in the Integrations tab will be open to integrate with.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.config && parentAcct.config.email.custdomain === 'yes') || (compdata.config && compdata.config.email.custdomain === 'yes')">
+                <md-checkbox ng-model="localData.data.config.email.custdomain" aria-label="Custom email domains" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Custom email domains
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">CUSTOM EMAIL DOMAINS</h4>
+                            <p>
+                                Activates the option to add custom email domains each brand in Settings. All notification and send data emails will be routed through the custom domain instead of 'enboarder.com'.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.enblbulkcsv === 'Y' || compdata.enblbulkcsv === 'yes'">
+                <md-checkbox ng-model="localData.data.enblbulkcsv" aria-label="Enable CSV bulk upload" ng-true-value="'Y'" ng-false-value="'N'" flex>
+                    CSV bulk upload
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">CSV BULK UPLOAD</h4>
+                            <p>
+                                Enables the Bulk Upload feature as a extra tab in Settings. This allows users to to upload a large batch of users and amend existing workflows.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.multilang === 'yes' || compdata.multilang === 'yes'">
+                <md-checkbox ng-model="localData.data.multilang" aria-label="GOOGLE-translate (Demo Purpose Only)" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    GOOGLE-translate (demo purpose only)
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">GOOGLE TRANSLATE</h4>
+                            <p>
+                                Activates google translate as an option in the footer of a sequence. This feature is still in demo stage.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.enc === 'yes' || compdata.enc === 'yes'">
+                <md-checkbox ng-model="localData.data.enc" aria-label="Enable Advanced Security" ng-true-value="'yes'" ng-false-value="'no'" flex disabled>
+                    Enable Encryption (enabled from backend)
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">ENCRYPT DATABASE</h4>
+                            <p>
+                                All account related data will be encrypted at rest on the database. This feature will affect the responsiveness of certain tasks.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.advsec === 'yes' || compdata.advsec === 'yes'">
+                <md-checkbox ng-model="localData.data.advsec" aria-label="Enable Advanced Security" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    SSO and sequence security
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">SSO AND SEQUENCE SECURITY</h4>
+                            <p>
+                                Enabling the option to password protect selected sequences, as well as setting up 'Single Sign-On',  an extra advanced security feature.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.config && parentAcct.config.email.trkcode === 'yes') || (compdata.config && compdata.config.email.trkcode === 'yes')">
+                <md-checkbox ng-model="localData.data.config.email.trkcode" aria-label="Tracking code for emails" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Tracking code for emails
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">TRACKING CODE FOR EMAILS</h4>
+                            <p>
+                                Activates the option to add custom tracking code to all notification and send data emails.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features.I9 === 'yes') || (compdata.features && compdata.features.I9) === 'yes'">
+                <md-checkbox ng-model="localData.data.features.I9" aria-label="Enable I9 integrations" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Enable I9 integrations
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Enable I9 integrations</h4>
+                            <p>
+                                Enables I9 integrations for a company.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features.df === 'yes') || (compdata.features && compdata.features.df) === 'yes'">
+                <md-checkbox ng-model="localData.data.features.df" ng-disabled="localData.data.enc === 'yes'" aria-label="Enable data filters" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Enable data filters
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Admin data filters</h4>
+                            <p>
+                                Enable admin data filters for the account
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <!-- lock workflows -->
+            <div layout layout-sm="column" ng-if="isparent !== 'yes'">
+                <md-checkbox ng-model="localData.data.lockedworkflows" aria-label="Lock workflows for admins" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Lock workflows for admins
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Lock workflows</h4>
+                            <p>
+                                Lock workflows for admins of the account
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <label class="lbl"
+                ng-if="isparent !== 'yes' ||
+                    parentAcct.allownotifcontrol === 'yes' || compdata.allownotifcontrol === 'yes' ||
+                    parentAcct.showsmsgateway === 'yes' || compdata.showsmsgateway === 'yes' ||
+                    (parentAcct.features && parentAcct.features['video-rec'] === 'yes') || (compdata.features && compdata.features['video-rec'] === 'yes')">
+                    Other FEATURES
+            </label>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features.exp === 'yes') || (compdata.features && compdata.features.exp === 'yes')">
+                <md-checkbox ng-model="localData.data.features.exp" aria-label="Video recording module" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Experience platform (prototype)
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Experience platform</h4>
+                            <p>
+                                Enables the experience platform prototype in feature for demos
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.learnapp === 'yes' || compdata.learnapp === 'yes'">
+                <md-checkbox ng-model="localData.data.learnapp" aria-label="Enable learn" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Enboarder LEARN
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Enboarder learn</h4>
+                            <p>
+                                Enable Enboarder LEARN modules and features
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || (parentAcct.features && parentAcct.features['video-rec'] === 'yes') || (compdata.features && compdata.features['video-rec'] === 'yes')">
+                <md-checkbox ng-model="localData.data.features['video-rec']" aria-label="Video recording module" ng-true-value="'yes'" ng-false-value="'no'"
+                    flex>
+                    Video recording module
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">Video recording module</h4>
+                            <p>
+                                Activates 'Video Recording' module to be used in workflows for the account
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.allownotifcontrol === 'yes' || compdata.allownotifcontrol === 'yes'">
+                <md-checkbox ng-model="localData.data.allownotifcontrol" aria-label="Show Notification Controller" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    Show messaging gateway mode
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">SHOW MESSAGING GATEWAY MODE</h4>
+                            <p>
+                                Allows user on the configurations tab in Settings to select 'Stop', 'redirect' or 'send as normal' for all notifications going our of that account.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" ng-if="isparent !== 'yes' || parentAcct.showsmsgateway === 'yes' || compdata.showsmsgateway === 'yes'">
+                <md-checkbox ng-model="localData.data.showsmsgateway" aria-label="SMS gateway selection" ng-true-value="'yes'" ng-false-value="'no'" flex>
+                    SMS gateway selection
+                </md-checkbox>
+                <span class="smlicn">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top" md-delay="100">
+                        <span class="copy">
+                            <h4 class="title">SMS GATEWAY SELECTION</h4>
+                            <p>
+                                Allows user to switch (Busts/Twillio) SMS gateway provider on the Configurations tab in Settings .
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </span>
+            </div>
+            <div layout layout-sm="column" class="hide">
+                <md-input-container flex>
+                    <label>Admin Bubble Image</label>
+                    <input md-no-asterisk ng-model="localData.data.adminappbubble">
+                </md-input-container>
+            </div>
+            <div layout layout-sm="column" class="hide">
+                <md-input-container flex>
+                    <label>Chatbot URL (Beta Only, Do not put any value for Live Customers)</label>
+                    <input md-no-asterisk ng-model="localData.data.chatboturl">
+                </md-input-container>
+            </div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row" ng-if="showPurgeConfirm !== 'yes' && showNewAcctMsg !== 'yes'">
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveCompany();" ng-disabled="companyForm.$invalid" md-autofocus>
+            <span class="text">Save</span>
+            <span class="text-save">Saving...</span>
+            <span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+    </md-dialog-actions>
+    <md-dialog-actions layout="row" ng-if="showPurgeConfirm === 'yes'" class="ldwf-btn">
+        <md-button aria-label="No" class="md-raised md-default-theme" ng-click="noToPurgeTestWorkflow();">
+            no
+        </md-button>
+        <md-button ng-click="yesToPurgeTestWorkflow();" class="save save-spinner md-default-theme" aria-label="Yes, Delete" md-autofocus>
+            <span class="text">yes, delete</span>
+            <span class="text-save">deleting...</span>
+            <span class="text-saved">deleted <span class="icon-notification-ok"></span></span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+    </md-dialog-actions>
+    <md-dialog-actions layout="row" ng-if="showNewAcctMsg === 'yes'" class="ldwf-btn">
+        <md-button aria-label="Close" class="save md-default-theme" ng-click="close();">
+            Close
+        </md-button>
+    </md-dialog-actions>
+<form>
+</md-dialog>

@@ -1,0 +1,168 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb">
+	<span><a ng-href="#/settings/security" class="active">Security &amp; Privacy</a></span>
+</div>
+
+<div class="container content-editor forms-editor">
+<form name="workflow3" novalidate>
+	<!-- Preview icon -->
+	<!-- <a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default' && iconname !== 'notification-small'">
+		<span class="icon icon-preview-big"></span>
+	</a> -->
+
+    <div ng-controller="saveModuleCtrl">
+        <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+            <span class="text">Save</span>
+            <span class="text-save">save</span>
+    		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+    		<span class="spinner">
+    			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    		</span>
+        </md-button>
+        <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+            <span class="text">Save</span>
+            <span class="text-save">save</span>
+    		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+    		<span class="spinner">
+    			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    		</span>
+        </md-button>
+        <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+            <span class="text">Save and exit</span>
+        </md-button>
+    </div>
+
+
+	<div class="content-editor-content" ng-cloak>
+        <div class="maskd" ng-if="locked === 'Y'"></div>
+		<div class="heading">
+			<md-input-container class="md-block">
+				<label>Page title</label>
+				<input class="heading-input" placeholder="Write a page title" ng-model="module.pagetitle"></input>
+                <span class="blrdv wht"></span>
+			</md-input-container>
+        </div>
+
+		<div dnd-list="widgetList" class="content" ng-class="{nowgt : !widgetList.length}" dnd-drop="dropCallback(event, index, item, external, type, 'itemType')">
+
+			<span class="placeholder-text" ng-if="!widgetList.length">
+				Drag a widget to begin
+			</span>
+			<div ng-repeat="widget in widgetList track by $index" class="widget" ng-init="widgetIdx = $index">
+
+				<!-- Text editor -->
+				<div class="editor notiedtr close-enabled-editor" ng-if="widget.type === 'text'">
+					<span class="icon icon-close-4" ng-click="removeWidget($index);" ng-if="allowTextWidgetClose==='yes'"></span>
+                    <textarea placeholder="Type your text into the box..." ui-tinymce="tinymceOptions" ng-model="widget.data"></textarea>
+				</div>
+
+                <!-- Privacy check box -->
+                <div class="editor prvc-cbox" ng-if="widget.type === 'gdpr'">
+                    <span class="cbox"></span>
+                    <md-input-container flex md-no-float class="md-block">
+                        <!-- <input ng-model="widget.text"> -->
+                        <textarea ng-model="widget.text"></textarea>
+                        <span class="pstxt">
+                            Privacy statement.
+                        </span>
+                    </md-input-container>
+                    <!-- <span class="pstxt">
+                        Privacy statement.
+                    </span> -->
+                </div>
+
+                <!-- Image -->
+                <div class="image close-enabled" ng-if="widget.type === 'image'">
+                    <span class="icon icon-close-4" ng-click="removeWidget($index,widget, widget);"></span>
+                    <div class="main-btn-wrap">
+                        <div class="button-wrap">
+                            <md-button ng-class="{active : widget.smallimage === 'yes'}" ng-click="smallimage(widget)" class="md-raised">Small</md-button>
+                            <md-button ng-class="{active : widget.mediumimage === 'yes'}" ng-click="mediumimage(widget)" class="md-raised">Medium</md-button>
+                            <md-button ng-class="{active : widget.fullimage === 'yes'}" ng-click="fullimage(widget)" class="md-raised">Large</md-button>
+                        </div>
+
+                        <div class="button-wrap upload-img-btn">
+                            <md-button ng-click="keepfocus()" ngf-select="upload($file, $index, widget)" accept="image/*" class="active md-raised">
+                                <span class="upld icon-image-upload"></span>
+                            </md-button>
+                        </div>
+
+
+                    </div>
+
+                    <md-input-container flex>
+                        <div class="button" ngf-drop="upload($file, $index, widget)" ng-class="{smallsize : widget.smallimage === 'yes', mediumsize : widget.mediumimage === 'yes', fullsize : widget.fullimage === 'yes'}">
+                            <div class="placeholder" ng-show="!widget.data">
+                                <span class="img-icon icon-image-bigger"></span>
+                                <span class="text">Drag and drop image</span>
+                                <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                                    <span class="upldtxt">
+                                        <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                        Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                                    </span>
+                                </span>
+                            </div>
+                            <img ng-class="{fullsize : widget.fullimage === 'yes'}" ng-hide="!widget.data" ng-src="{{widget.data}}" ngf-drop="upload($file, $index, widget)" alt="">
+                        </div>
+                    </md-input-container>
+                    <div ng-if="widget.invalidContentTypeError === 'yes'" class="error">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Wrong format, we accept .JPG .PNG &amp; .GIF</span>
+                    </div>
+                </div>
+
+                <!-- Horizontal rule -->
+                <div class="rule close-enabled" ng-if="widget.type === 'line'">
+                    <hr><span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                </div>
+			</div>
+		</div>
+
+        <div class="lgcnt-wrap">
+            <div layout="row" layout-align="space-around start" layout-wrap class="legal-container">
+                <span class="label" flex="35">Legal company name:</span>
+                <md-input-container flex md-no-float class="md-block">
+                    <input ng-model="gdprdata.legalname">
+                    <span class="blrdv esgn comp"></span>
+                </md-input-container>
+            </div>
+            <div layout="row" layout-align="space-around start" layout-wrap class="legal-container">
+                <span class="label" flex="35">Legal company number:</span>
+                <md-input-container flex md-no-float class="md-block">
+                    <input ng-model="gdprdata.legalnum">
+                    <span class="blrdv esgn comp"></span>
+                </md-input-container>
+            </div>
+            <div layout="row" layout-align="space-around start" layout-wrap class="legal-container">
+                <span class="label" flex="25">Privacy policy link:</span>
+                <md-input-container flex md-no-float class="md-block">
+                    <input ng-model="gdprdata.privacylink" type="url">
+                    <span class="blrdv esgn comp"></span>
+                </md-input-container>
+            </div>
+        </div>
+
+
+        <div class="advanced-option-wrap cmplnce-wrap">
+            <div class="show-hide" ng-click="show = !show">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Privacy statement</span>
+            </div>
+            <div class="detail-section" ng-show="show">
+                <div class="action-wrap">
+                    <span class="cnme">
+                        <span class="nme">{{gdprdata.legalname}}</span>
+                        <span class="nmbr">{{gdprdata.legalnum}}</span>
+                    </span>
+                    <md-input-container class="md-block" md-no-float>
+        				<textarea md-detect-hidden placeholder="Write privacy statement..." ng-model="gdprdata.privacytext"></textarea>
+        			</md-input-container>
+                    <span class="priste">
+                        <a href="{{gdprdata.privacylink}}" target="_blank">Privacy policy</a>
+                    </span>
+                </div>
+            </div>
+        </div>
+	</div>
+</form>
+</div>

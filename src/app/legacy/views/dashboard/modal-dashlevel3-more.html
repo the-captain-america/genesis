@@ -1,0 +1,43 @@
+<md-dialog aria-label="Change Action" class="dashlevel3-more">
+	<form name="myForm" novalidate>
+
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{label}}</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-dialog-content style="min-width:500px;max-width:500px;max-height:810px;">
+			<div layout="row" layout-align="center" layout-wrap>
+			  	<div flex="100" class="input-field">
+					<span class="datepicker-wrap date" ng-if="content == 'StartdateModal'">
+						<md-datepicker ng-model="localdata.hirestdtDate" md-placeholder="Employee start date" required  ng-change="changeStartDate();"></md-datepicker>
+					</span>
+					<md-input-container ng-if="content == 'WfModal'">
+						<md-select ng-model="workflow">
+				        	<md-option ng-repeat="workflow in workflows" value="{{workflow}}">
+				        		{{workflow}}
+				        	</md-option>
+				        </md-select>
+					</md-input-container>
+                    <md-input-container class="tstflgdd" ng-if="content === 'TestStatusModal'" md-no-float>
+                        <md-select md-container-class="fixed-dd" ng-model="localdata.type" placeholder="Select workflow type">
+                            <md-option ng-repeat="type in types" value="{{type}}">
+                                {{type}}
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+				</div>
+			</div>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row">
+			<md-button aria-label="Save" class="md-raised save" ng-click="SaveMoreAction($event)" md-autofocus>
+				Save
+			</md-button>
+		</md-dialog-actions>
+	</form>
+</md-dialog>

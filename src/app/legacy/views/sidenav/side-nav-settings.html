@@ -1,0 +1,72 @@
+<ul class="settings-side-nav" ng-controller="NavCtrl">
+	<li class="header">
+		<h4>Settings</h4>
+	</li>
+
+    <li ng-class="{ active: isActiveEquals('/settings')}" ng-if="canAccess('settings','configurations')">
+        <a href="/#settings">
+            <span class="text">CONFIGURATION</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActiveEquals('/settings/security')}" ng-if="canAccess('settings','security')">
+        <a href="/#settings/security">
+            <span class="text">SECURITY &amp; PRIVACY</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActiveEquals('/settings/branding')}" ng-if="canAccess('settings','branding')">
+		<a href="/#settings/branding">
+			<span class="text">BRANDING</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/settings/loc')}" ng-if="canAccess('settings','locations')">
+		<a href="/#settings/loc">
+			<span class="text">LOCATIONS</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/settings/optcat')}" ng-if="canAccess('settings','categories')">
+		<a href="/#settings/optcat">
+			<span class="text">CATEGORIES</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/settings/customfields')}" ng-if="canAccess('settings','customfields')">
+        <a href="/#settings/customfields">
+            <span class="text">CUSTOM FIELDS</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActive('/settings/profilefields')}" ng-if="canAccess('settings','profilefields')">
+        <a href="/#settings/profilefields">
+            <span class="text">PROFILE FIELDS</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActive('/settings/managers')}" ng-if="canAccess('settings','managerlist')">
+		<a href="/#settings/managers">
+			<span class="text">{{(userdata.custlabels.Manager || 'MANAGER') | uppercase }} LIST</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/settings/integration')}" ng-if="canAccess('settings','integration')">
+        <a href="/#settings/integration">
+            <span class="text">INTEGRATION</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActiveEquals('/settings/user')}" ng-if="canAccess('settings','users')">
+		<a href="/#settings/user">
+			<span class="text">ADMINS</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/settings/bulkupload')}" ng-if="userdata.enblbulkcsv === 'Y' && canAccess('settings','bulkupload')">
+		<a href="/#settings/bulkupload">
+			<span class="text">CSV UPLOAD</span>
+		</a>
+	</li>
+    <!-- <li ng-class="{ active: isActiveEquals('/settings/userspermissions')}">
+        <a href="/#settings/userspermissions">
+            <span class="text">USERS &amp; PERMISSIONS</span>
+        </a>
+    </li> -->
+	<li class="sign-out" ng-class="{ active: isActive('/settings/login')}">
+		<a href="/#login">
+			<span class="text">SIGN OUT</span>
+			<span class="icon icon-exit"></span>
+		</a>
+	</li>
+</ul>

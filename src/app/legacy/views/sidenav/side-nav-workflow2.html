@@ -1,0 +1,487 @@
+<div class="tabs seq-module-tabs" ng-controller="WorkflowEditorSideNavCtrl" ng-cloak ng-if="hasPermission('permissions.createWF')" ng-class="{sngltb : seqmodnavList.tabs.length ===1}">
+	<ul>
+		<!-- <li class="header wfl2" ng-class="{spsc : selectedIndex === 0}"> -->
+		<li class="header wfl2">
+			<h4>Workflow Editor</h4>
+		</li>
+        <!-- <li class="srch-wrap" ng-class="{showsrch : selectedIndex === 1}"> -->
+        <li class="srch-wrap showsrch">
+            <md-input-container flex md-no-float class="md-block">
+                <input md-no-asterisk ng-model="contentSearch.name" placeholder="Search">
+                <span class="srch-icon icon-search-small"></span>
+                <span ng-click="contentSearch.name = ''" class="cls-icon icon-tl-skipped"></span>
+                <span class="blrdv srch"></span>
+            </md-input-container>
+        </li>
+	</ul>
+	<md-content>
+		<md-tabs md-dynamic-height class="md-accent">
+
+            <!-- Sequence tab -->
+			<!-- <md-tab id="tab1">
+				<md-tab-label>Sequences</md-tab-label>
+				<md-tab-body>
+					<ul>
+						<li class="seqtab-list" dnd-draggable="models.sequence"
+					        dnd-effect-allowed="copy"
+					        dnd-dragstart="dargstart(event)"
+					        dnd-canceled="dargcanceled(event)">
+							<a>
+								<span class="icon icon-addnew-big"></span>
+								<span class="text truncate">Add new sequence</span>
+                                <span class="drag icon-handles"></span>
+							</a>
+					    </li>
+                        <li class="seqtab-list" ng-if="showManager === 'yes'" dnd-draggable="sequence"
+                        dnd-effect-allowed="copy" dnd-dragstart="dargstartMgr(event)"
+                        dnd-canceled="dargcanceled(event)"
+                        ng-repeat="sequence in seqmodnavList.seq | filter:{act: 'N', seqfor :'M'} | orderBy:['critdays','name']">
+                            <a>
+                                <span class="icon-after icon-sequence-manager-big"></span>
+                                <span class="text truncate">{{sequence.name}}</span>
+                                <span class="drag icon-handles"></span>
+                                <span class="more more-action icon-more-icon"></span>
+                                <div class="action-popover sequence">
+                                    <span class="icon close-popover icon-more-icon"></span>
+                                    <span ng-click="deleteSequence(sequence.uid, sequence.name, false);">
+                                        <span class="icn icon-close-5"></span>
+                                        Delete
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="seqtab-list" dnd-draggable="sequence"
+                        dnd-effect-allowed="copy"
+                        dnd-dragstart="dargstartEmp(event)"
+                        dnd-canceled="dargcanceled(event)"
+                        ng-repeat="sequence in seqmodnavList.seq | filter:{act: 'N', seqfor :'NH'} | orderBy:['critdays','name']">
+                            <a>
+                                <span class="icon-after icon-sequence-newhire-big"></span>
+                                <span class="text truncate">{{sequence.name}}</span>
+                                <span class="drag icon-handles"></span>
+                                <span class="more more-action icon-more-icon"></span>
+                                <div class="action-popover sequence">
+                                    <span class="icon close-popover icon-more-icon"></span>
+                                    <span ng-click="deleteSequence(sequence.uid, sequence.name, false);">
+                                        <span class="icn icon-close-5"></span>
+                                        Delete
+                                    </span>
+                                </div>
+                            </a>
+                        </li>
+                        <li class="maskd wf2sdnv" ng-if="locked ==='Y'"></li>
+                        <li class="fake-list">&nbsp;</li>
+					</ul>
+
+				</md-tab-body>
+			</md-tab> -->
+
+            <!-- Onboard tab -->
+			<md-tab ng-repeat="tab in seqmodnavList.tabs track by $index">
+                <md-tab-label>{{tab}}</md-tab-label>
+				<md-tab-body>
+					<ul>
+                        <!-- sequences-->
+                        <li ng-repeat="seqenvlp in seqmodnavList.seqlist track by $index" class="seqtab-list">
+                            <a class="show-hide-wfl2" dnd-draggable="models.sequence" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)"
+                                dnd-canceled="dargcanceled(event)">
+                                <span class="icon-after icon-sequence-new-big"></span>
+                                <span class="text truncate">Sequence</span>
+                                <span class="icon-before arrow-toggle icon-arrow-2" ng-class="{'icon-arrow-3' : (contentSearch.name && (seqenvlp.seq|filter:contentSearch).length > 0)}"></span>
+                                <span class="drag icon-handles drag-large"></span>
+                            </a>
+                            <ul class="list-content detail-section" ng-class="{'show' : (contentSearch.name  && (seqenvlp.seq|filter:contentSearch).length > 0)}">
+                                <li>
+                                    <a dnd-draggable="models.sequence" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)"
+                                    dnd-canceled="dargcanceled(event)">
+                                        <span class="icon icon-addnew-small"></span>
+                                        <span class="drag drag-small icon-handles-small"></span>
+                                        <span class="text truncate">Add new</span>
+                                    </a>
+                                </li>
+                                <li ng-if="seqenvlp.seq && (seqenvlp.seq | filter:{act:'Y'} | filter:contentSearch ).length > 0" class="active">
+                                    <ul ng-repeat="sequence in seqenvlp.seq | filter:{act:'Y'} | filter:contentSearch track by $index" class="folder folderlvl0 detail-section show">
+                                        <li>
+                                            <a title="{{sequence.name}}">
+                                                <span class="icon" ng-class="{'icon-sequence-newhire-small' : sequence.seqfor === 'M', 'icon-sequence-manager-small': sequence.seqfor === 'NH'}"></span>
+                                                <span class="text truncate" ng-click="showEditSequenceModal(sequence);">{{sequence.name}}</span>
+                                                <span class="drag drag-small icon-handles-small"></span>
+                                                <span class="icon more-action icon-more-icon"></span>
+                                                <div class="action-popover">
+                                                    <span class="icon close-popover icon-more-icon"></span>
+                                                    <span ng-click="showEditSequenceModal(sequence);">
+                                                        <span class="icn icon-edit"></span>
+                                                        Edit
+                                                    </span>
+                                                    <span ng-click="removeSeq(sequence);">
+                                                        <span class="icn icon-close-5"></span>
+                                                        Remove
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Unused sequences -->
+                                <li ng-if="(!contentSearch.name && (seqenvlp.seq|filter:{act :'N'}).length > 0) || (contentSearch.name && (seqenvlp.seq|filter:{ act :'N'}|filter:contentSearch).length  > 0)" class="inactive">
+                                    <a href="" class="show-hide-wfl2">
+                                        <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : (contentSearch.name && (seqenvlp.seq|filter:{ act :'N'}|filter:contentSearch).length  > 0)}"></span>
+                                        <span class="text truncate">Unused sequences</span>
+                                    </a>
+
+                                    <ul class="folder detail-section" ng-class="{'show': (contentSearch.name && (seqenvlp.seq | filter: { act :'N'} | filter:contentSearch).length  > 0)}">
+                                        <div class="shape"></div>
+                                        <li ng-repeat="sequence in seqenvlp.seq | filter: {act :'N'} | filter:contentSearch track by $index" dnd-draggable="sequence" dnd-effect-allowed="copy" dnd-dragstart="dargstartSeq(event,sequence.seqfor)" dnd-canceled="dargcanceled(event)"
+                                            dnd-draggable="module" dnd-effect-allowed="copy" dnd-type="module.iconname">
+                                            <a title="{{sequence.name}}">
+                                                <span class="icon" ng-class="{'icon-sequence-newhire-small' : sequence.seqfor === 'M', 'icon-sequence-manager-small': sequence.seqfor === 'NH'}"></span>
+                                                <span class="text truncate">{{sequence.name}}</span>
+                                                <span class="drag drag-small icon-handles-small"></span>
+                                                <span class="icon more-action icon-more-icon"></span>
+                                                <div class="action-popover">
+                                                    <span class="icon close-popover icon-more-icon"></span>
+                                                    <span ng-click="showEditSequenceModal(sequence);">
+                                                        <span class="icn icon-edit"></span>
+                                                        Edit
+                                                    </span>
+                                                    <span ng-click="deleteSequence(sequence.uid, sequence.name, false);">
+                                                        <span class="icn icon-close-5"></span>
+                                                        Delete
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
+                        <li ng-repeat="modtype in seqmodnavList.modwflist track by $index" ng-if="(tab===modtype.tabtype)" dnd-draggable="modtype.dndtyp" dnd-disable-if="modtype.disabled === 'yes'"
+                            dnd-effect-allowed="copy" dnd-type="models.draggable">
+							<a ng-if="isModuleVisible(modtype.type)" class="show-hide-wfl2">
+								<span class="icon-after {{modtype.dicon}}-big {{modtype.inactive}}"></span>
+								<span class="text truncate">{{modtype.nm}}</span>
+								<span class="icon-before arrow-toggle icon-arrow-2" ng-class="{'icon-arrow-3' : (contentSearch.name && ((modtype.activewf | filter:contentSearch).length > 0  || (modtype.unused | filter:contentSearch).length > 0 || (modtype.samples | filter:contentSearch).length > 0  || (modtype.allinactive | filter:contentSearch).length > 0 || (modtype.allactive | filter:contentSearch).length > 0))}"></span>
+                                <span class="drag icon-handles drag-large"></span>
+							</a>
+                            <a ng-if="!isModuleVisible(modtype.type)" class="in-progress upgrade" ng-click="openUpgradeDialog(modtype.type)">
+                                <span class="in-progress upgrade"></span>
+								<span class="icon-after {{modtype.dicon}}-big {{modtype.inactive}}"></span>
+								<span class="text truncate">{{modtype.nm}}</span>
+							</a>
+                            <ul class="list-content detail-section" ng-class="{'show' : ( contentSearch.name && ((modtype.activewf | filter:contentSearch).length > 0  || (modtype.unused | filter:contentSearch).length > 0 || (modtype.samples | filter:contentSearch).length > 0  || (modtype.allinactive | filter:contentSearch).length > 0 || (modtype.allactive | filter:contentSearch).length > 0))}">
+
+								<li dnd-draggable="modtype.dndtyp"
+                                dnd-effect-allowed="copy"
+                                dnd-type="models.draggable"
+                                ng-if="modtype.type !== 'esign' && modtype.type !== 'senddata' && modtype.type !== 'embed-course'">
+									<a ng-click="addNewModule(modtype.type);">
+										<span class="icon icon-addnew-small"></span>
+                                        <span class="drag drag-small icon-handles-small"></span>
+										<span class="text truncate">Add new</span>
+									</a>
+								</li>
+                                <!-- special condition for add new Esign module becuase of different controller -->
+                                <li ng-controller="addSignConnCtrl"
+                                dnd-draggable="modtype.dndtyp"
+                                dnd-effect-allowed="copy"
+                                dnd-type="models.draggable"
+                                ng-if="modtype.type === 'esign' && modtype.type !== 'senddata' && modtype.type !== 'embed-course'">
+									<a ng-click="showNewESignModal();">
+										<span class="icon icon-addnew-small"></span>
+                                        <span class="drag drag-small icon-handles-small"></span>
+										<span class="text truncate">Add new</span>
+									</a>
+								</li>
+                                <li ng-controller="addSendDataCtrl"
+                                dnd-draggable="modtype.dndtyp"
+                                dnd-effect-allowed="copy"
+                                dnd-type="models.draggable"
+                                ng-if="modtype.type === 'senddata' && modtype.type !== 'esign' && modtype.type !== 'embed-course'">
+									<a ng-click="showNewSendDataModal();">
+										<span class="icon icon-addnew-small"></span>
+                                        <span class="drag drag-small icon-handles-small"></span>
+										<span class="text truncate">Add new</span>
+									</a>
+                                </li>
+                                <li ng-controller="addEmbedCourseCtrl"
+                                dnd-draggable="modtype.dndtyp"
+                                dnd-effect-allowed="copy"
+                                dnd-type="models.draggable"
+                                ng-if="modtype.type === 'embed-course' && modtype.type !== 'senddata' && modtype.type !== 'esign'">
+									<a ng-click="showEmbedCourseModal();">
+										<span class="icon icon-addnew-small"></span>
+                                        <span class="drag drag-small icon-handles-small"></span>
+										<span class="text truncate">Add new</span>
+									</a>
+								</li>
+
+                                <li ng-if="modtype.activewf && (modtype.activewf | filter:contentSearch).length > 0" class="active">
+                                    <ul class="folder folderlvl0 detail-section show">
+                                        <li dnd-draggable="module"
+                                        dnd-effect-allowed="copy"
+                                        dnd-type="module.iconname"
+                                        ng-repeat="module in modtype.activewf | filter:contentSearch | orderBy:['name'] track by $index">
+                                            <a title="{{module.name}}">
+                                                <span ng-class="(module.uid.indexOf('473benchmark155_') === 0) ? 'icon icon-form-benchmark-small' : 'icon '+modtype.dicon+'-small'" ng-if="modtype.type !== 'senddata'"></span>
+                                                <span class="icon icon-send-email" ng-if="modtype.type === 'senddata' && module.sd_action==='email'"></span>
+                                                <span class="icon icon-send-webhook" ng-if="modtype.type === 'senddata' && module.sd_action==='webhook'"></span>
+                                                <span class="icon icon-send-value" ng-if="modtype.type === 'senddata' && module.sd_action==='updateval'"></span>
+                                                <span ng-click="moduleTileClicked(modtype.type, module);" class="text truncate" ng-class="{usgcnt : module.usgcnt > 1}">
+                                                    {{module.name}}
+                                                </span>
+                                                <span class="drag drag-small icon-handles-small"></span>
+                                                <span class="module-number" ng-if="module.usgcnt > 1">{{module.usgcnt}}</span>
+                                                <span class="icon more-action icon-more-icon"></span>
+                                                <div class="action-popover">
+                                                    <span class="icon close-popover icon-more-icon"></span>
+                                                    <span ng-click="renameModule(module);">
+                                                        <span class="icn icon-rename"></span>
+                                                        Rename
+                                                    </span>
+                                                    <span ng-click="duplicateModule(module);">
+                                                        <span class="icn icon-duplicate"></span>
+                                                        Duplicate
+                                                    </span>
+                                                    <span ng-click="deleteModule(module);">
+                                                        <span class="icn icon-close-5"></span>
+                                                        Delete
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Other active -->
+                                <li ng-if="modtype.folders.active.hasdata === 'yes' && modtype.allactive && (modtype.allactive | filter:contentSearch).length > 0" class="inactive">
+                                    <a href="" class="show-hide-wfl2" dnd-nodrag>
+                                        <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : contentSearch.name}"></span>
+                                        <span class="text truncate">Other active workflows</span>
+                                    </a>
+                                    <ul class="folder detail-section" ng-class="{'show' : contentSearch.name}">
+                                        <li ng-repeat="(wfid, wfmoddata) in modtype.folders.active track by $index" ng-if="wfid !== 'hasdata' && (wfmoddata.modlist | filter:contentSearch).length  > 0" class="{{ftype}}">
+                                            <div ng-if="$first" class="shape"></div>
+                                            <a title="{{wfmoddata.wfname}}" class="show-hide-wfl2" dnd-nodrag>
+                                                <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : wfmoddata.wfname === wfname || contentSearch.name}"></span>
+                                                <span class="text truncate">{{wfmoddata.wfname}}</span>
+                                            </a>
+                                            <ul class="folder detail-section folderlvl2" ng-class="{show : (contentSearch.name && (wfmoddata.modlist | filter:contentSearch).length  > 0) || wfmoddata.wfname === wfname}">
+                                                <div class="shape"></div>
+
+                                                <li dnd-draggable="module"
+                                                dnd-effect-allowed="copy"
+                                                dnd-type="module.iconname"
+                                                ng-repeat="module in wfmoddata.modlist | filter:contentSearch | orderBy:['name'] track by $index" class="modname">
+                                                    <a title="{{module.name}}">
+                                                        <span ng-class="(module.uid.indexOf('473benchmark155_') === 0) ? 'icon icon-form-benchmark-small' : 'icon '+modtype.dicon+'-small'" ng-if="modtype.type !== 'senddata'"></span>
+                                                        <span class="icon icon-send-email" ng-if="modtype.type === 'senddata' && module.sd_action==='email'"></span>
+                                                        <span class="icon icon-send-webhook" ng-if="modtype.type === 'senddata' && module.sd_action==='webhook'"></span>
+                                                        <span class="icon icon-send-value" ng-if="modtype.type === 'senddata' && module.sd_action==='updateval'"></span>
+                                                        <span ng-click="moduleTileClicked(modtype.type, module);" class="text truncate" ng-class="{usgcnt : module.usgcnt > 1}">
+                                                            {{module.name}}
+                                                        </span>
+                                                        <span class="drag drag-small icon-handles-small"></span>
+                                                        <span class="module-number" ng-if="module.usgcnt > 1">{{module.usgcnt}}</span>
+                                                        <span class="icon more-action icon-more-icon"></span>
+                                                        <div class="action-popover">
+                                                            <span class="icon close-popover icon-more-icon"></span>
+                                                            <span ng-click="renameModule(module);">
+                                                                <span class="icn icon-rename"></span>
+                                                                Rename
+                                                            </span>
+                                                            <span ng-click="duplicateModule(module);">
+                                                                <span class="icn icon-duplicate"></span>
+                                                                Duplicate
+                                                            </span>
+                                                            <span ng-click="deleteModule(module);">
+                                                                <span class="icn icon-close-5"></span>
+                                                                Delete
+                                                            </span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Inactive workflows -->
+                                <li ng-if="modtype.folders.inactive.hasdata === 'yes' && modtype.allinactive && (modtype.allinactive | filter:contentSearch).length > 0" class="inactive">
+                                    <a href="" class="show-hide-wfl2" dnd-nodrag>
+                                        <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : contentSearch.name}"></span>
+                                        <span class="text truncate">Inactive workflows</span>
+                                    </a>
+                                    <ul class="folder detail-section" ng-class="{'show' : contentSearch.name}">
+                                        <div class="shape"></div>
+                                        <li ng-repeat="(wfid, wfmoddata) in modtype.folders.inactive track by $index" ng-if="wfid !== 'hasdata' && (wfmoddata.modlist | filter:contentSearch).length  > 0" class="{{ftype}}">
+                                            <a title="{{wfmoddata.wfname}}" class="show-hide-wfl2" dnd-nodrag>
+                                                <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : wfmoddata.wfname === wfname || contentSearch.name}"></span>
+                                                <span class="text truncate">{{wfmoddata.wfname}}</span>
+                                            </a>
+                                            <ul class="folder detail-section folderlvl2" ng-class="{show : (contentSearch.name && (wfmoddata.modlist | filter:contentSearch).length  > 0) || wfmoddata.wfname === wfname}">
+                                                <div class="shape"></div>
+
+                                                <li dnd-draggable="module"
+                                                dnd-effect-allowed="copy"
+                                                dnd-type="module.iconname"
+                                                ng-repeat="module in wfmoddata.modlist | filter:contentSearch | orderBy:['name'] track by $index" class="modname">
+                                                    <a title="{{module.name}}">
+                                                        <span ng-class="(module.uid.indexOf('473benchmark155_') === 0) ? 'icon icon-form-benchmark-small' : 'icon '+modtype.dicon+'-small'" ng-if="modtype.type !== 'senddata'"></span>
+                                                        <span class="icon icon-send-email" ng-if="modtype.type === 'senddata' && module.sd_action==='email'"></span>
+                                                        <span class="icon icon-send-webhook" ng-if="modtype.type === 'senddata' && module.sd_action==='webhook'"></span>
+                                                        <span class="icon icon-send-value" ng-if="modtype.type === 'senddata' && module.sd_action==='updateval'"></span>
+                                                        <span ng-click="moduleTileClicked(modtype.type, module);" class="text truncate" ng-class="{usgcnt : module.usgcnt > 1}">
+                                                            {{module.name}}
+                                                        </span>
+                                                        <span class="drag drag-small icon-handles-small"></span>
+                                                        <span class="module-number" ng-if="module.usgcnt > 1">{{module.usgcnt}}</span>
+                                                        <span class="icon more-action icon-more-icon"></span>
+                                                        <div class="action-popover">
+                                                            <span class="icon close-popover icon-more-icon"></span>
+                                                            <span ng-click="renameModule(module);">
+                                                                <span class="icn icon-rename"></span>
+                                                                Rename
+                                                            </span>
+                                                            <span ng-click="duplicateModule(module);">
+                                                                <span class="icn icon-duplicate"></span>
+                                                                Duplicate
+                                                            </span>
+                                                            <span ng-click="deleteModule(module);">
+                                                                <span class="icn icon-close-5"></span>
+                                                                Delete
+                                                            </span>
+                                                        </div>
+                                                    </a>
+                                                </li>
+
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Unused modules -->
+                                <li ng-if="modtype.unused && (modtype.unused | filter:contentSearch).length > 0" class="inactive">
+                                    <a href="" class="show-hide-wfl2" dnd-nodrag>
+                                        <span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : (contentSearch.name && (modtype.unused | filter:contentSearch).length  > 0)}"></span>
+                                        <span class="text truncate">Unused modules</span>
+                                    </a>
+
+                                    <ul class="folder detail-section" ng-class="{show : (contentSearch.name && (modtype.unused | filter:contentSearch).length  > 0)}">
+                                        <div class="shape"></div>
+                                        <li dnd-draggable="module"
+                                        dnd-effect-allowed="copy"
+                                        dnd-type="module.iconname" class="modname"
+                                        ng-repeat="module in modtype.unused | filter:contentSearch | orderBy:['name'] track by $index">
+                                            <a title="{{module.name}}">
+                                                <span ng-class="(module.uid.indexOf('473benchmark155_') === 0) ? 'icon icon-form-benchmark-small' : 'icon '+modtype.dicon+'-small'" ng-if="modtype.type !== 'senddata'"></span>
+                                                <span class="icon icon-send-email" ng-if="modtype.type === 'senddata' && module.sd_action==='email'"></span>
+                                                <span class="icon icon-send-webhook" ng-if="modtype.type === 'senddata' && module.sd_action==='webhook'"></span>
+                                                <span class="icon icon-send-value" ng-if="modtype.type === 'senddata' && module.sd_action==='updateval'"></span>
+                                                <span ng-click="moduleTileClicked(modtype.type, module);" class="text truncate" ng-class="{usgcnt : module.usgcnt > 1}">
+                                                    {{module.name}}
+                                                </span>
+                                                <span class="drag drag-small icon-handles-small"></span>
+                                                <span class="module-number" ng-if="module.usgcnt > 1">{{module.usgcnt}}</span>
+                                                <span class="icon more-action icon-more-icon"></span>
+                                                <div class="action-popover">
+                                                    <span class="icon close-popover icon-more-icon"></span>
+                                                    <span ng-click="renameModule(module);">
+                                                        <span class="icn icon-rename"></span>
+                                                        Rename
+                                                    </span>
+                                                    <span ng-click="duplicateModule(module);">
+                                                        <span class="icn icon-duplicate"></span>
+                                                        Duplicate
+                                                    </span>
+                                                    <span ng-click="deleteModule(module);">
+                                                        <span class="icn icon-close-5"></span>
+                                                        Delete
+                                                    </span>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Samples -->
+								<li ng-if="modtype.samples && (modtype.samples | filter:contentSearch).length > 0" class="inactive">
+									<a href="" class="show-hide-wfl2" dnd-nodrag>
+										<span class="icon folder-toggle icon-folder-closed" ng-class="{'icon-folder-open' : (contentSearch.name && (modtype.samples | filter:contentSearch).length  > 0)}"></span>
+										<span class="text truncate">Samples</span>
+									</a>
+
+									<ul class="folder detail-section" ng-class="{show : (contentSearch.name && (modtype.samples | filter:contentSearch).length  > 0)}">
+										<div class="shape"></div>
+										<li dnd-draggable="module"
+                                        dnd-effect-allowed="copy"
+                                        dnd-type="module.iconname" class="modname"
+                                        ng-repeat="module in modtype.samples | filter:contentSearch | orderBy:['name'] track by $index">
+											<a title="{{module.name}}">
+                                                <span ng-class="(module.uid.indexOf('473benchmark155_') === 0) ? 'icon icon-form-benchmark-small' : 'icon '+modtype.dicon+'-small'" ng-if="modtype.type !== 'senddata'"></span>
+                                                <span class="icon icon-send-email" ng-if="(modtype.type === 'senddata' && module.sd_action==='email')"></span>
+                                                <span class="icon icon-send-webhook" ng-if="(modtype.type === 'senddata' && module.sd_action==='webhook')"></span>
+                                                <span class="icon icon-send-value" ng-if="(modtype.type === 'senddata' && module.sd_action==='updateval')"></span>
+                                                <span class="drag drag-small icon-handles-small"></span>
+												<span ng-click="sampleClicked(modtype.type, module);" class="text truncate">{{module.name}}</span>
+											</a>
+										</li>
+									</ul>
+								</li>
+							</ul>
+						</li>
+                        <li ng-if="tab === 'learn'">
+                            <a class="in-progress">
+                               <span class="in-progress release"></span>
+                                <span class="icon-after icon-quiz-big"></span>
+                                <span class="text truncate">Quiz</span>
+                            </a>
+                        </li>
+                        <li ng-if="tab === 'learn'">
+                            <a class="in-progress">
+                               <span class="in-progress release"></span>
+                                <span class="icon-after icon-learn-library-big"></span>
+                                <span class="text truncate">Learn library</span>
+                            </a>
+                        </li>
+                        <li ng-if="tab === 'learn'">
+                            <a class="in-progress">
+                               <span class="in-progress release"></span>
+                                <span class="icon-after icon-interactive-game-big"></span>
+                                <span class="text truncate">Interactive game</span>
+                            </a>
+                        </li>
+                        <li ng-if="tab === 'learn'">
+                            <a class="in-progress">
+                               <span class="in-progress release"></span>
+                                <span class="icon-after icon-real-world-game-big"></span>
+                                <span class="text truncate">Real-world game</span>
+                            </a>
+                        </li>
+                        <li class="maskd wf2sdnv" ng-if="locked ==='Y'"></li>
+                        <li class="fake-list">&nbsp;</li>
+
+						<!-- <li>
+							<a class="in-progress">
+                                <span class="in-progress"></span>
+								<span class="icon-after icon-reminder-big"></span>
+								<span class="text truncate">Event reminder</span>
+								<span class="icon-before icon-arrow-2"></span>
+							</a>
+						</li>
+						<li>
+							<a class="in-progress">
+								<span class="icon-after icon-profilebuilder-big"></span>
+								<span class="text truncate">Profile builder</span>
+								<span class="icon-before icon-arrow-2"></span>
+							</a>
+						</li> -->
+					</ul>
+				</md-tab-body>
+			</md-tab>
+
+		</md-tabs>
+	</md-content>
+</div>

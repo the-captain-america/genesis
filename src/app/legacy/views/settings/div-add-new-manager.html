@@ -1,0 +1,145 @@
+<div ng-controller="AddNewManagerCtrl" ng-cloak>
+
+    <ng-include src="'views/profiles/div-profile-content.html'" ng-if="editprofile === 'yes'"></ng-include>
+
+    <div ng-if="editprofile !== 'yes'">
+        <div layout="column">
+            <div flex>
+                <md-input-container class="required">
+                    <label>{{custlabels.Manager || 'Manager'}} Label</label>
+                    <input md-no-asterisk ng-model="newMgrData.l" focus="true" required>
+                    <span class="blrdv"></span>
+                </md-input-container>
+            </div>
+            <!-- Commenting for the time being, will enable it once we support this -->
+            <div flex layout="row" layout-align="space-between start" class="radio-wrap-wfmdl cbox-wrap">
+                <div flex="55">
+                    <label>Allow {{(custlabels.Manager || 'Manager') | lowercase}} to access {{(custlabels.Employee || 'Employee') | lowercase}} workflow</label>
+                </div>
+                <div flex="45" class="radio-group mgr-dialog">
+                    <md-checkbox ng-model="newMgrData.accessempdata" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Access {{(custlabels.Employee || 'Employee') | lowercase}} data">
+                        <span class="static-tooltip-wrap">
+                            <span class="icon icon-tooltip"></span>
+                            <md-tooltip class="manager-tooltip" md-direction="top">
+                                <span class="copy">
+                                    <h4 class="title">ACCESS {{(custlabels.Employee || 'Employee') | uppercase}} DATA</h4>
+                                    <p>
+                                        {{custlabels.Manager || 'Manager'}} can access and manage the {{(custlabels.Employee || 'Employee') | lowercase}}'s workflows experience and related data.
+                                    </p>
+                                </span>
+                            </md-tooltip>
+                        </span>
+                    </md-checkbox>
+                </div>
+            </div>
+            <div flex layout="row" layout-align="space-between start" class="radio-wrap-wfmdl">
+                <div flex="55">
+                    <label>Does this {{(custlabels.Manager || 'Manager') | lowercase}} vary with each {{(custlabels.Employee || 'Employee') | lowercase}}?</label>
+                </div>
+                <div flex="45" class="radio-group mgr-dialog">
+                    <md-radio-group class="radio-group" ng-model="newMgrData.t">
+                          <md-radio-button value="d" ng-disabled="selectedIndex === 0">
+                              YES (Variable)
+                          </md-radio-button>
+                          <md-radio-button value="s" ng-disabled="selectedIndex === 0">
+                              NO (Fixed)
+                          </md-radio-button>
+                    </md-radio-group>
+                    <span class="static-tooltip-wrap">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <!-- md-visible="showTooltip" -->
+                            <!-- <span class="arrow-wrapper"></span> -->
+                            <span class="copy">
+                                <h4 class="title">Variable {{(custlabels.Manager || 'Manager') | lowercase}} type</h4>
+                                <p>
+                                    The {{(custlabels.Manager || 'Manager') | lowercase}} name and contact details are entered when starting/running a workflow.
+                                </p>
+                                <p>
+                                    <em>This can be a different {{(custlabels.Manager || 'Manager') | lowercase}} for each {{(custlabels.Employee || 'Employee') | lowercase}}. Use this option for: Direct {{custlabels.Managers || 'Managers'}}, Mentors, Supervisors etc.</em>
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                    <span class="dynamic-tooltip-wrap">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">Fixed {{(custlabels.Manager || 'Manager') | lowercase}} type</h4>
+                                <p>
+                                    The name and contact details will not need to be entered when starting/running a workflow.
+                                </p>
+                                <p>
+                                    <em>This is the same {{(custlabels.Manager || 'Manager') | lowercase}} for all the {{(custlabels.Employees || 'Employees') | lowercase}}. Use this option for: HR, IT, CEO, etc.</em>
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="space-between center" class="atcmwrap" ng-if="newMgrData.t==='s'">
+            <div flex="50" class="manager-mobile-wrap adppl-chips">
+                <label class="fklbl" ng-if="profilelist.length > 0">Enter {{custlabels.Manager || 'Manager'}} Name</label>
+                <md-chips md-max-chips="2" ng-model="profilelist" md-autocomplete-snap="" md-require-match="true" md-on-remove="chipRemoved()">
+                    <md-autocomplete ng-hide="profilelist.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="newStaticMgr.name"
+                        md-search-text="newStaticMgr.searchManager" md-items="mgritem in getProfileList(newStaticMgr.searchManager)"
+                        md-item-text="mgritem.name" md-min-length="0" placeholder="Enter {{custlabels.Manager || 'Manager'}} Name"
+                        md-delay='50' md-selected-item-change="selectedStaticMgrChange(mgritem,$index)" md-autoselect="true"
+                        md-floating-label="Enter Manager Name" md-autofocus="true" class="required" ng-required="!newMgrData.n">
+                        <span>
+                            <img alt="profile" ng-if="mgritem.attr && mgritem.attr.photo" ng-src="{{mgritem.attr.photo}}" width="10" class="md-avatar"/>
+                            <img alt="profile" ng-if="!(mgritem.attr && mgritem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"/>
+                            <span class="txtwrp">
+                                <span class="nmtxt" md-highlight-text="searchText">{{mgritem.name}}</span>
+                                <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in mgritem.commlist">
+                                    <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                    <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                    <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                </span>
+                            </span>
+                        </span>
+                    </md-autocomplete>
+                    <md-chip-template>
+                      <span>
+                          <img alt="profile" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}" class="md-avatar"></img>
+                          <img alt="profile" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                          <span md-highlight-text="searchText">{{$chip.name}}</span>
+                      </span>
+                    </md-chip-template>
+                </md-chips>
+            </div>
+
+            <div class="manager-mobile-wrap" flex="50">
+                <md-input-container class="required">
+                    <label>Enter Mobile or Email</label>
+                    <div class="msk" ng-if="newMgrData.pid"></div>
+                    <input md-no-asterisk ng-model="newMgrData.em" required ng-readonly="newMgrData.pid">
+                    <span class="blrdv"></span>
+                </md-input-container>
+            </div>
+        </div>
+
+        <div layout="row" layout-align="space-between center" ng-if="newMgrData.t==='d'">
+            <div class="dynamic-info mnm" flex="50">
+                <label class="heading">{{custlabels.Manager || 'Manager'}} name</label>
+                <label class="heading text"><em>Enter at runtime</em></label>
+            </div>
+            <div class="dynamic-info" flex="50">
+                <label class="heading">Contact details</label>
+                <label class="heading text"><em>Enter at runtime</em></label>
+            </div>
+        </div>
+
+        <md-button class="add-more gtprfl" ng-click="editProfile();" ng-if="newMgrData.t==='s' && updManager === 'yes'">
+            <span class="icon icon-go-to-small"></span>
+            <span class="text">edit profile</span>
+        </md-button>
+
+        <div class="error" ng-if="newMgrServerError">
+            <span class="icon icon-notification-alert"></span>
+            <span class="text">{{newMgrServerErrorMessage}}</span>
+        </div>
+    </div>
+</div>

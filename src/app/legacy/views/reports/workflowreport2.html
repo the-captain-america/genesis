@@ -1,0 +1,43 @@
+<div class="bread-crumb">
+    <span><a ng-href="#/reports">Workflow report</a></span>
+    <span>/</span>
+    <span><a href="javascript:void(0)" class="active">{{wfname}} ({{level3data.hirefnm}})</a></span>
+</div>
+
+<div ng-cloak class="reports-level2-wrap" ng-include="'views/reports/div-workflowreport2.html'"></div>
+
+<!-- testing button -->
+<span class="status button-adjustment" style="display: none;">
+    <span class="button-close"><span class="icon icon-close-5"></span></span>
+    <span class="content-text">Error</span>
+    <span class="button-retry">
+        <span class="icon icon-refresh"></span>
+        <span class="content-text">Retry</span>
+    </span>
+</span>
+
+<!-- <div class="bread-crumb"><span><a class="active" href="javascript:void(0)">Reports</a></span></div>
+<div class="container reports"><div class="reports-content placeholder"><img alt="" src="//static.enboarder.net/images/reports.png"></div><div class="message-placeholder"><h1>Coming Soon</h1></div></div>
+<style media="screen">
+    .container.reports {
+        display: table;
+        margin: 0;
+        width: 100%;
+    }
+    .container.reports .reports-content {
+        display: table-cell;
+        position: relative;
+    }
+    .placeholder img {
+        width: 80%;
+    }
+</style> -->
+
+<!-- <span>Current Selected page >>>
+    {{currentSelPage}}</span>
+<span>
+    <md-input-container flex>
+        <label>Items to Display</label>
+        <input ng-model="visibleItems" ng-model-options="{ updateOn: 'blur' }" ng-change="updateTableDisplay();">
+    </md-input-container>
+</span> -->

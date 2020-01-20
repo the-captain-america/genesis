@@ -1,0 +1,131 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Profile field</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','profilefields')">
+    <h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','profilefields')">
+    <h4>Set up fields for profile pages</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular
+                class="wht"
+                md-diameter="55px"
+            ></md-progress-circular>
+        </span>
+    </div>
+    <div class="settings-wrap-inner" ng-if="rowCollection.length > 0">
+        <div class="table-responsive">
+            <table
+                class="table table-hover manager-list-table profilefields-table"
+            >
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Field type</th>
+                        <!-- Consider conditional logic for this column -->
+                        <th>Auto synced field</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="row in rowCollection track by $index">
+                        <td
+                            ng-click="showProfileFieldModal($event,'update',$index)"
+                            class="td-container"
+                        >
+                            <div>{{ row.nm }}</div>
+                        </td>
+                        <td
+                            ng-click="showProfileFieldModal($event,'update',$index)"
+                            class="td-container"
+                        >
+                            <div ng-if="row.typ === 'f-longtext'">
+                                <span class="icon icon-f-longtext"></span>
+                                Long text
+                            </div>
+                            <div ng-if="row.typ === 'f-shorttext'">
+                                <span class="icon icon-f-shorttext"></span>
+                                Short text
+                            </div>
+                            <div ng-if="row.typ === 'f-date'">
+                                <span class="icon icon-f-date"></span>
+                                Date
+                            </div>
+                        </td>
+
+                        <td
+                            ng-if="row.lnk2ds==='y'"
+                            ng-click="showProfileFieldModal($event,'update',$index)"
+                            class="td-container"
+                        >
+                            <div class="icon__adjustment">
+                                <span
+                                    class="icon__item icnfld icon-link"
+                                ></span>
+                                <span>Linked</span>
+                            </div>
+                        </td>
+                        <td
+                            ng-if="row.lnk2ds !=='y'"
+                            ng-click="showProfileFieldModal($event,'update',$index)"
+                            class="td-container"
+                        >
+                            <div>-</div>
+                        </td>
+
+                        <td class="td-container delete-col">
+                            <div>
+                                <md-button
+                                    class="delete-btn"
+                                    aria-label="Delete"
+                                    ng-click="deleteRow($event,$index);"
+                                >
+                                    <span class="icon icon-close-5"></span>
+                                </md-button>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="btnDiv">
+            <md-button
+                class="md-raised"
+                ng-click="showProfileFieldModal($event,'add',-1);"
+            >
+                <span class="icon icon-plus"></span>
+                Add New
+            </md-button>
+        </div>
+    </div>
+
+    <div
+        class="settings-wrap-inner settings-no-data"
+        ng-if="rowCollection.length === 0"
+    >
+        <p>
+            No profile fields yet?<br />If you like to get advanced with your
+            own profile information,<br />simply create a profile field and try
+            it out.
+        </p>
+        <div class="img-wrap">
+            <img
+                alt="Error"
+                src="//static.enboarder.net/images/whooops-bouble-1.gif"
+            />
+        </div>
+        <div class="btnDiv">
+            <md-button
+                class="md-raised refresh"
+                ng-click="showProfileFieldModal($event,'add',-1);"
+            >
+                Create a Profile Field
+            </md-button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,184 @@
+<md-dialog aria-label="{{label}}" class="edit-workflow-modal prfl-fld-modal md-default-theme">
+  <form name="profileFieldForm" novalidate>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>{{label}} profile field</h2>
+      <span flex></span>
+      <md-button ng-if="managerListTab !== 'yes' && selectcfListTab !== 'yes'" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+        <span class="icon icon-close-2"></span>
+      </md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content aria-label="Workflow Dialog" style="min-width:600px;max-width:600px;max-height:810px;">
+
+    <div layout="row" layout-align="space-between center">
+        <md-input-container class="required" flex="50">
+			<label>File name</label>
+			<input md-no-asterisk name="name" ng-model="prfdata.flname" required focus="true">
+		</md-input-container>
+        <md-input-container flex="45" class="typedd">
+            <label>Type</label>
+            <md-select md-no-asterisk aria-label="Type" ng-model="prfdata.type" md-container-class="prfltype-dd" required>
+                <md-option value="folder">
+                    <span class="icon-select icon-folder-closed"></span>
+                    Folder / Headline
+                </md-option>
+                <md-option value="date">
+                    <span class="icon-select icon-f-date"></span>
+                    Date field
+                </md-option>
+                <md-option value="time">
+                    <span class="icon-select icon-f-time"></span>
+                    Time field
+                </md-option>
+                <md-option value="number">
+                    <span class="icon-select icon-f-numbers"></span>
+                    Numbers field
+                </md-option>
+                <md-option value="email">
+                    <span class="icon-select icon-mail-small"></span>
+                    Email field
+                </md-option>
+                <md-option value="mobile">
+                    <span class="icon-select icon-mobile-small"></span>
+                    Mobile field
+                </md-option>
+            </md-select>
+        </md-input-container>
+    </div>
+
+    <md-checkbox ng-model="prfdata.cbox" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Editable by participant (The profile owner)">
+        Editable by participant (The profile owner)
+    </md-checkbox>
+
+    <md-tabs md-dynamic-height md-border-bottom class="advanced-option-wrap" md-selected="selectedTabIndex">
+        <md-tab label="Souuce">
+            <md-content class="md-padding">
+
+                <label class="heading">Choose source that can auto-update this profile field</label>
+
+            	<div layout="row" class="select-group-wrap">
+                    <md-input-container flex="95" class="sub-input valuemd md-block" md-no-float>
+                        <input aria-label="new value" ng-if="!seldata.target.id" ng-model="seldata.source.nestlbl" disabled required>
+                        <!-- <input aria-label="new value" ng-if="seldata.target.id" placeholder="Set value" ng-model="seldata.source.nestlbl" required> -->
+                        <span class="tokens-wrap" ng-if="seldata.target.id">
+                            <span class="tokens" ng-if="seldata.source.nestlbl.length > 0 || seldata.entry === 'manual'" ng-style="{'background': seldata.source.bgcolor}">
+                                <span ng-if="seldata.entry === 'manual'">Manual text entry</span>
+                                <span ng-if="seldata.entry !== 'manual' && seldata.source.nestlbl.length < 30">{{seldata.source.nestlbl}}</span>
+                                <span ng-if="seldata.entry !== 'manual' && seldata.source.nestlbl.length > 29">...<a title="{{seldata.source.nestlbl}}">{{seldata.source.nestlbl.substring(seldata.source.nestlbl.length-24,seldata.source.nestlbl.length)}}</a></span>
+                                <span class="rmv-tkn icon-close-3" ng-click="removeSourceLabel(outerIndex);"></span>
+                            </span>
+                        </span>
+                        <div class="custom-dropdown-wrap newvalue">
+                            <md-menu-bar>
+                                <div class="msk" ng-if="!seldata.target.id"></div>
+                                <md-menu>
+                                    <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                                        <span class="icon icon-dynamic-text"></span>
+                                    </button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="tokenItem in tokenList track by tokenItem.id" ng-if="seldata.target.id && seldata.target.id !== tokenItem.id && tokenItem.haschild ==='y' && tokenItem.avail.indexOf('us') !== -1 && tokenItem.dtype.indexOf(seldata.target.dtype) > -1">
+                                            <md-menu>
+                                                <md-button ng-click="$mdOpenMenu()">{{tokenItem.lbl}}</md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="l2tokenItem in tokenItem.childlist track by $index" ng-if="seldata.target.id !== l2tokenItem.id && l2tokenItem.haschild==='n' && l2tokenItem.avail.indexOf('us') !== -1 && seldata.target.dtype.indexOf(l2tokenItem.dtype) > -1">
+                                                        <md-button ng-click="selectSourceValue(outerIndex,l2tokenItem);">
+                                                            <span ng-if="l2tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                            <span ng-if="l2tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                            <span ng-if="l2tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                            <span ng-if="l2tokenItem.icon === 'picklist'" class="icon-dtype icon-f-choice"></span>
+                                                            <span class="text">{{l2tokenItem.lbl}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                    <md-menu ng-repeat="l2tokenItem in tokenItem.childlist track by $index" ng-if="seldata.target.id !== l2tokenItem.id && l2tokenItem.haschild==='y' && l2tokenItem.avail.indexOf('us') !== -1">
+                                                        <md-button ng-click="$mdOpenMenu()">
+                                                            {{l2tokenItem.lbl}}
+                                                        </md-button>
+                                                            <md-menu-content>
+                                                                <md-menu-item ng-repeat="l3tokenItem in l2tokenItem.childlist track by $index" ng-if="seldata.target.id !== l3tokenItem.id && l3tokenItem.avail.indexOf('us') !== -1 && seldata.target.dtype.indexOf(l3tokenItem.dtype) > -1">
+                                                                    <md-button ng-click="selectSourceValue(outerIndex, l3tokenItem);">
+                                                                        <span ng-if="l3tokenItem.icon === 'ltext'" class="icon-dtype icon-f-longtext"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'stext'" class="icon-dtype icon-f-shorttext"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'date'" class="icon-dtype icon-f-date"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'time'" class="icon-dtype icon-f-time"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'number'" class="icon-dtype icon-f-numbers"></span>
+
+                                                                        <span ng-if="l3tokenItem.icon === 'rating'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'dropdown'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'radio'" class="icon-dtype icon-f-choice"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'check'" class="icon-dtype icon-f-choice"></span>
+
+                                                                        <span ng-if="l3tokenItem.icon === 'email'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'mobile'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span ng-if="l3tokenItem.icon === 'contact'" class="icon-dtype icon-f-contact"></span>
+                                                                        <span class="text">{{l3tokenItem.lbl}}</span>
+                                                                    </md-button>
+                                                                </md-menu-item>
+                                                            </md-menu-content>
+                                                    </md-menu>
+                                                </md-menu-content>
+                                            </md-menu>
+                                        </md-menu-item>
+                                        <md-menu-item ng-if="seldata.target.id">
+                                            <md-button ng-click="enterManuallySelected(outerIndex);">
+                                                <span class="icon-dtype icon-f-shorttext"></span>
+                                                <span class="text">Manual text entry</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-bar>
+                        </div>
+                     </md-input-container>
+
+            		<md-button class="delete-btn" ng-click="deleteCriteria($index);" aria-label="Close">
+            			<span class="icon icon-close-5"></span>
+            		</md-button>
+            	</div>
+
+                <div class="add-more-new-wrap">
+                    <md-button class="add-more" ng-click="addMoreCriteria();">
+                        <span class="icon icon-plus"></span>
+                        <span class="text">add more</span>
+                    </md-button>
+                </div>
+
+            </md-content>
+        </md-tab>
+    </md-tabs>
+
+    <div class="error" ng-show="deleteMgrErr === 'yes'">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">You can not delete a manager that is active in a workflow. Remove the sequence from the workflow before deleting the manager here.</span>
+    </div>
+    <div class="error" ng-if="serverError">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">{{serverErrorMessage}}</span>
+    </div>
+
+  </md-dialog-content>
+
+  <md-dialog-actions layout="row">
+    <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveProfileField();" ng-disabled="profileFieldForm.$invalid" md-autofocus>
+    	<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+  </md-dialog-actions>
+
+  </form>
+</md-dialog>

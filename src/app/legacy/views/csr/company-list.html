@@ -1,0 +1,161 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Accounts</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('csrsettings','complist')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('csrsettings','complist')">
+    <h4>Access accounts, manage settings and features.</h4>
+	<div class="settings-wrap-inner">
+
+        <span class="show-more" ng-if="isparent !== 'yes'">
+            <span class="more more-action icon-more-icon"></span>
+            <div class="action-popover">
+                <span class="icon close-popover icon-more-icon"></span>
+                <span ng-csv="downloadCompList('active')" filename="{{exportActiveFileName}}">
+                    <span class="icon icon-download"></span>
+                    <span class="text">Download Active Accounts</span>
+                </span>
+                <span ng-csv="downloadCompList('archived')" filename="{{exportArchivedFileName}}">
+                    <span class="icon icon-download"></span>
+                    <span class="text">Download Inactive Accounts</span>
+                </span>
+                <span ng-csv="downloadCompList('demo')" filename="{{exportDemoFileName}}">
+                    <span class="icon icon-download"></span>
+                    <span class="text">Download Demo Accounts</span>
+                </span>
+            </div>
+        </span>
+        <div ng-if="isparent === 'yes'">
+            <div ng-include="'views/csr/div-company-list.html'"></div>
+        </div>
+
+        <md-tabs ng-if="isparent !== 'yes'" md-dynamic-height md-border-bottom md-selected="selectedTabIndex">
+            <md-tab label="Active">
+                <md-content class="md-padding">
+                    <div ng-include="'views/csr/div-company-list.html'"></div>
+                </md-content>
+            </md-tab>
+            <md-tab label="In-active">
+                <md-content class="md-padding">
+                    <div class="clstwrap">
+                        <span ng-repeat="schar in searchChars track by $index" ng-click="filterList(schar);" ng-class="{selfilter : schar === filter.selected}">
+                            {{schar}}
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+            			<table class="table company-list-table">
+            				<thead>
+            					<tr>
+             						<th colspan="1">Company Name</th>
+             						<th colspan="1">&nbsp;</th>
+            					</tr>
+            				</thead>
+            				<tbody>
+            					<tr ng-repeat="row in archivedList track by $index" ng-class="{dsbl : disabled === 'yes'}">
+            						<td class="td-container actnm">
+            							<div ng-click="loginArchivedAs($index);">
+                                            {{row.name}}
+                                            <a title="Parent account"><span ng-if="isparent !== 'yes' && row.isparent === 'yes'" class="icn icon-multimanager"></span></a>
+                                            <span ng-if="isparent !== 'yes' && row.parentname" class="txt"><a title="{{row.parentname}}"></a>Parent: {{row.parentname}}</span>
+                                        </div>
+            						</td>
+                                    <td class="td-container center">
+                                        <div>
+                                            <md-button class="signinas md-raised" ng-click="showArchivedCompanyModal($event,'update', $index);">
+                                                <span class="text">edit</span>
+                                            </md-button>
+                                        </div>
+                                    </td>
+            					</tr>
+                                <tr ng-if="archivedList.length == '0'" class="nodata">
+                                    <td colspan="4">
+                                        <hr>
+                                    </td>
+                                </tr>
+            				</tbody>
+            			</table>
+            		</div>
+                </md-content>
+            </md-tab>
+            <md-tab label="Demo">
+                <md-content class="md-padding">
+                    <div class="clstwrap">
+                        <span ng-repeat="schar in searchChars track by $index" ng-click="filterList(schar);" ng-class="{selfilter : schar === filter.selected}">
+                            {{schar}}
+                        </span>
+                    </div>
+                    <div class="table-responsive">
+            			<table class="table company-list-table">
+            				<thead>
+            					<tr>
+             						<th>Acount Name</th>
+                                    <th class="smsbtn">&nbsp;</th>
+             						<th class="signin">&nbsp;</th>
+             						<th>&nbsp;</th>
+            					</tr>
+            				</thead>
+            				<tbody>
+            					<tr ng-repeat="row in demoList track by $index" ng-class="{dsbl : disabled === 'yes'}">
+            						<td class="td-container actnm">
+            							<div ng-click="loginDemoAs($index);">
+                                            {{row.name}}
+                                            <a title="Parent account"><span ng-if="isparent !== 'yes' && row.isparent === 'yes'" class="icn icon-multimanager"></span></a>
+                                            <span ng-if="isparent !== 'yes' && row.parentname" class="txt"><a title="{{row.parentname}}"></a>Parent: {{row.parentname}}</span>
+                                        </div>
+            						</td>
+
+            						<td class="td-container smsbtntd">
+            							<div ng-if="isparent !== 'yes'">
+                                            <md-button class="smsbtn md-raised" ng-click="showSMSModal(row);" ng-if="!(row.smsdisp)">
+                                                <span class="text">Provision SMS account</span>
+                                            </md-button>
+                                            <span class="dnme" ng-click="showSMSModal(row);" ng-if="row.smsdisp">
+                                                <span class="txt truncate">{{row.smsdisp}}</span>
+                                                <span class="icon icon-edit"></span>
+                                            </span>
+                                        </div>
+            						</td>
+            						<td class="td-container center">
+            							<div>
+                                            <md-button class="signinas md-raised" ng-click="showDemoCompanyModal($event,'update', $index);">
+                                                <span class="text">edit</span>
+                                            </md-button>
+                                        </div>
+            						</td>
+                                    <td class="td-container center">
+                                        <div ng-if="!row.sfacctid">
+                                            <span>&nbsp;</span>
+                                        </div>
+                                        <div ng-if="row.sfacctid">
+                                            <span ng-click="logintoSalesforce(row.sfacctid);" class="sficn icon-salesforce"></span>
+                                        </div>
+                                    </td>
+            					</tr>
+                                <tr ng-if="activeList.length == '0'" class="nodata">
+                                    <td colspan="4">
+                                        <hr>
+                                    </td>
+                                </tr>
+            				</tbody>
+            			</table>
+            		</div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+
+        <div class="btnDiv">
+            <md-button class="md-raised"
+                ng-click="showCompanyModal($event,'add');"
+                ng-disabled="activeList && maxchildaccts && activeList.length >= maxchildaccts">
+                <span class="icon icon-plus"></span>
+                Add New
+            </md-button>
+            <span ng-if="isparent === 'yes'" class="txt" ng-class="{red : activeList.length >= maxchildaccts}">{{activeList.length}}/{{maxchildaccts}} accounts allowed</span>
+        </div>
+</div>
+</div>

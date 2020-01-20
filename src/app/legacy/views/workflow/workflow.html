@@ -1,0 +1,142 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Workflow</a>
+    </span>
+</div>
+
+<div class="container workflow">
+
+    <div class="workflow-content" ng-cloak>
+
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <div ng-controller="addPeopleMultiCtrl" ng-if="hasPermission('permissions.addpeople')">
+            <md-button class="add-new-people md-raised" ng-click="addnewPeopleModalWorkflow()">
+                <span class="icon icon-plus"></span>
+                <span class="text">Add New People</span>
+            </md-button>
+        </div>
+
+        <span class="shape-wrap">
+            <span class="shape"></span>
+        </span>
+
+        <div class="drag-wrap" ng-repeat="(zone, list) in models.dropzones">
+
+            <ul dnd-list="list" dnd-drop="dropCallbackCopy(event, index, item, external, type, 'itemType')"
+                class="workflow-list drag-holder">
+                <li class="new-workflow drag-placeholder">
+                    <span class="text">Drag your workflow here</span>
+                </li>
+            </ul>
+            <span class="vline"></span>
+        </div>
+
+        <ul dnd-list="list" dnd-drop="dropCallbackMove(event, index, item, external, type, 'itemType')"
+            class="workflow-list">
+            <span class="vline"></span>
+            <li ng-repeat="item in workflowlist | filter:{act: 'Y'} |   orderBy:'ord' track by $index"
+                ng-class="{'active' : item.act == 'Y'}" dnd-draggable="item" dnd-effect-allowed="move"
+                dnd-disable-if="!hasPermission('permissions.createWF') || item.hide === 'Y'">
+                <span class="desc">
+                    <span ng-repeat="crititem in getWFDisplayCriteria(item)">
+                        {{ crititem.field }}
+                        <span ng-if="crititem.operator === 'Equals'" class="icon icon-symbol-1"></span>
+                        <span ng-if="crititem.operator === 'Not Equals'" class="icon icon-symbol-2"></span>
+                        {{ crititem.value }}
+                        <span class="and">and</span>
+                    </span>
+                </span>
+
+
+                <div class="workflow-block" ng-if="hasPermission('permissions.createWF') && item.hide !== 'Y'">
+                    <!-- layout -->
+                    <div class="block-content" ng-click="level2Editor(item.name, item.uid, item.hide);">
+                        <span title="{{ item.name }}" class="layout-text truncate">{{ item.name }}</span>
+                    </div>
+                    <!-- control -->
+                    <div class="block-control">
+                        <!-- is-handle -->
+                        <span class="block-control__item is-handle grabbable" ng-if="item.hide !== 'Y'">
+                            <span class="icon drag icon-handles"></span>
+                        </span>
+                        <!-- is-unlocked -->
+                        <div class="block-control__item is-unlocked"
+                            ng-if="lockedworkflows === 'yes' && item.controlaccess === 'yes'">
+                            <span class="icon icon-security-unlock"></span>
+                        </div>
+                        <!-- is-action -->
+                        <span class="block-control__item is-action more-action" ng-if="item.hide !== 'Y'">
+                            <span class="icon-more-icon"></span>
+                            <div class="action-popover">
+                                <span class="icon close-popover icon-more-icon"></span>
+                                <span ng-if="locked !== 'Y'" ng-click="showEditCriteriaModal($event, item)">
+                                    <span class="icn icon-edit"></span>
+                                    Edit
+                                </span>
+                                <span ng-if="locked !== 'Y'" ng-click="duplicateWorkflow(item);">
+                                    <span class="icn icon-duplicate"></span>
+                                    Duplicate
+                                </span>
+                                <span class="dsbl" ng-if="locked !== 'Y'" ng-show="item.wfcriteria"
+                                    ng-click="makeCatchAll(item);">
+                                    <span class="icn icon-catch-all"></span>
+                                    Make this 'default'
+                                </span>
+                                <span ng-if="item.wfcriteria && locked !== 'Y' && wfactivecount > 1"
+                                    ng-click="removeWorkflowFromActive(item);">
+                                    <span class="icn icon-close-5"></span>
+                                    Remove
+                                </span>
+                                <span class="dsbl" ng-if="locked === 'Y'">
+                                    <span class="icn icon-edit"></span>
+                                    Edit
+                                </span>
+                                <span class="dsbl" ng-if="locked === 'Y'">
+                                    <span class="icn icon-duplicate"></span>
+                                    Duplicate
+                                </span>
+                                <span class="dsbl" ng-if="locked === 'Y'">
+                                    <span class="icn icon-catch-all"></span>
+                                    Make this 'default'
+                                </span>
+                                <span class="dsbl" ng-if="locked === 'Y'">
+                                    <span class="icn icon-close-5"></span>
+                                    Remove
+                                </span>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="workflow-block" ng-if="!hasPermission('permissions.createWF')">
+                    <!-- layout -->
+                    <div class="block-content">
+                        <span title="{{ item.name }}" class="layout-text truncate">{{ item.name }}</span>
+                    </div>
+                </div>
+
+                <div class="workflow-block is-locked"
+                    ng-if="hasPermission('permissions.createWF') && item.hide === 'Y'"
+                    ng-click="lockWorkflowClick(item.uid);">
+                    <!-- block layout -->
+                    <div class="block-content">
+                        <span title="{{ item.name }}" class="content-text truncate">{{ item.name }}</span>
+                    </div>
+                    <!-- block control -->
+                    <div class="block-control">
+                        <!-- is-locked -->
+                        <div class="block-control__item is-locked">
+                            <span class="icon icon-security-lock"></span>
+                        </div>
+                    </div>
+                </div>
+                <span ng-if="!$last" class="hline"></span>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<ul class="settings-side-nav" ng-controller="NavCtrl">
+	<li class="header">
+		<h4>Reports</h4>
+	</li>
+
+	<li ng-class="{ active: isActiveEquals('/reports'), activereports: isActive('/reports-level2')}" ng-if="canAccess('reports','workflows')">
+		<a href="/#reports">
+			<span class="text">WORKFLOW REPORT</span>
+		</a>
+	</li>
+	<li ng-class="{ active: isActive('/reports/wfstarted')}" ng-if="canAccess('reports','wfstarted')">
+		<a href="/#reports/wfstarted">
+			<span class="text">WORKFLOWS LAUNCHED</span>
+		</a>
+	</li>
+	<li ng-class="{ active: isActiveEquals('/reports/engagement')}" ng-if="canAccess('reports','engagement')">
+		<a href="/#reports/engagement">
+			<span class="text">ENGAGEMENT REPORT</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActiveEquals('/reports/engagementhm')}" ng-if="canAccess('reports','engagementhm')">
+		<a href="/#reports/engagementhm">
+			<span class="text">ENGAGEMENT HEATMAP</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/reports/forms')}" ng-if="canAccess('reports','forms')">
+		<a href="/#reports/forms">
+			<span class="text">FORMS</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/reports/people')}" ng-if="canAccess('reports','people')">
+		<a href="/#reports/people">
+			<span class="text">PROFILES</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/reports/notification')}" ng-if="canAccess('reports','notification')">
+		<a href="/#reports/notification">
+			<span class="text">ALERTS</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/reports/error')}" ng-if="canAccess('reports','error')">
+		<a href="/#reports/error">
+			<span class="text">ERRORS</span>
+		</a>
+	</li>
+</ul>

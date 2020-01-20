@@ -1,0 +1,369 @@
+<!-- notdone , inprogress, alert, dismiss, complete -->
+<div class="dashlvl-3-content">
+
+    <!-- Timeline -->
+	<div class="main-table">
+        <div class="bread-crumb dashlvl3">
+            <span ng-if="phase !== 'none'"><a ng-href="#/dashboard">Dashboard</a></span>
+            <span ng-if="phase === 'none'"><a ng-href="#/reports">Workflow report</a></span>
+            <span>/</span>
+            <span ng-if="phase === 'start' || phase === 'pre' || phase === 'post'"><a href="#/dashboard-level2/wf/{{level3data.wfid}}/{{phase}}?wfname={{wfname}}&&stph={{stph}}">
+                Workflows in progress (<span ng-if="phase === 'pre'">Pre Phase</span><span ng-if="phase === 'start'">Start Phase</span><span ng-if="phase === 'post'">Post Phase</span>)</a></span>
+            <span ng-if="phase === 'manager' || phase === 'employee' "><a href="#/alerts-level2/{{phase}}"><span ng-if="phase === 'employee'">{{custlabels.Employee || 'Employee'}} Alerts</span><span ng-if="phase === 'manager'">{{custlabels.Manager || 'Manager'}} Alerts</span></a></span>
+            <span ng-if="phase !== 'none'"><span>/</span><a href="javascript:void(0)" class="active">{{wfname}} ({{level3data.hirefnm}})</a></span>
+            <span ng-if="phase === 'none'"><a href="#/reports-level2/{{level3data.uid}}/wf/reports?frompage=timeline&wfname={{wfname}}">{{wfname}} ({{level3data.hirefnm}})</a></span>
+        </div>
+
+        <div class="line linemain"></div>
+
+        <div class="area-icon-wrap manager">
+            <div class="content-manager">
+                <span class="icon icon-manager"></span>
+                <span class="text">{{custlabels.Manager || 'Manager'}} area</span>
+            </div>
+        </div>
+        <div class="area-icon-wrap new-hire">
+            <div class="content-new-hire">
+                <span class="icon icon-newhire"></span>
+                <span class="text">{{custlabels.Employee || 'Employee'}} area</span>
+            </div>
+        </div>
+
+        <div class="main-table-in">
+
+            <div class="main-cell {{phase}}-phase" ng-repeat="(phase, innerTable) in timeline track by $index">
+                <div class="line"></div>
+                <span class="pipe pipe-start"></span>
+                <div class="text-info text-start" ng-if="phase === 'start'">
+                    <span class="sdate">{{level3data.hirestdtformatted}}</span>
+                    <span class="sdatetxt">Start date</span>
+                </div>
+                <div class="inner-table" ng-repeat="tableItem in innerTable track by $index">
+    				<div class="inner-cell">
+    					<div class="wrap-height">
+                            <div ng-class="{'manager-area': tableCell.seqfor === 'M', 'emp-area': tableCell.seqfor === 'NH', 'onstrt' : tableCell.hasstart === 'yes', 'onstartpre' : tableCell.sametable === 'yes'}" ng-repeat="tableCell in tableItem track by $index">
+                                <div class="box-wrap {{tableCell.state}}" ng-class="{'dotted' : tableCell.dotted === 'dotted', 'connected': tableCell.critseq , 'mm': tableCell.critseq && tableCell.parenttype === 'M', 'cancelled': !(level3data.state_act === 'NEW' || level3data.state_act === 'INIT')}" ng-if="tableCell.seqfor === 'NH' || tableCell.seqfor === 'M'">
+                                    <div class="info-text dash3-text more-action" ng-class="{'opt' : alertid.startsWith(tableCell.uid)}">
+                                        <span class="info">
+                                            <span ng-if="tableCell.seqfor === 'M'">
+                                                <span class="date truncate"><a title="{{tableCell.seqdt}}">{{tableCell.seqdt}}</a></span>
+                                                <span class="text truncate"><a title="{{tableCell.name}}">{{tableCell.name}}</a></span>
+                                            </span>
+                                            <span ng-if="tableCell.seqfor === 'NH'">
+                                                <span class="text truncate"><a title="{{tableCell.name}}">{{tableCell.name}}</a></span>
+                                                <span class="date truncate"><a title="{{tableCell.seqdt}}">{{tableCell.seqdt}}</a></span>
+                                            </span>
+                                        </span>
+                                        <span class="more-action-wrap">
+                                            <span class="arrow"></span>
+                                            <span class="action-popover" ng-class="{'popopen' : alertid.startsWith(tableCell.uid)}">
+                                                <span class="arrow"></span>
+                                                <span class="content">
+                                                    <div class="header" layout="row" layout-align="start start">
+                                                        <div class="bar" ng-style="{'background': tableCell.sidecolor}"></div>
+                                                        <div flex="5" class="prflicn-img" ng-if="tableCell.seqfor==='NH'">
+                                                            <!-- <span class="picon icon-newhire" ng-if="tableCell.seqfor==='NH'"></span>
+                                                            <span class="picon icon-manager" ng-if="tableCell.seqfor==='M'"></span> -->
+                                                            <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+                                                            <img ng-if="!level3data.pic" class="prfimg" src="" alt="">
+                                                            <img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+                                                        </div>
+                                                        <div flex="5" class="prflicn-img" ng-if="tableCell.seqfor==='M'">
+                                                            <!-- <span class="picon icon-newhire" ng-if="tableCell.seqfor==='NH'"></span>
+                                                            <span class="picon icon-manager" ng-if="tableCell.seqfor==='M'"></span> -->
+                                                            <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+                                                            <img ng-if="!(level3data.managerMap[tableCell.mgrid] && level3data.managerMap[tableCell.mgrid].pic)" class="prfimg" src="" alt="">
+                                                            <img ng-if="level3data.managerMap[tableCell.mgrid] && level3data.managerMap[tableCell.mgrid].pic" class="prfimg" ng-src="{{level3data.managerMap[tableCell.mgrid].pic}}{{level3data.refreshProfileToken}}" alt="">
+                                                        </div>
+                                                        <div flex="90" class="truncate">
+                                                            <span class="np" ng-if="tableCell.seqfor==='NH'">{{getEmpNameandLabel(level3data.hirenm, tableCell.forwardto);}}</span>
+                                                            <span class="np" ng-if="tableCell.seqfor==='M'">{{getMgrNameandLabel(tableCell.mgrid, tableCell.forwardto);}}</span>
+                                                            <span class="np">&nbsp;|&nbsp;</span>
+                                                            <span class="np tm-txt">{{tableCell.name}}</span>
+                                                            <!-- <span class="np tm-txt">{{tableCell.status}}</span> -->
+                                                            <!-- <span class="np">: {{tableCell.lbldt}}</span> -->
+                                                            <!-- <span class="np" ng-if="tableCell.oddays"> ({{tableCell.oddays}})</span> -->
+                                                        </div>
+                                                        <div class="btn-wrap">
+                                                            <span class="status complete" ng-if="data.status==='complete'">
+            													{{data.status}}
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+            												</span>
+            												<span class="status overdue" ng-if="data.status==='overdue'">
+            													{{data.status}}
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+            												</span>
+            												<span class="status inprogress" ng-if="data.status==='inprogress'">
+            													In progress
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+            												</span>
+            												<span class="status skipped" ng-if="data.status==='skipped'">
+            													{{data.status}}
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+            												</span>
+                                                            <span class="status dismiss" ng-if="data.status==='dismissed'">
+            													{{data.status}}
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+            												</span>
+                                                            <span class="status skipped" ng-if="data.status==='gdpr_viewed' || data.status==='gdpr_notsigned'">
+                                                                Not Signed
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+                                                            </span>
+                                                            <span class="status launched" ng-if="data.status==='gdpr_signed'">
+                                                                Signed
+                                                                <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+                                                            </span>
+                                                        </div>
+                                                        <div class="llicn-wrap" ng-class="{shmr : level3data.state_act=== 'INIT' && (tableCell.state==='alert'|| tableCell.state==='inprogress' || tableCell.state==='complete' || tableCell.state==='skipped')}">
+                                                            <span ng-if="tableCell.seqtype && tableCell.seqtype === 'logic'" class="icon-cndn icon-logic-small"></span>
+                                                            <span ng-if="tableCell.seqprot === 'pp'" class="icon-cndn icon-security-1"></span>
+                                                            <span ng-if="tableCell.seqprot === 'sso'" class="icon-cndn icon-security-2"></span>
+                                                        </div>
+                                                        <div>
+                                                            <span class="show-more-wrap" ng-if="level3data.state_act=== 'INIT' && (tableCell.state==='alert'|| tableCell.state==='inprogress' || tableCell.state==='complete' || tableCell.state==='skipped')">
+                                                                <span class="show-more">
+                                                                    <span class="more more-action-dbl icon-more-icon"></span>
+                                                                    <div class="action-dblpop">
+                                                                        <span class="icon close-popover-dbl icon-more-icon"></span>
+                                                                        <span  ng-if="tableCell.seqfor==='NH'" ng-click="resendSeqModal($event, level3data.uid, tableCell.uid, tableCell.name,level3data.brand, level3data.hirechnl)" ng-controller="changeWfDetailsCtrl">Re-send</span>
+                                                                        <span  ng-if="tableCell.seqfor==='M' && tableCell.mgrid && level3data.managerMap[tableCell.mgrid]" ng-click="resendSeqModal($event, level3data.uid, tableCell.uid, tableCell.name,level3data.brand, level3data.managerMap[tableCell.mgrid].chnl)" ng-controller="changeWfDetailsCtrl">Re-send</span>
+                                                                        <span ng-if="tableCell.seqfor==='M' && (!tableCell.mgrid || !level3data.managerMap[tableCell.mgrid])" ng-click="resendSeqModal($event, level3data.uid, tableCell.uid, tableCell.name,level3data.brand)"
+                                                                            ng-controller="changeWfDetailsCtrl">Re-send</span>
+                                                                        <span  ng-click="forwardSeqModal($event, level3data.uid, tableCell.uid, tableCell.name,level3data.brand)" ng-controller="changeWfDetailsCtrl" ng-if="tableCell.state==='alert'|| tableCell.state==='inprogress'">Forward</span>
+                                                                        <span ng-click="dismissSeqModal($event, level3data.uid, tableCell.uid, tableCell.name)" ng-controller="changeWfDetailsCtrl" ng-if="tableCell.state==='alert'">Dismiss alert</span>
+                                                                        <!-- <span ng-click="actionDash3Modal($event, 'complete')">Complete now</span> -->
+                                                                    </div>
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="details-wrap">
+                                                        <div class="details {{module.scls}}" ng-class="{last : module.lastcls}" layout="row" layout-align="start start" ng-repeat="module in tableCell.modules track by $index">
+                                                            <div flex="5">
+                                                                <span class="sicon {{getModuleIcon(module)}}" ng-if="!module.lastcls"></span>
+                                                                <span class="sicon icon-sequence-manager-small" ng-if="module.lastcls && tableCell.seqfor==='NH'"></span>
+                                                                <span class="sicon icon-sequence-newhire-small" ng-if="module.lastcls && tableCell.seqfor==='M'"></span>
+                                                            </div>
+                                                            <div flex="30" class="truncate" ng-if="!module.lastcls">
+                                                                <span class="txt">{{module.modulename}}</span>
+                                                                <span ng-if="hasmd === 'y' && hasPermission('permissions.createWF')" class="icon goto icon-go-to-small" ng-click="gotoModule(level3data.wfid, wfname, module.moduleid, module.iconname, tableCell.uid);"></span>
+                                                            </div>
+                                                            <div flex="35" class="date">
+                                                                <a title="Timezone: {{level3data.tz}}">{{module.dt}}</a>
+                                                                <span ng-if="module.scls === 'inprogress'" class="nicon icon-tl-sml-progress"></span>
+                                                                <span ng-if="module.scls === 'ok'" class="nicon icon-tl-sml-complet"></span>
+                                                                <!-- <span ng-if="module.scls === 'pending' && (tableCell.state!=='notdone' && tableCell.state!=='complete')" class="nicon icon-tl-sml-alert"></span>
+                                                                <span ng-if="module.scls === 'pending' && (tableCell.state==='notdone' || tableCell.state==='complete')" class="nicon"></span> -->
+
+                                                                <span ng-if="module.scls === 'pending' && tableCell.state==='alert'" class="nicon icon-tl-sml-alert"></span>
+                                                                <span ng-if="module.scls === 'pending' && tableCell.state!=='alert'" class="nicon"></span>
+
+                                                                <span ng-if="module.scls === 'error'" class="nicon icon-tl-sml-alert"></span>
+                                                                <span ng-if="module.scls === 'dismiss'" class="nicon icon-tl-sml-dismiss"></span>
+                                                                <span ng-if="module.scls === 'skipped'" class="nicon icon-tl-sml-skip"></span>
+                                                            </div>
+                                                            <div flex="30" ng-if="module.lastcls">Sequence status</div>                                                         
+                                                            <div flex="30" ng-if="module.showst ==='multi-page' || (module.showst === 'embed-course' &&  module.test_type !== 'none')" ng-controller="showWfDetailsCtrl" 
+                                                                ng-init="mod = {initid: initid, modtype: module.showst, modid: module.moduleid, modname: module.modulename, dtls: module.dtls, status: module.status, compdt: module.compdt}; 
+                                                                    learnstatus = getLearnModuleStatus(mod); assessmentstatus = getAssessmentStatus(level3data, mod)"
+                                                                class="truncate">
+                                                                <md-button ng-if="learnstatus === 'complete'" class="md-raised ok refresh" ng-click="showLearnDetailsModal(mod, tableCell, level3data)">
+                                                                    <span class="text">{{learnstatus}}</span>
+                                                                </md-button>
+                                                                <md-button ng-if="learnstatus !== 'complete'" class="md-raised inprogress refresh" ng-click="showLearnDetailsModal(mod, tableCell, level3data)">
+                                                                    <span class="text">{{learnstatus}}</span>
+                                                                </md-button>
+                                                                <span ng-if="module.test_type === 'quiz' && learnstatus === 'complete' && assessmentstatus !== 'complete'" class="cir inprogress">
+                                                                    <span class="icni icon-tl-sml-progress"></span>
+                                                                </span>
+                                                                <span ng-if="module.test_type === 'quiz' && assessmentstatus === 'complete'" class="cir complete">
+                                                                    <span class="icni icon-tl-sml-complet"></span>
+                                                                </span>
+                                                                <span ng-if="module.test_type === 'quiz' && learnstatus !== 'complete'" class="cir active"></span>
+                                                                <span ng-if="data1.status === 'inactive'" class="cir inactive"></span>
+                                                            </div>
+                                                            <div flex="30" ng-if="module.showst !=='multi-page' && (module.showst !== 'embed-course' || (module.showst === 'embed-course' && module.test_type === 'none'))" class="truncate">
+                                                                <span ng-if="!module.showst || (module.showst === 'embed-course' && module.test_type === 'none')" class="status"><a title="{{module.s}}">{{module.s}}</a></span>
+                                                                <md-button ng-if="(module.showst && module.showst !== 'embed-course') || module.logic" ng-controller="showWfDetailsCtrl" class="md-raised {{module.scls}} refresh" ng-click="showStatusDialog(module.showst || module.logic, level3data.uid, tableCell.uid, module.moduleid, level3data.cold)">
+                                                                    <span class="text" ng-if="module.showst">{{module.s}}</span>
+                                                                    <span class="text" ng-if="module.logic">Sequence Logic</span>
+                                                                </md-button>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                    <div class="box">
+                                        <span class="icon ictick icon-tl-complete"></span>
+                                        <span class="icon icalrt icon-tl-alert"></span>
+                                        <span class="icon icdis icon-tl-dismiss"></span>
+                                        <span class="icon icprg icon-tl-progress"></span>
+                                        <span class="icon icskip icon-tl-skipped"></span>
+                                    </div>
+                                    <div class="group {{tableCell.groupbndry}} {{tableCell.grpalrt}}" ng-if="tableCell.grouptype === 'group' && tableCell.seqfor === 'M'"></div>
+                                    <div class="shape-wrap shape-full-wrap {{tableCell.groupbndry}}" ng-class="{noshape : tableCell.grouptype === 'group' && tableCell.seqfor === 'M'}">
+                                        <span class="shape"></span>
+                                        <div class="blurb"></div>
+                                    </div>
+                                </div>
+                                <div class="box-wrap prfl" ng-if="tableCell.seqfor === 'profile'">
+                                    <div class="box {{tableCell.statecls}}">
+                                        <span class="more-action-wrap">
+                                            <!-- <span class="icon more-action ictick icon-tl-profile"></span> -->
+                                            <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="" class="more-action">
+                                            <img ng-if="!level3data.pic" class="more-action prfimg" src="" alt="">
+                                            <img ng-if="level3data.pic" class="more-action prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+                                            <span class="action-popover">
+                                                <span class="arrow"></span>
+                                                <span class="content">
+                                                    <span class="text truncate"><strong>Name:</strong> {{level3data.hirenm}}</span>
+                                                    <span class="text truncate status"><strong>Status:</strong> {{level3data.state}}</span>
+                                                    <span class="text truncate"><strong>Workflow started:</strong> {{tableCell.dt}}</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+    					</div>
+    				</div>
+    			</div>
+             </div>
+
+        </div>
+
+	</div>
+
+    <!-- Info Panel -->
+    <div class="info-panel-wrap">
+        <div class="info-panel-inn">
+            <!-- <h4><span>{{level3data.wfname}}</span> | <span>{{level3data.hirenm}}</span></h4> -->
+            <h4>
+                <span>{{level3data.wfname}}</span>
+                <span ng-if="level3data.state_cap === 'Cancelled'">(Cancelled)</span>
+                <span ng-if="level3data.state_cap === 'Complete'">(Complete)</span>
+                <!-- <span ng-if="level3data.iststwf !=='y'" class="tstbdg live">Live</span> -->
+                <span ng-if="level3data.iststwf ==='y'" class="tstbdg">Test</span>
+            </h4>
+            <span class="show-more-wrap">
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover" ng-controller="changeWfDetailsCtrl">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <!-- <span ng-click="changeStartDateModal($event)" ng-if="allowEdits=== 'yes'">Change Start date</span> -->
+                        <span ng-click="cancelWfModal($event)" ng-if="allowEdits=== 'yes'">Cancel this Workflow</span>
+                        <span ng-click="gotoReportsLevel2($event)">View audit log</span>
+                    </div>
+                </span>
+            </span>
+            <div class="info-panel" ng-class="{hvrmsk : level3data.state_cap === 'Cancelled' || level3data.state_cap === 'Complete'}">
+                <!-- <div class="msk" ng-if="level3data.state_cap === 'Cancelled'|| level3data.state_cap === 'Complete'"></div> -->
+                <div class="in">
+                    <span class="heading">Main info</span>
+
+                    <span class="text" ng-controller="changeWfDetailsCtrl" ng-click="showProfileDialog($event, level3data, 'no');">
+                        <strong>{{custlabels.Employee || 'Employee'}}:</strong>
+                        <span class="dnme fkchip truncate" ng-class="{nohover : allowEdits!== 'yes'}">
+                            <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                            <img ng-if="!level3data.pic" class="prfimg" src="" alt="">
+                            <img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+                            <span class="txt">
+                                <a title="{{level3data.hirenm}}">{{level3data.hirenm}}</a>
+                            </span>
+                        </span>
+                    </span>
+                    <span class="text" ng-controller="changeWfDetailsCtrl" ng-click="showProfileDialog($event, level3data, 'no');">
+                        <strong>Preferred contact:</strong>
+                        <span ng-if="!level3data.hirechnl || level3data.hirechnl ==='mob'" class="dnme truncate" ng-class="{nohover : allowEdits!== 'yes'}">
+                            <span>{{level3data.hiremob}}</span>
+                            <span class="icon icon-edit" ng-if="allowEdits=== 'yes'"></span>
+                        </span>
+                        <span ng-if="level3data.hirechnl ==='eml'" class="dnme truncate" ng-class="{nohover : allowEdits!== 'yes'}">
+                            <span>{{level3data.hireeml}}</span>
+                            <span class="icon icon-edit" ng-if="allowEdits=== 'yes'"></span>
+                        </span>
+                    </span>
+                    <span class="text" ng-class="{nohover : allowEdits!== 'yes'}">
+                        <strong>Workflow:</strong>
+                        <span class="dnme truncate">
+                            <span>{{level3data.wfname}}</span>
+                            <a ng-if="level3data.bh ==='yes' && level3data.iststwf !=='y'" title="Bulk process">
+                                <span class="icn icon-bulkhire"></span>
+                            </a>
+                        </span>
+                    </span>
+                    <span class="text" ng-class="{nohover : allowEdits!== 'yes'}">
+                        <strong>Status:</strong>
+                        <span class="dnme truncate">
+                            <span>{{level3data.state_cap}}</span>
+                        </span>
+                    </span>
+                    <span class="text" ng-class="{nohover : allowEdits!== 'yes'}" ng-click="changeStartDateModal($event)" ng-controller="changeWfDetailsCtrl">
+                        <strong>Start date:</strong>
+                        <span class="dnme truncate">
+                            {{level3data.hirestdtformatted}}
+                            <span class="icon icon-edit" ng-if="allowEdits=== 'yes'"></span>
+                        </span>
+                    </span>
+                </div>
+                <div class="in">
+                    <span class="heading">{{custlabels.Manager || 'Manager'}}</span>
+                    <div ng-repeat="manager in level3data.managers"  ng-controller="changeWfDetailsCtrl" ng-click="showProfileDialog($event, manager, 'yes');">
+                        <span class="text">
+                            <strong>{{manager.label}}:</strong>
+                            <span class="dnme fkchip truncate" ng-class="{nohover : manager.type==='s' || allowEdits!== 'yes'}" ng-if="manager.mgrname">
+                                <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                <img ng-if="!manager.pic" class="prfimg" src="" alt="">
+                                <img ng-if="manager.pic" class="prfimg" ng-src="{{manager.picCdn||manager.pic}}{{level3data.refreshProfileToken}}" alt="">
+                                <span class="txt">
+                                    <a title="{{manager.dispnm}}">{{manager.mgrname}}</a>
+                                </span>
+                            </span>
+                            <span ng-if="allowEdits === 'yes' && !manager.mgrname" class="icnwrap" ng-class="{nohover : false}">
+                                <span class="icon icon-edit"></span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="in">
+                    <span class="heading">Category</span>
+                    <div ng-repeat="category in level3data.categories track by $index" ng-controller="changeWfDetailsCtrl" ng-click="changeCategoryModal($event, category);">
+                        <span class="text" ng-class="{nohover : allowEdits!== 'yes'}">
+                            <strong>{{category.dnm}}:</strong>
+                            <span ng-if="allowEdits === 'yes' && category.dval.length > 0" class="dnme truncate" ng-class="{nohover : false}">
+                                <a title="{{category.dval}}">{{category.dval}}</a>
+                                <span class="icon icon-edit"></span>
+                            </span>
+                            <span ng-if="allowEdits === 'yes' && category.dval.length === 0" class="icnwrap" ng-class="{nohover : false}">
+                                <span class="icon icon-edit"></span>
+                            </span>
+                            <span ng-if="allowEdits !== 'yes'" class="dnme truncate">
+                                <span>{{category.dval}}</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <div class="in">
+                    <span class="heading">Custom Field</span>
+                    <div ng-repeat="cf in level3data.cflist track by $index" ng-controller="changeWfDetailsCtrl" ng-click="changeCustomFieldsModal($event, cf);">
+                        <span class="text" ng-class="{nohover : allowEdits!== 'yes'}">
+                            <strong>{{cf.nm}}:</strong>
+                            <span ng-if="allowEdits === 'yes' && cf.dispval.length > 0" class="dnme truncate" ng-class="{nohover : false}">
+                                <a title="{{cf.dispval}}">{{cf.dispval}}</a>
+                                <span class="icon icon-edit"></span>
+                            </span>
+                            <span ng-if="allowEdits === 'yes' && cf.dispval.length === 0" class="dnme truncate" ng-class="{nohover : false}">
+                                <span class="icon icon-edit"></span>
+                            </span>
+                            <span ng-if="allowEdits !== 'yes'" class="dnme truncate">
+                                <span>{{cf.dispval}}</span>
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

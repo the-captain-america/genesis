@@ -1,0 +1,27 @@
+<md-dialog aria-label="Revert to previous" class="revert-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>REVERT TO PREVIOUS</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content style="max-height:810px">
+        <div layout="column" layout-align="space-around center" layout-wrap>
+            <div class="info-text">
+                <p>
+                    Are you sure you want to revert to the previous version <br>of the Live account: {{prevjobruntime}}?
+                </p>
+            </div>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Cancel" class="md-default-theme" ng-click="cancel();">Cancel</md-button>
+        <md-button aria-label="Yes, Hide Link" class="save md-default-theme" ng-click="revert();" md-autofocus>
+            <span>yes, revert</span>
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

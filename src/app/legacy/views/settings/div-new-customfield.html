@@ -1,0 +1,71 @@
+<div class="custom-field-modal" ng-controller="AddCustomFieldCtrl" ng-cloak>
+    <div layout="column">
+        <div flex>
+            <md-input-container class="required">
+                <label>Enter field name</label>
+                <input md-no-asterisk ng-model="newCustomFieldData.nm" focus="true" required>
+                <span class="blrdv"></span>
+            </md-input-container>
+        </div>
+
+        <label class="radio-title">Select the field type:</label>
+        <div flex layout="row" layout-align="space-between start" class="radio-wrap">
+            <div class="radio-group">
+                <md-radio-group class="radio-group" ng-model="newCustomFieldData.typ" ng-disabled="updCustomfield === 'yes'">
+                    <md-radio-button value="f-shorttext">
+                        Short text
+                        <span class="icon icon-f-shorttext"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-longtext">
+                        Long text
+                        <span class="icon icon-f-longtext"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-numbers">
+                        Number
+                        <span class="icon icon-f-numbers"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-date">
+                        Date
+                        <span class="icon icon-f-date"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-time">
+                        Time
+                        <span class="icon icon-f-time"></span>
+                    </md-radio-button>
+                    <md-radio-button value="f-picklist">
+                        Picklist
+                        <span class="icon icon-f-choice"></span>
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+        </div>
+        <div class="pcklst-wrap" ng-if="newCustomFieldData.typ === 'f-picklist'">
+            <span class="lbl">Create picklist</span>
+            <div class="pw-in">
+                <div class="inptwrp" ng-repeat="optn in picklist track by $index">
+                    <md-input-container md-no-float class="md-block required">
+                        <input md-no-asterisk ng-model="optn.val" placeholder="Enter an option" required>
+                    </md-input-container>
+                    <md-button class="delete-btn" ng-click="deletePicklist($index)" aria-label="Delete" ng-if="$index > 0">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+                <div class="add-more-new-wrap">
+                    <md-button class="add-more" ng-click="addPicklist();">
+                        <span class="icon icon-plus"></span>
+                        <span class="text">add more</span>
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="switch-wrap">
+            <md-switch ng-model="newCustomFieldData.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Is Required">
+                Make this field required
+            </md-switch>
+        </div>
+    </div>
+    <div class="error" ng-if="customfieldError">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">{{customfieldErrorMessage}}</span>
+    </div>
+</div>

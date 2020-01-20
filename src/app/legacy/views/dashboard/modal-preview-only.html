@@ -1,0 +1,36 @@
+<md-dialog aria-label="Preview Notification" class="modal-preview-notification">
+
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<h2>Preview Notification</h2>
+			<span flex></span>
+			<md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+				<span class="icon icon-close-2"></span>
+			</md-button>
+		</div>
+	</md-toolbar>
+
+	<md-dialog-content class="{{actionclass}}" style="min-width:850px;max-width:850px;max-height:810px;">
+
+		<div class="preview-spinner">
+			<span class="spinner">
+				<img src="//static.enboarder.net/images/spinner-pink.gif" alt="spinner">
+			</span>
+		</div>
+
+		<div class="overlay {{overlayclass}}"></div>
+
+		<iframe title="preview" id="previewFrame" src="/mobile/#notification/previewonly"></iframe>
+
+	</md-dialog-content>
+
+	<md-dialog-actions layout="row">
+		<md-button aria-label="Dismiss" class="md-raised" ng-click="cancel()" md-autofocus>
+			Dismiss
+		</md-button>
+		<md-button aria-label="Action" class="md-raised save" ng-click="actionNotification()" md-autofocus>
+			Action
+		</md-button>
+	</md-dialog-actions>
+
+</md-dialog>

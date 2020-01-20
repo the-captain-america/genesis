@@ -1,0 +1,205 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">CSV upload</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','bulkupload')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','bulkupload')">
+	<h4>Add and manage advanced bulk uploads.</h4>
+    <!-- <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div> -->
+	<div class="settings-wrap-inner bulkupload">
+        <!-- <span class="show-more">
+            <span class="more more-action icon-more-icon"></span>
+            <div class="action-popover">
+                <span class="icon close-popover icon-more-icon"></span>
+                <span ng-click="addAutobulkupld();">
+                    <span class="icon icon-addnew-small"></span>
+                    <span class="text" ng-if="!sftconfig">Add auto bulk upload</span>
+                    <span class="text" ng-if="sftconfig">Edit auto bulk upload</span>
+                </span>
+            </div>
+        </span> -->
+        <md-tabs md-dynamic-height md-border-bottom>
+            <md-tab label="Bulk upload">
+                <md-content>
+                    <ol>
+                        <li> Add all relevant columns and information into your CSV file and save. You can have columns <br/>for any manager type, category and custom fields used in Enboarder.</li>
+                        <li>Upload the CSV file and map columns to a corresponding Enboarder field.</li>
+                        <li>Review the result before launching workflows.</li>
+                    </ol>
+
+                    <div class="map-wrap">
+                        <div class="mapwrap-inn">
+                            <div class="btnDiv">
+                                <md-button class="md-raised" ng-click="showUploadModal();">
+                                    <span class="icnupld icon-upload-small"></span>
+                                    <span class="text">MANUAL UPLOAD</span>
+                                </md-button>
+                            </div>
+                            <div class="btnDiv">
+                                <md-button class="md-raised" ng-click="addAutobulkupld();">
+                                    <span ng-if="sftconfig && sftconfig.status === 'active'" class="icnok icon-notification-ok"></span>
+                                    <span class="text">AUTO UPLOAD <span ng-if="sftconfig && sftconfig.status === 'active'">ACTIVE</span></span>
+                                </md-button>
+                            </div>
+                            <!-- <md-input-container class="mapping-dropdown" md-no-float>
+                                <label>Preset mapping</label>
+                                <md-select md-no-asterisk md-container-class="mapping-dd fixed-dd" ng-model="localdata.selectedMap">
+                                    <md-option value="none" selected>None</md-option>
+                                    <md-option value="{{presetmapping.uid}}" ng-repeat="presetmapping in presetmappings">{{presetmapping.name}}</md-option>
+                                    <md-option ng-if="presetmappings && presetmappings.length > 0" value="two" ng-click="showpreMapDialog();">Edit list</md-option>
+                                </md-select>
+                            </md-input-container>
+                            <md-checkbox class="tstcbox" aria-label="This bulk upload is for testing" ng-model="localdata.iststwf" ng-true-value="'y'" ng-false-value="'n'">
+                	            <span>Test workflows</span>
+                	        </md-checkbox> -->
+                        </div>
+                    </div>
+
+                    <!-- <hr>
+
+                    <div class="btnDiv autobtn" ng-if="!sftconfig">
+                        <md-button class="md-raised" ng-click="addAutobulkupld();">
+                            <span class="text">set up auto bulk upload</span>
+                        </md-button>
+                    </div>
+
+                    <div class="table-responsive sch-tbl-wrap" ng-if="sftconfig">
+                        <h4>Scheduled auto bulk upload</h4>
+                        <table class="table table-hover sch-list-table">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Preset mapping</th>
+                                    <th>Frequency</th>
+                                    <th>Next scheduled date ({{timezone}})</th>
+                                    <th>&nbsp;</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="td-container">
+                                        <div ng-if="sftconfig.status === 'active'">Active</div>
+                                        <div ng-if="sftconfig.status === 'inactive'">In active</div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div>{{sftconfig.premapname}}</div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div ng-if="sftconfig.frequency === 'daily'">Every day</div>
+                                        <div ng-if="sftconfig.frequency === 'weekly'">Weekly</div>
+                                        <div ng-if="sftconfig.frequency === 'monthly'">Monthly</div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div>{{sftconfig.nextrun}}</div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div>
+                                            <md-button class="edit md-raised" ng-click="addAutobulkupld();">
+                                                <span class="text">Edit</span>
+                                            </md-button>
+                                        </div>
+                                    </td>
+                                    <td class="td-container delete-col">
+                                        <md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow($event,$index);">
+                                            <span class="icon icon-close-5"></span>
+                                        </md-button>
+            						</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div> -->
+
+                </md-content>
+            </md-tab>
+            <md-tab label="Upload log" ng-click="updateTableDisplay(1,'next',0)">
+                <md-content>
+                    <div class="table-responsive">
+                        <table class="table table-hover map-list-table">
+                            <thead>
+                                <tr>
+                                    <th>Upload date/time</th>
+                                    <th>Uploaded file</th>
+                                    <th>User</th>
+                                    <th>Preset mapping</th>
+                                    <th>Workflow report</th>
+                                    <th>&nbsp;</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="jobrun in displayedCollection">
+                                    <td class="td-container">
+                                        <div>
+                                            <a title="{{jobrun.crdtdisplay}}">{{jobrun.crdtdisplay}}</a>
+                                        </div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div class="truncate">
+                                            <a title="{{jobrun.initdata.fname}}">{{jobrun.initdata.fname}}</a>
+                                        </div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div class="truncate">
+                                            <a title="{{jobrun.initdata.usernm}}">{{jobrun.initdata.usernm}}</a>
+                                        </div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div class="truncate">
+                                            <a title="{{jobrun.initdata.mappingnm}}">{{jobrun.initdata.mappingnm}}</a>
+                                        </div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div class="truncate">
+                                            <a title="{{jobrun.wflaunched}}">{{jobrun.wflaunched}}</a>
+                                        </div>
+                                    </td>
+                                    <td class="td-container">
+                                        <div>
+                                            <md-button class="btn md-raised" ng-if="jobrun.initdata.downloadlog" ng-href="{{jobrun.initdata.downloadlog}}">
+                                                <span class="text">DOWNLOAD LOG</span>
+                                            </md-button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr ng-if="displayedCollection && displayedCollection.length > 0">
+                                    <td colspan="15" class="text-center">
+                                        <div class="pagination-wrap">
+
+                                            <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                                <span class="icon icon-arrow-1"></span>
+                                                <span class="text">Back</span>
+                                            </button>
+
+                                            <div class="pagination-number-wrap">
+                                                <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                                <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                                <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                            </div>
+
+                                            <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                                <span class="text">Next</span>
+                                                <span class="icon icon-arrow-1"></span>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+	</div>
+</div>

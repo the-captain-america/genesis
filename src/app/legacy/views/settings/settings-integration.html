@@ -1,0 +1,382 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Integration</a>
+    </span>
+</div>
+
+<div class="settings-wrap intepge" ng-if="oauthstarted === 'yes'">
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','integration')">
+    <h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','integration')">
+    <h4>Set up and manage integrations with other applications.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+    <form name="integrationForm" ng-submit="searchApilogs();" novalidate>
+        <div class="settings-wrap-inner integration" ng-class="{bggray : selectedTabIndex === 2}">
+
+            <md-tabs md-dynamic-height md-border-bottom md-selected="selectedTabIndex">
+                <md-tab label="APP CENTER">
+                    <md-content class="md-padding">
+                        <div class="otherapp-wrap">
+                            <md-input-container class="appdd" flex="20">
+                                <md-select ng-model="selCategory" placeholder="All apps"
+                                    ng-change="changeCategorySel(selCategory)">
+                                    <md-option value="All">All apps</md-option>
+                                    <md-option value="{{cat}}" ng-repeat="cat in integCategory">{{cat}}</md-option>
+                                    <!-- <md-optgroup label="RELEVANT">
+                                        <md-option ng-value="app.name1">All relevant apps</md-option>
+                                        <md-option ng-value="app.name2">Applicant tracking system (ATS)</md-option>
+                                        <md-option ng-value="app.name3">Co-work & social networks</md-option>
+                                        <md-option ng-value="app.name4">Chat service</md-option>
+                                        <md-option ng-value="app.name5">E-signing</md-option>
+                                        <md-option ng-value="app.name6">Helpdesk support</md-option>
+                                    </md-optgroup>
+                                    <md-optgroup label="OTHER">
+                                        <md-option ng-value="app.other1">All other apps</md-option>
+                                        <md-option ng-value="app.other2">Accounting</md-option>
+                                        <md-option ng-value="app.other3">Statistics</md-option>
+                                    </md-optgroup>
+                                    <md-optgroup label="PERSONAL">
+                                        <md-option ng-value="app.personal1">All integrated apps</md-option>
+                                        <md-option ng-value="app.personal2">My app</md-option>
+                                        <md-option ng-value="app.personal3">All relevant apps</md-option>
+                                    </md-optgroup> -->
+                                </md-select>
+                            </md-input-container>
+                            <div class="srch-wrap">
+                                <md-input-container flex md-no-float class="md-block">
+                                    <input md-no-asterisk ng-model="srchName" placeholder="Search"
+                                        ng-change="searchAppByName(srchName)">
+                                    <span class="srch-icon icon-search-small"></span>
+                                    <span ng-click="srchName = '';searchAppByName(srchName)"
+                                        class="cls-icon icon-tl-skipped"></span>
+                                    <span class="blrdv srch"></span>
+                                </md-input-container>
+                            </div>
+
+                            <div class="layout__group aptlwrp">
+                                <div class="tleoutr"
+                                    ng-if="!selCategory || integItem.category === selCategory || selCategory === 'All'"
+                                    ng-repeat="integItem in integList">
+                                    <div class="layout__item tle"
+                                        ng-class="{cmngsnwrp : integItem.avail === 'coming' || integItem.marketupgrade === 'yes'}"
+                                        ng-click="showIntegrationDialog(integItem.integrated === 'yes'?'update':'add', integItem.integType)">
+                                        <span class="msk"></span>
+                                        <span class="cmngsn" ng-if="integItem.avail === 'coming'"></span>
+                                        <span class="imgwrp">
+                                            <img ng-if="integItem.icon" src="{{integItem.icon}}"
+                                                alt="{{integItem.nm}}" />
+                                        </span>
+                                        <span class="stwrp done"
+                                            ng-if="(integItem.integrated==='yes' && integItem.tokenError ==='no' && integItem.integType !== 'snaphire') || (integItem.integrated==='yes' && integItem.integType === 'snaphire' && integItem.snaphiretenantstatus === 'active')">
+                                            <span class="icn icon-notification-ok"></span>
+                                            <span class="txt">Integrated</span>
+                                        </span>
+
+                                        <div id="webhook" class="layout__identifier"
+                                            ng-if="integItem.category === 'Webhook Authentications'">
+                                            <span class="icon icon-webhook"></span>
+                                        </div>
+
+
+                                        <span class="stwrp pending"
+                                            ng-if="integItem.pending==='yes' || (integItem.integType === 'snaphire' && integItem.snaphiretenantstatus === 'pending')">
+                                            <span class="icn icon-f-time"></span>
+                                            <span class="txt">Pending...</span>
+                                        </span>
+                                        <span class="stwrp pending"
+                                            ng-if="(integItem.integrated !=='yes' || integItem.tokenError ==='yes') && integItem.connection === 'oauth2' && integItem.oauthError">
+                                            <span class="icn icon-f-time"></span>
+                                            <span class="txt">{{integItem.oauthError}}</span>
+                                        </span>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="nthng" ng-if="noappfound === 'yes'">
+                                <p>Hmmm, no apps in sight here</p>
+                                <div class="img-wrap">
+                                    <img src="//static.enboarder.net/images/error-bouble.gif" alt="" />
+                                </div>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="OUR extensions">
+                    <md-content class="md-padding">
+                        <div class="inte-wrap" ng-if="demourl">
+                            <span class="label">Workflow Demo URL</span>
+                            <span class="content"><span>{{demourl}}</span></span>
+                            <span class="action-btn-wrap">
+                                <md-button ngclipboard data-clipboard-text="{{demourl}}"
+                                    class="btn save save-spinner md-raised" ng-click="copyToken($event);">
+                                    <span class="text">Copy</span>
+                                    <span class="text-saved">
+                                        Copied
+                                        <span class="btn-icon icon-criteria"></span>
+                                    </span>
+                                </md-button>
+                                <!-- <md-button class="btn md-raised save save-spinner" ng-click="generateNewToken($event);">
+                                <span class="text">
+                                    Generate New Key
+                                    <span class="btn-icon icon-refresh"></span>
+                                </span>
+                                <span class="text-saved">
+                                    Generated
+                                    <span class="btn-icon icon-criteria"></span>
+                                </span>
+                                </md-button> -->
+                            </span>
+                            <span class="icon icon-demo"></span>
+                        </div>
+                        <div class="inte-wrap">
+                            <md-switch ng-model="intg.keyval" ng-true-value="'Y'" ng-false-value="'N'"
+                                aria-label="Activate" ng-change="activateAPI($event)">
+                                Activate
+                            </md-switch>
+                            <span class="label" ng-class="{empt : intg.keyval === 'N'}">Account API token</span>
+                            <span ng-if="intg.keyval === 'Y'">
+                                <span class="content"><span>{{apikey}}</span></span>
+                                <span class="action-btn-wrap wstch">
+                                    <md-button ngclipboard data-clipboard-text="{{apikey}}"
+                                        class="btn save save-spinner md-raised" ng-click="copyToken($event);">
+                                        <span class="text">Copy</span>
+                                        <span class="text-saved">
+                                            Copied
+                                            <span class="btn-icon icon-criteria"></span>
+                                        </span>
+                                    </md-button>
+                                    <md-button class="btn md-raised save save-spinner gnkey"
+                                        ng-click="generateNewToken($event, 'api');">
+                                        <span class="text">
+                                            Generate New Key
+                                            <span class="btn-icon icon-refresh"></span>
+                                        </span>
+                                        <span class="text-saved">
+                                            Generated
+                                            <span class="btn-icon icon-criteria"></span>
+                                        </span>
+                                    </md-button>
+                                </span>
+                                <span class="icon icon-link"></span>
+                            </span>
+                        </div>
+                        <!-- <div class="inte-wrap" ng-if="emailkey">
+                            <md-switch ng-model="intg.emlval" ng-true-value="'Y'" ng-false-value="'N'" aria-label="Activate" ng-change="activateEmailInteg($event)">
+                                Activate
+                            </md-switch>
+                            <span class="label" ng-class="{empt : intg.emlval === 'N'}">Email Integration Key</span>
+                            <span ng-if="intg.emlval === 'Y'">
+                                <span class="content"><span>{{emailkey}}</span></span>
+                                <span class="action-btn-wrap wstch">
+                                    <md-button ngclipboard data-clipboard-text="{{emailkey}}" class="btn save save-spinner md-raised" ng-click="copyToken($event);">
+                                        <span class="text">Copy</span>
+                                        <span class="text-saved">
+                                            Copied
+                                            <span class="btn-icon icon-criteria"></span>
+                                        </span>
+                                    </md-button>
+                                    <md-button class="btn md-raised save save-spinner" ng-click="generateNewToken($event,'email');">
+                                        <span class="text">
+                                            Generate New Key
+                                            <span class="btn-icon icon-refresh"></span>
+                                        </span>
+                                		<span class="text-saved">
+                                            Generated
+                                            <span class="btn-icon icon-criteria"></span>
+                                        </span>
+                                    </md-button>
+                                </span>
+                                <span class="icon icon-mail-small"></span>
+                                <span class="emlwrp">
+                                    <span class="label">Send email to</span>
+                                    <span class="content"><span>{{sendmail}}</span></span>
+                                </span>
+                                <span class="emlwrp">
+                                    <span class="label">Receive email from</span>
+                                    <md-input-container md-no-float class="md-block">
+                                        <input ng-model="user.eml" placeholder="Enter email address" ng-blur="changeEmailFromList($event)">
+                                    </md-input-container>
+                                </span>
+                            </span>
+                        </div> -->
+
+                    </md-content>
+                </md-tab>
+                <md-tab label="AUDIT LOGS" ng-click="updateTableDisplay(1, 'next', 0)">
+                    <md-content class="md-padding">
+                        <div class="reports-wrap-inner lngtbl">
+
+                            <form name="reportForm" novalidate>
+                                <!-- <div class="heading-panel">
+                                    <h4>{{wfdefn.name}}</h4>
+                                    <span class="show-more">
+                                        <span class="more more-action icon-more-icon"></span>
+                                        <div class="action-popover">
+                                            <span class="icon close-popover icon-more-icon"></span>
+                                            <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}">
+                                                <span class="icon icon-download"></span>
+                                                <span class="text">Download table data (CSV)</span>
+                                            </span>
+                                        </div>
+                                    </span>
+                                </div> -->
+
+                                <div class="search-panel detail-section" style="display:block">
+
+                                    <div layout="row" layout-align="center center">
+                                        <div flex>
+                                            <md-input-container>
+                                                <label>Employee</label>
+                                                <input ng-model="reportSearch.hirenm">
+                                                <span class="blrdv rpt"></span>
+                                            </md-input-container>
+                                        </div>
+                                        <div flex>
+                                            <md-input-container>
+                                                <label>System</label>
+                                                <md-select md-no-asterisk aria-label="System"
+                                                    ng-model="reportSearch.system" placeholder="System">
+                                                    <md-option value="{{system.val}}"
+                                                        ng-repeat="system in availableSystems">{{system.dispnm}}
+                                                    </md-option>
+                                                </md-select>
+                                            </md-input-container>
+                                        </div>
+                                        <div class="datepicker-wrap" flex>
+                                            <label class="md-caption">Date From</label>
+                                            <md-datepicker ng-model="datecrit.dtfrom" md-placeholder="Select date">
+                                            </md-datepicker>
+                                        </div>
+                                        <div class="datepicker-wrap" flex>
+                                            <label class="md-caption">Date To</label>
+                                            <md-datepicker ng-model="datecrit.dtto" md-placeholder="Select date">
+                                            </md-datepicker>
+                                        </div>
+                                    </div>
+
+                                    <div layout="row" layout-align="center center">
+                                        <div flex="100" class="search-button">
+                                            <md-button class="md-raised clear" ng-disabled="reportForm.$invalid"
+                                                ng-click="clearFilter();">
+                                                <span class="icon"></span>
+                                                <span class="text">Clear</span>
+                                            </md-button>
+                                            <md-button type="submit" class="md-raised search"
+                                                ng-disabled="reportForm.$invalid">
+                                                <span class="icon"></span>
+                                                <span class="text">Search</span>
+                                            </md-button>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+
+                            <div style="position:relative">
+                                <div class="scroll-btn-wrap">
+                                    <span class="scroll-btn icon-arrow-1"></span>
+                                </div>
+                                <div class="scroll-btn-wrap-rt">
+                                    <span class="scroll-btn icon-button-arrow-left"></span>
+                                </div>
+
+                                <div class="table-wrapper">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th class="dte">
+                                                    Date <span ng-if="tz">({{tz}})</span>
+                                                </th>
+                                                <th class="emp">Employee</th>
+                                                <th class="sys">System</th>
+                                                <!-- <th class="code">Http code</th> -->
+                                                <th class="msg">Message</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="audititem in displayedCollection"
+                                                ng-click="showAuditDetailDialog(audititem);">
+                                                <td class="td-container">
+                                                    {{audititem.dispdt}}
+                                                </td>
+                                                <td class="td-container">
+                                                    {{audititem.hirenm}}
+                                                </td>
+                                                <td class="td-container">
+                                                    {{audititem.system}}
+                                                </td>
+                                                <!-- <td class="td-container">
+                                                    {{audititem.status}}
+                                                </td> -->
+                                                <td class="td-container">
+                                                    {{audititem.dispmsg}}
+                                                </td>
+                                            </tr>
+                                            <tr class="nohover" ng-if="rowCollection.length == 0 || apilogerr">
+                                                <td colspan="6">
+                                                    <div>
+                                                        <p ng-if="apilogerr">{{apilogerr}}</p>
+                                                        <p ng-if="!apilogerr">Hmmmm, can't find any relating data.</p>
+                                                        <div class="img-wrap">
+                                                            <img src="//static.enboarder.net/images/error-bouble.gif"
+                                                                alt="Error" />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                        <tfoot>
+                                            <tr ng-if="displayedCollection && displayedCollection.length > 0">
+                                                <td colspan="6" class="text-center">
+                                                    <div class="pagination-wrap">
+
+                                                        <button class="back" ng-click="prevClick();"
+                                                            ng-disabled="showPrevBtn != 'yes'">
+                                                            <span class="icon icon-arrow-1"></span>
+                                                            <span class="text">Back</span>
+                                                        </button>
+
+                                                        <div class="pagination-number-wrap">
+                                                            <span class="dots"
+                                                                ng-show="showPrevDots === 'yes'">...</span>
+                                                            <span ng-class="{ 'active-page' : page == currentSelPage}"
+                                                                ng-repeat="page in displayedPages"
+                                                                ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                                            <span class="dots"
+                                                                ng-show="showNextDots === 'yes'">...</span>
+                                                        </div>
+
+                                                        <button class="next" ng-click="nextClick();"
+                                                            ng-disabled="showNextBtn != 'yes'">
+                                                            <span class="text">Next</span>
+                                                            <span class="icon icon-arrow-1"></span>
+                                                        </button>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+
+    </form>
+</div>

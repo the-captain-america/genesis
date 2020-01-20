@@ -1,0 +1,364 @@
+<!-- <div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">User &amp; Permissions</a>
+    </span>
+</div>
+
+<div class="settings-wrap usrper-mainwrap">
+	<div class="settings-wrap-inner usrper-wrap">
+
+        <md-tabs md-dynamic-height md-border-bottom md-selected="selectedTabIndex">
+            <md-tab label="Users">
+                <md-content class="md-padding">
+                    <div class="table-responsive">
+            			<table class="table usrper-table">
+            				<thead>
+            					<tr>
+             						<th>Name</th>
+             						<th>Email</th>
+             						<th>Role</th>
+             						<th>Status</th>
+             						<th>Data access</th>
+            					</tr>
+            				</thead>
+            				<tbody>
+            					<tr ng-click="showUPUserModal($event,'update');">
+            						<td class="td-container">
+            							<div>HR Helen</div>
+            						</td>
+            						<td class="td-container">
+            							<div>helenemail</div>
+            						</td>
+            						<td class="td-container">
+            							<div>Super admin</div>
+            						</td>
+            						<td class="td-container err">
+            							<div>Inactive</div>
+            						</td>
+            						<td class="td-container">
+            							<div>Region = West</div>
+            						</td>
+            					</tr>
+            					<tr ng-click="showUPUserModal($event,'update');">
+            						<td class="td-container">
+            							<div>Brent Pearson</div>
+            						</td>
+            						<td class="td-container">
+            							<div>email1</div>
+            						</td>
+            						<td class="td-container">
+            							<div>Content creator</div>
+            						</td>
+            						<td class="td-container">
+            							<div>Active</div>
+            						</td>
+            						<td class="td-container">
+            							<div>
+                                            Region <span class="icnsep icon-symbol-1"></span> West
+                                            <span class="orsep">OR</span>
+                                            East
+                                            <span class="orsep">OR</span>
+                                            North
+                                            <span class="orsep">OR</span>
+                                            South
+                                            <span class="andsep">AND</span>
+                                            State <span class="icnsep icon-symbol-2"></span> Nsw
+                                            <span class="orsep">OR</span>
+                                            Qld
+                                            <span class="orsep">OR</span>
+                                            Nt
+                                            <span class="andsep">AND</span>
+                                            State <span class="icnsep icon-symbol-2"></span> Nsw
+                                            <span class="orsep">OR</span>
+                                            Qld
+                                            <span class="orsep">OR</span>
+                                            Nt
+                                        </div>
+            						</td>
+            					</tr>
+            				</tbody>
+            			</table>
+            		</div>
+                    <div class="btnDiv">
+            			<md-button class="md-raised" ng-click="showUPUserModal($event,'add new');">
+            			    <span class="icon icon-plus"></span>
+                            add new user
+            		    </md-button>
+                	</div>
+                </md-content>
+            </md-tab>
+            <md-tab label="Permissions">
+                <md-content class="md-padding">
+                    <div class="usrper-per-table">
+                        <div class="scroll-btn-wrap">
+                            <span class="scroll-btn icon-arrow-1"></span>
+                        </div>
+                        <div class="scroll-btn-wrap-rt">
+                            <span class="scroll-btn icon-button-arrow-left"></span>
+                        </div>
+                        <div class="table-wrapper">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>&nbsp;</th>
+                                        <th class="tab">&nbsp;</th>
+                                        <th class="tab">&nbsp;</th>
+                                        <th class="tab">Tabs</th>
+                                        <th class="tab">&nbsp;</th>
+                                        <th class="tab">&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                        <th>&nbsp;</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Role</th>
+                                        <th>Dashboard</th>
+                                        <th>Workflow</th>
+                                        <th>Reports</th>
+                                        <th>Helpcenter</th>
+                                        <th>Settings</th>
+                                        <th>Users &amp; Permissions</th>
+                                        <th>Launch workflows</th>
+                                        <th>Create &amp; edit workflows</th>
+                                        <th>
+                                            Something 1
+                                            <span class="icon icon-tooltip">
+                                                <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                                                    <span class="copy">
+                                                        <h4 class="title">title here</h4>
+                                                        <p>
+                                                            Some text in this para here....
+                                                        </p>
+                                                    </span>
+                                                </md-tooltip>
+                                            </span>
+                                        </th>
+                                        <th>Something 2</th>
+                                        <th>Something 3</th>
+                                        <th>Something 4</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-click="showUPPermissionModal($event,'update');" class="sadmn">
+                                        <td class="td-container">
+                                            <div>Super admin</div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-click="showUPPermissionModal($event,'update');">
+                                        <td class="td-container">
+                                            <div>Content creator</div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr ng-click="showUPPermissionModal($event,'update');">
+                                        <td class="td-container">
+                                            <div>Initiator</div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-cross"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container dsbl">
+                                            <div>
+                                                <span class="icon icon-tick"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="btnDiv">
+            			<md-button class="md-raised" ng-click="showUPPermissionModal($event,'new');">
+            			    <span class="icon icon-plus"></span>
+                            add new role
+            		    </md-button>
+                	</div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+    </div>
+</div> -->
+
+<!-- It was on line 100 == <table class="table"> -->
+<!-- <div class="tab-info">
+    Tabs
+</div> -->

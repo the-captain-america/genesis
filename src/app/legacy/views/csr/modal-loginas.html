@@ -1,0 +1,48 @@
+<md-dialog aria-label="Bulk upload" class="modal-loginas md-default-theme">
+<form name="LoginAsForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+        <h2>LOG INTO ACCOUNT</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:620px;max-width:620px" ng-class="{cnfrmScrn : wizardState === 'confirmMapping'}">
+    <label class="heading">Why are you logging into {{localData.compname}} account?</label>
+    <div layout="column" layout-align="space-around start">
+        <md-radio-group class="rdgrp" ng-model="localData.rsn" required>
+            <md-radio-button value="purdemo">
+                Demo purpose
+            </md-radio-button>
+            <md-radio-button value="purdebug">
+                Support / Technical debugging
+            </md-radio-button>
+            <md-radio-button value="purrev">
+                Quarterly review
+            </md-radio-button>
+            <md-radio-button value="purothr">
+                Other
+            </md-radio-button>
+        </md-radio-group>
+        <md-input-container md-no-float class="md-block required">
+            <input ng-model="localData.rsntxt" placeholder="My reason is..." required>
+            <!-- <span class="msk" ng-if="localdata.rsn !== 'purothr'"></span> -->
+        </md-input-container>
+    </div>
+</md-dialog-content>
+<md-dialog-actions layout="row" ng-if="errWarMsg === 'yes'">
+    <md-button ng-click="next();" class="save md-default-theme" aria-label="Next" md-autofocus>
+        <span class="text">next</span>
+    </md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row">
+    <md-button type="submit" ng-click="loginAs();" class="save md-default-theme" aria-label="Next" ng-disabled="LoginAsForm.$invalid" md-autofocus>
+        <span class="text">log in</span>
+    </md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

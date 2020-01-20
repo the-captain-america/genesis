@@ -1,0 +1,37 @@
+<md-dialog aria-label="Form Status" class="esign-status-modal form-status-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Forms: {{formsDefn.name}}</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content aria-label="Form Status" style="min-width:570px;max-width:570px;max-height:810px;">
+        <md-tabs md-dynamic-height md-border-bottom class="advanced-option-wrap" ng-class="{nores : showCompletedTab !== 'yes'}">
+            <md-tab label="Response">
+                <md-content class="md-padding">
+                    <ng-include src="'views/dashboard/div-form-status.html'"></ng-include>
+                </md-content>
+            </md-tab>
+            <md-tab label="WHEN COMPLETED" ng-if="showCompletedTab === 'yes'">
+                <md-content class="md-padding">
+                    <div class="status-wrap">
+                        <ng-include src="'views/dashboard/div-form-completed-status.html'"></ng-include>
+                    </div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+    </md-dialog-content>
+    <!-- <md-dialog-actions layout="row">
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="downloadAttachment();" md-autofocus>
+        	<span class="text">DOWNLOAD FORM &amp; ATTACHMENTS</span>
+    		<span class="text-save">Saving...</span>
+    		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+    		<span class="spinner">
+    			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    		</span>
+        </md-button>
+    </md-dialog-actions> -->
+</md-dialog>

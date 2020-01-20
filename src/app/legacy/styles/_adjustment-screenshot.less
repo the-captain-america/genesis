@@ -1,0 +1,54 @@
+.capture-item {
+    display: inline-block;
+    margin-left: 2px;
+    font-size: 11px;
+    transition: all 0.5s ease-in-out;
+    opacity: 0.5;
+    cursor: pointer;
+    &:hover {
+        opacity: 1;
+    }
+    .item__camera {
+        display: block;
+        position: absolute;
+        top: 1px;
+        &.is-loading {
+            -webkit-animation: spin 4s infinite linear;
+            animation: spin 4s infinite linear;
+        }
+    }
+    .item__animation {
+        display: inline-block;
+        top: -2px;
+        color: white;
+        position: absolute;
+        md-progress-circular path {
+            stroke: white;
+        }
+    }
+}
+
+@-moz-keyframes spin {
+    from {
+        -moz-transform: rotate(0deg);
+    }
+    to {
+        -moz-transform: rotate(360deg);
+    }
+}
+@-webkit-keyframes spin {
+    from {
+        -webkit-transform: rotate(0deg);
+    }
+    to {
+        -webkit-transform: rotate(360deg);
+    }
+}
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}

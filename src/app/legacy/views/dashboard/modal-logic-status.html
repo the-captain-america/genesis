@@ -1,0 +1,174 @@
+<md-dialog aria-label="Logic Status" ng-class="{'ack-status-modal' : showview === 'ack' || showview === 'logiclist' || showview==='seqlogic' || showview==='change', 'senddata-status-modal form-status-modal' : showview === 'ack' || showview === 'logiclist' || showview === 'form' || showview === 'senddata', 'lgc-status-lbl' : showview==='seqlogic', 'form-status-modal chngdte-modal' : showview==='change'}" class="esign-status-modal md-default-theme">
+
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <span ng-if="showview==='ack' || showview==='form' || showview==='senddata'  || showview==='esign'" ng-click="gotoLogicModuleList();" class="icon glbl-back-btn icon-arrow-8"></span>
+            <h2 ng-if="showview==='logiclist'">Logic: {{logicmodname}}</h2>
+            <h2 ng-if="showview==='ack'">ACKNOWLEDGE: {{logicinnermodname}}</h2>
+            <h2 ng-if="showview==='form'">FORMS: {{logicinnermodname}}</h2>
+            <h2 ng-if="showview==='senddata'">SEND DATA: {{logicinnermodname}}</h2>
+            <h2 ng-if="showview==='esign'">ESIGNING: {{logicinnermodname}}</h2>
+            <h2 ng-if="showview==='seqlogic'">Logic: {{seqname}}</h2>
+            <h2 ng-if="showview==='change'">START DATE CHANGED</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content style="min-width:570px;max-width:570px;max-height:810px;">
+        <div class="logic-status-wrap" ng-if="showview==='seqlogic'">
+            <span class="label" ng-if="status === 'skipped'">Sequence Condition Not Met :<br><br>
+                <span data-ng-bind-html="criteria"></span>
+            </span>
+            <span class="label" ng-if="status !== 'skipped'">Sequence Condition Met :<br><br>
+                <span data-ng-bind-html="criteria"></span>
+            </span>
+        </div>
+
+
+        <div class="logic-status-wrap" ng-if="showview==='change'">
+            <span class="label">
+                Start Date was changed to: {{changeNotif.nval}}<br>
+                The below participants were notified.
+            </span>
+            <div class="logic-status-wrap-in" layout="row" layout-align="start start" ng-repeat="owner in changeNotif.owners track by $index">
+                <div flex="70">
+                    <span class="icon icon-newhire" ng-if="owner.seq ==='NH'"></span>
+                    <span class="icon icon-manager" ng-if="owner.seq ==='M'"></span>
+                    <span class="text">{{owner.usrlbl}} : {{owner.nm}}</span>
+                </div>
+                <div flex="30" class="sdate">
+                    <span class="text">{{owner.contact}}</span>
+                </div>
+            </div>
+        </div>
+
+        <div ng-if="showview==='logiclist'">
+
+            <div class="logic-status-wrap" ng-repeat="logicAuditItem in logicAuditItems track by $index">
+                <span class="label">Result:
+                    <span data-ng-bind-html="logicAuditItem.criteria"></span>
+                </span>
+                <div class="logic-status-wrap-in" layout="row" layout-align="start start" ng-repeat="item in logicAuditItem.auditlist track by $index">
+                    <div flex="40">
+                        <span class="icon {{getModuleIcon(item.iconname);}}"></span>
+                        <span class="text" ng-if="item.modname !== 'no_op'">{{item.modname}}</span>
+                        <span class="text" ng-if="item.modname === 'no_op'">Do Nothing</span>
+                    </div>
+                    <div flex="25">
+                        <span class="status viewed" ng-if="item.action==='v' && item.modname !== 'no_op'">viewed</span>
+                        <span class="status viewed" ng-if="item.action==='sms'">sms sent</span>
+                        <span class="status viewed" ng-if="item.action==='event'">invite sent</span>
+                        <span class="status viewed" ng-if="item.action==='skip'">sms skip</span>
+                        <span class="status viewed" ng-if="item.action==='email'">email sent</span>
+                        <span class="status viewed" ng-if="item.action==='btnclk'">clicked</span>
+                        <span class="status viewed pending" ng-if="item.action==='pending' && logic_status !== 'logic_comp'">pending</span>
+                        <span class="status viewed pending" ng-if="item.action==='pending' && logic_status === 'logic_comp'">skipped</span>
+
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='ack_comp'" ng-click="showLogicSubmittedAck(item)">
+                            <span class="text">completed</span>
+                        </md-button>
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='ack_prog'" ng-click="showLogicSubmittedAck(item)">
+                            <span class="text">in progress</span>
+                        </md-button>
+
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='sd_prog'" ng-click="showLogicSendDataStatus(item)">
+                            <span class="text">in progress</span>
+                        </md-button>
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='sd_comp'" ng-click="showLogicSendDataStatus(item)">
+                            <span class="text">completed</span>
+                        </md-button>
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='sd_err'" ng-click="showLogicSendDataStatus(item)">
+                            <span class="text">Error</span>
+                        </md-button>
+
+
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='sbt'" ng-click="showLogicSubmittedForm(item)">
+                            <span class="text">Submitted</span>
+                        </md-button>
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='comp'" ng-click="showLogicSubmittedForm(item)">
+                            <span class="text">Completed</span>
+                        </md-button>
+
+
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='esign_st'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Started</span>
+                        </md-button>
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='esign_prep'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Preparing</span>
+                        </md-button>
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='esign_done'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Completed</span>
+                        </md-button>
+                        <md-button class="md-raised cancelled refresh" ng-if="item.action==='esign_cancel'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Cancelled</span>
+                        </md-button>
+                        <md-button class="md-raised error refresh" ng-if="item.action==='esign_err'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Error</span>
+                        </md-button>
+                        <md-button class="md-raised declined refresh" ng-if="item.action==='esign_declined'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Declined</span>
+                        </md-button>
+                        <md-button class="md-raised declined refresh" ng-if="item.action==='esign_voided'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Voided</span>
+                        </md-button>
+                        <md-button class="md-raised deleted refresh" ng-if="item.action==='esign_deleted'" ng-click="showLogicEsignStatusDialog(item)">
+                            <span class="text">Deleted</span>
+                        </md-button>
+
+                        <md-button class="md-raised error refresh" ng-if="item.action==='I9_error'" ng-click="showLogicI9StatusDialog(item)">
+                            <span class="text">Error</span>
+                        </md-button>
+                        <md-button class="md-raised error refresh" ng-if="item.action==='I9_complete'" ng-click="showLogicI9StatusDialog(item)">
+                            <span class="text">Completed</span>
+                        </md-button>
+                        <md-button class="md-raised error refresh" ng-if="item.action==='I9_inprogress'" ng-click="showLogicI9StatusDialog(item)">
+                            <span class="text">In progress</span>
+                        </md-button>
+
+                        <md-button class="md-raised inprogress refresh" ng-if="item.action==='recorded'" ng-click="showMyInterviewDialog(item)">
+                            <span class="text">Recorded</span>
+                        </md-button>
+                        <md-button class="md-raised ok refresh" ng-if="item.action==='saved'" ng-click="showMyInterviewDialog(item)">
+                            <span class="text">Saved</span>
+                        </md-button>
+
+                    </div>
+                    <div flex="35" class="sdate">
+                        <span class="text">{{item.crdt}}</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div ng-if="showview==='ack'">
+            <ng-include src="'views/dashboard/div-ack-status.html'"></ng-include>
+        </div>
+        <div ng-if="showview==='form'">
+            <md-tabs md-dynamic-height md-border-bottom class="advanced-option-wrap" ng-class="{nores : showCompletedTab !== 'yes'}">
+                <md-tab label="Response">
+                    <md-content class="md-padding">
+                        <ng-include src="'views/dashboard/div-form-status.html'"></ng-include>
+                    </md-content>
+                </md-tab>
+                <md-tab label="WHEN COMPLETED" ng-if="showCompletedTab === 'yes'">
+                    <md-content class="md-padding">
+                        <div class="status-wrap">
+                            <ng-include src="'views/dashboard/div-form-completed-status.html'"></ng-include>
+                        </div>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+        <div ng-if="showview==='senddata'" class="status-wrap">
+            <ng-include src="'views/dashboard/div-senddata-status.html'"></ng-include>
+        </div>
+        <div ng-if="showview==='esign'" class="status-wrap">
+            <ng-include src="'views/workflow/div-esign-status.html'"></ng-include>
+        </div>
+
+    </md-dialog-content>
+</md-dialog>

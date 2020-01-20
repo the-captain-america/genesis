@@ -1,0 +1,272 @@
+<div ng-controller="ContentEditorSideNavCtrl" ng-if="hasPermission('permissions.createWF')">
+    <div ng-if="editortype === 'content'">
+        <ul class="content-editor-sidenav">
+        	<li class="header">
+        		<h4 ng-if="contentType === 'content' ">Content Page</h4>
+                <h4 ng-if="contentType === 'gdpr' ">Compliance form</h4>
+        		<h4 ng-if="contentType === 'event' ">Event</h4>
+                <h4 ng-if="contentType === 'none' && iconname === 'notification-small'">Notification</h4>
+                <h4 ng-if="contentType === 'none' && iconname === 'verification-small'">Finished</h4>
+        		<h4 class="embed-header" ng-if="contentType === 'embed-link' ">Embed Content</h4>
+        		<h4 class="comm-header" ng-if="contentType === 'communication' ">Communication</h4>
+                <h4 ng-if="contentType === 'forms'">Forms</h4>
+                <h4 ng-if="contentType === 'acknowledge'">Acknowledge</h4>
+                <h4 ng-if="contentType === 'I9'">I9 (Work authorisation)</h4>
+                <h4 ng-if="contentType === 'video-rec'">Video recording</h4>
+                <h4 ng-if="contentType === 'multi-page'">Multi-page content</h4>
+                <h4 ng-if="contentType === 'embed-course'">Embed-course</h4>
+                <h4 class="logic-header" ng-if="contentType === 'logic' ">Logic</h4>
+                <h4 class="senddata-header" ng-if="contentType === 'senddata' && sd_action === 'email'">Send email</h4>
+                <h4 class="senddata-header" ng-if="contentType === 'senddata' && sd_action === 'webhook'">Send webhook</h4>
+                <h4 class="senddata-header" ng-if="contentType === 'senddata' && sd_action === 'updateval'">Send update-value</h4>
+        	</li>
+            <li ng-if="showLinkSwitch === 'yes' && contentType === 'none' && iconname === 'notification-small'" class="linkswitch-dropdown">
+        		<span class="text">
+                    <md-switch ng-model="switch.showlink" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Show/Hide link" ng-change="updateLinkSwitch(switch.showlink);">
+                        Show URL sequence link
+                    </md-switch>
+        		</span>
+        	</li>
+            <li ng-if="contentType === 'multi-page' || contentType === 'embed-course'" class="multipage-ddwrp" ng-cloak>
+                <span ng-if="contentType === 'embed-course'" class="rdbtnwrp">
+                    <md-radio-group class="radiobtn-wrap" ng-model="embed.popup" ng-change="updateWidgetPopup(embed.popup);">
+                       <md-radio-button value="no" class="md-primary">Embed on page</md-radio-button>
+                       <md-radio-button value="yes">Embed in pop-up</md-radio-button>
+                    </md-radio-group>
+                </span>
+                <span class="inn">
+                    <span class="txt">
+                        Assessment
+                    </span>
+                    <md-input-container class="direct-dropdown">
+                        <md-select aria-label="Assessment option" placeholder="Select" ng-model="assessment.test_type" md-container-class="form-dd" ng-change="updateTestInfo()">
+                            <md-option value="quiz">
+                                <span class="icon-select icon-flashcards"></span>
+                                Flashcard quiz
+                            </md-option>
+                            <md-option disabled value="mgrassessment">
+                                <span class="icon-select icon-manager"></span>
+                                Manager assessment <small><em>(coming soon)</em></small>
+                            </md-option>
+                            <md-option value="none">
+                                <span class="icon-select icon-tl-sml-dismiss"></span>
+                                No assessment
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                    <span class="btnwrp" ng-class="{edit : assessment.questions.length > 0}" ng-if="assessment.test_type === 'quiz' && showadd === 'yes'">
+                        <md-button class="md-raised" ng-click="showQuizDialog();">
+                            <span class="icn icon-plus"></span>
+                            <span class="btntxt">add</span>
+                            <span class="btntxt" ng-if="assessment.questions.length > 0"> / edit</span>
+                        </md-button>
+                        <span class="info">Cards: {{assessment.questions.length}}</span>
+                    </span>
+                    <!-- <span class="btnwrp edit" ng-if="assessment.test_type === 'mgrassessment'">
+                        <md-button class="md-raised" ng-click="">
+                            <span class="btntxt">edit</span>
+                        </md-button>
+                        <span class="info">Score: Pass/Fail</span>
+                    </span> -->
+                    <span class="btnwrp none" ng-if="assessment.test_type === 'none'">
+                        <span class="info">No assessment needed</span>
+                    </span>
+                </span>
+        	</li>
+            <li ng-if="contentType === 'none' || contentType === 'content' || contentType === 'multi-page' || contentType === 'embed-course'  || contentType === 'acknowledge' || contentType === 'event' || contentType === 'forms' || contentType === 'gdpr' || contentType === 'video-rec'"
+                dnd-draggable="item" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-dragend="dargcanceled(event)" dnd-canceled="dargcanceled(event)" ng-repeat="item in dragwidget track by $index">
+        		<a>
+        			<span ng-class="{btnicon : item.icon === 'button'}" class="icon-before icon-{{item.icon}}"></span>
+        			<span class="text">{{item.name}}</span>
+        			<span class="drag icon-handles"></span>
+        		</a>
+        	</li>
+            <li class="maskd" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+
+    <div ng-if="contentType === 'embed-link'">
+        <ul class="esign-side-nav embed-params-side-nav">
+            <li>
+                <span class="text">
+                    <md-radio-group class="radiobtn-wrap" ng-model="embed.popup" ng-change="updateWidgetPopup(embed.popup);">
+                       <md-radio-button value="no" class="md-primary">Embed on the page</md-radio-button>
+                       <md-radio-button value="yes">Embed in a pop-up</md-radio-button>
+                    </md-radio-group>
+
+                    <md-button class="md-raised refresh" ng-click="setupEmbedParams();" ng-disabled="!embed.url">
+                       <span class="text">Configure URL Data</span>
+                       <span class="icon icon-embed-url"></span>
+                    </md-button>
+                </span>
+                <span class="urlwrap" ng-if="embed.params && embed.params.length > 0">
+                    <span class="label">
+                        New Embed URL:
+                    </span>
+                    <span class="url">
+                        {{embed.enhancedUrl}}
+                    </span>
+                    <span class="del-btnwrap">
+                        <md-button class="delete-btn" ng-click="deleteAllEmbedParams();" aria-label="Delete">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                    </span>
+                </span>
+            </li>
+            <li class="maskd wf3sdnv" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+
+    <div ng-if="contentType === 'communication'">
+        <ul class="esign-side-nav senddata-side-nav comm-side-nav">
+            <li ng-if="contentType === 'communication'" dnd-draggable="item" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-dragend="dargcanceled(event)" dnd-canceled="dargcanceled(event)" ng-repeat="item in dragwidget track by $index">
+        		<a>
+        			<span ng-class="{btnicon : item.icon === 'button'}" class="icon-before icon-{{item.icon}}"></span>
+        			<span class="text">{{item.name}}</span>
+        			<span class="drag icon-handles"></span>
+        		</a>
+        	</li>
+            <li class="maskd wf3sdnv" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+
+    <div ng-if="editortype === 'esign'">
+        <ul class="esign-side-nav">
+            <li class="header">
+                <span class="text">
+                    <h4>Electronic signing</h4>
+                    <span class="description">
+                        This module only triggers an action. It is not visible inside a sequence.
+                    </span>
+                </span>
+        	</li>
+            <li>
+                <span class="text" ng-controller="addSignConnCtrl">
+
+                    <md-button ng-if="echosign === 'yes'" aria-label="Adobe sign" class="linked-wrap md-default-theme" ng-click="updateEchosign();">
+                        <span class="icon icon-link"></span>
+                        <span class="text">Adobe sign</span>
+                    </md-button>
+
+                    <md-button ng-if="securedsign === 'yes'" aria-label="SecuredSign" class="linked-wrap ss md-default-theme" ng-click="updateSecuredsign();">
+                        <span class="icon icon-link"></span>
+                        <span class="text">SecuredSign</span>
+                    </md-button>
+
+                    <md-button ng-if="docusign_test === 'yes'" aria-label="DocuSign" class="linked-wrap md-default-theme" ng-click="updateDocusignTest();">
+                        <span class="icon icon-link"></span>
+                        <span class="text">DocuSign</span>
+                    </md-button>
+
+                    <md-button ng-if="docusign_prod === 'yes'" aria-label="DocuSign" class="linked-wrap md-default-theme" ng-click="updateDocusignProd();">
+                        <span class="icon icon-link"></span>
+                        <span class="text">DocuSign</span>
+                    </md-button>
+
+                    <md-button  ng-if="hellosign === 'yes'" aria-label="HelloSign" class="linked-wrap md-default-theme" ng-click="updateHellosign(hellosign_env);">
+                        <span class="icon icon-link"></span>
+                        <span class="text">HelloSign</span>
+                    </md-button>
+                </span>
+            </li>
+            <li ng-if="hellosign === 'yes'">
+                <div flex class="radio-group text" ng-controller="addSignConnCtrl">
+                    <md-radio-group class="radio-group" ng-model="hellosign_env" ng-change="switchHelloSignEnv();">
+                        <md-radio-button value="test">
+                            Test
+                        </md-radio-button>
+                        <md-radio-button value="prod" ng-if="hellosign_paid === 'yes'">
+                            Live
+                        </md-radio-button>
+                    </md-radio-group>
+                </div>
+            </li>
+            <li ng-if="docusign_test === 'yes' || docusign_prod === 'yes'" ng-controller="addSignConnCtrl">
+                <div flex class="radio-group text">
+                    <md-radio-group class="radio-group" ng-model="docusign_env">
+                        <md-radio-button value="test" ng-if="docusign_test === 'yes'">
+                            Test
+                        </md-radio-button>
+                        <md-radio-button value="prod" ng-if="docusign_prod === 'yes'">
+                            Live
+                        </md-radio-button>
+                    </md-radio-group>
+                </div>
+            </li>
+            <li class="maskd wf3sdnv esgn" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+    <div ng-if="contentType === 'senddata'">
+        <ul class="esign-side-nav senddata-side-nav">
+            <li class="header">
+                <span class="text">
+                    <span class="description">
+                        This module only triggers an action. It&nbsp;is&nbsp;not visible in preview.
+                    </span>
+                </span>
+        	</li>
+            <li class="devider"></li>
+        </ul>
+    </div>
+
+    <div ng-if="contentType === 'senddata' && dragList">
+        <ul class="esign-side-nav senddata-side-nav">
+            <li class="folder-list" dnd-draggable="dragItem"  dnd-effect-allowed="copy" ng-repeat="dragItem in dragList track by dragItem.id">
+                <span href="" class="anchor show-hide-wfl2">
+                    <span class="icon {{dragItem.iconname}}" ng-if="dragItem.haschild==='n'"></span>
+                    <span class="icon folder-toggle icon-folder-closed" ng-if="dragItem.haschild==='y'"></span>
+                    <span class="text truncate">{{dragItem.lbl}}</span>
+                    <span class="drag drag-small icon-handles-small"></span>
+                    <span class="bar" ng-style="{'background': dragItem.bgcolor}"></span>
+                </span>
+
+                <ul class="folder detail-section" ng-if="dragItem.haschild==='y' && (dragItem.avail.indexOf('s') !== -1)">
+                    <div class="shape"></div>
+                    <li dnd-draggable="l2dragItem"  dnd-effect-allowed="copy" ng-repeat="l2dragItem in dragItem.childlist track by $index">
+                        <span class="show-hide-wfl2 anchor">
+                            <span class="icon {{l2dragItem.iconname}}" ng-if="l2dragItem.haschild==='n'"></span>
+                            <span class="icon folder-toggle icon-folder-closed" ng-if="l2dragItem.haschild==='y'"></span>
+                            <span class="text truncate">{{l2dragItem.lbl}}</span>
+                            <span class="drag drag-small icon-handles-small"></span>
+                            <span class="bar" ng-style="{'background': dragItem.bgcolor}"></span>
+                        </span>
+                        <ul class="folder detail-section second-level" ng-if="l2dragItem.haschild==='y' && (l2dragItem.avail.indexOf('s') !== -1)">
+                            <div class="shape"></div>
+                            <li dnd-draggable="l3dragItem"  dnd-effect-allowed="copy" ng-repeat="l3dragItem in l2dragItem.childlist track by $index">
+                                <span class="anchor">
+                                    <span class="icon {{l3dragItem.iconname}}"></span>
+                                    <span ng-click="" class="text truncate">{{l3dragItem.lbl}}</span>
+                                    <span class="drag drag-small icon-handles-small"></span>
+                                    <span class="bar" ng-style="{'background': dragItem.bgcolor}"></span>
+                                </span>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </li>
+            <li class="maskd wf3sdnv esgn" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+
+    <div ng-if="contentType === 'logic'">
+        <ul class="esign-side-nav senddata-side-nav logic-side-nav">
+            <li class="header">
+                <span class="text">
+                    <span class="description">
+                        This module triggers actions if a condition is met.
+                    </span>
+                </span>
+            </li>
+            <!-- <li class="devider"></li> -->
+            <li dnd-type="item.type" dnd-draggable="item" dnd-effect-allowed="copy" dnd-dragstart="dargstart(event)" dnd-dragend="dargcanceled(event)" dnd-canceled="dargcanceled(event)" ng-repeat="item in dragwidget track by $index">
+        		<a>
+                    <span class="icon-before icon-logic-branch"></span>
+        			<span class="text">{{item.name}}</span>
+        			<span class="drag icon-handles"></span>
+        		</a>
+        	</li>
+            <li class="maskd" ng-if="locked === 'Y'"></li>
+        </ul>
+    </div>
+</div>

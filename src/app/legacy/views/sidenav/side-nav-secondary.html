@@ -1,0 +1,8 @@
+<md-sidenav layout="column" class="secondary-side-nav md-sidenav-left md-whiteframe-z2" md-component-id="left" md-is-locked-open="$mdMedia('min-width: 0')" ng-cloak>
+	<div ng-if="SideNavWorkflow && hasPermission('permissions.createWF')" ng-include="'views/sidenav/side-nav-workflow1.html'"></div>
+	<div ng-if="SideNavWorkflowEditor && hasPermission('permissions.createWF')" ng-include="'views/sidenav/side-nav-workflow2.html'"></div>
+	<div ng-if="SideNavContentEditor && hasPermission('permissions.createWF')" ng-include="'views/sidenav/side-nav-workflow3.html'"></div>
+	<div ng-if="SideNavSettingsHome && canAccess('settings')" ng-include="'views/sidenav/side-nav-settings.html'"></div>
+	<div ng-if="SideNavCSRSettingsHome && canAccess('csrsettings')" ng-include="'views/sidenav/side-nav-csrsettings.html'"></div>
+	<div ng-if="SideNavReports && canAccess('reports')" ng-include="'views/sidenav/side-nav-reports.html'"></div>
+</md-sidenav>

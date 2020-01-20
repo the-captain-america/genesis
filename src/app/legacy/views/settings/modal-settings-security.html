@@ -1,0 +1,23 @@
+<md-dialog aria-label="Disable Link" class="disablelink-modal delete-senddata md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>WARNING - LOW SECURITY!</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content style="min-width:570px;max-width:570px">
+        <label class="heading heading-inside">
+            We do not recommend a low security setting for<br>
+            anyone who wants to keep their account secure.<br>
+            If you proceed, you do this at your own risk.
+        </label>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Yes, I like it dangerous" class="save md-default-theme" ng-click="confirmLowSecurity();" md-autofocus>
+            <span class="text">Yes, I like it dangerous</span>
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

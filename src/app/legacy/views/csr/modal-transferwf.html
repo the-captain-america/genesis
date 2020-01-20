@@ -1,0 +1,71 @@
+<md-dialog aria-label="Bulk upload" class="embed-params-modal bulkupload-modal wftransfer-modal md-default-theme">
+<form name="TransferWfForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+        <h2 ng-if="errWarMsg === 'yes'">WARNING</h2>
+        <h2 ng-if="errWarMsg !== 'yes'">INTELLECTUAL PROPERTY</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:620px;max-width:620px" ng-class="{cnfrmScrn : wizardState === 'confirmMapping'}">
+
+    <div layout="column" ng-if="errWarMsg === 'yes'">
+        <div class="scan-on errMsg">
+            <div class="content">
+                <div class="inner">
+                    <span class="img-wrap">
+                        <img src="//static.enboarder.net/images/warning.gif" alt="Error">
+                        <span class="emdtext">
+                            Resolve all Errors before transferring workflow
+                        </span>
+                    </span>
+                    <span class="error">
+                        <span class="errtitle">
+                            {{errmsgtxt}}
+                        </span>
+                    </span>
+                    <!-- <span class="error alrt">
+                        <span class="errtitle">
+                            Alert 1: Send datat modules "webhhook - Slack" should be updated with new client data.
+                        </span>
+                    </span> -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <div layout="column" ng-if="errWarMsg !== 'yes'">
+    <!-- <div layout="column"> -->
+        <div class="scan-on errMsg">
+            <div class="content">
+                <div class="inner">
+                    <md-checkbox ng-model="intellectualproperty" ng-true-value="'yes'" ng-false-value="'no'" aria-label="INTELLECTUAL PROPERTY" required>
+                        I confirm that I am allowed to transfer all intellectual property<br>and content of '{{selwf.name}}' from '{{srccomp.name}}' into '{{targetcomp.name}}'.
+                    </md-checkbox>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</md-dialog-content>
+<!-- <md-dialog-actions layout="row" ng-if="showbutton === 'next'">
+    <md-button ng-click="next();" class="save md-default-theme" aria-label="Next" md-autofocus ng-disabled="intellectualproperty !== 'yes'">
+        <span class="text">next</span>
+    </md-button>
+</md-dialog-actions> -->
+<md-dialog-actions layout="row" ng-if="errWarMsg !== 'yes'">
+    <md-button ng-click="transfer();" class="save save-spinner md-default-theme" aria-label="Next" ng-disabled="TransferWfForm.$invalid" md-autofocus>
+        <span class="text">transfer</span>
+        <span class="text-save">transferring...</span>
+		<span class="text-saved">transferred <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

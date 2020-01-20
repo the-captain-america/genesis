@@ -1,0 +1,15 @@
+<md-dialog aria-label="Form Status" class="form-status-modal ack-status-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>ACKNOWLEDGE: {{localdata.modname}}</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content aria-label="Form Status" style="min-width:570px;max-width:570px;max-height:810px;">
+        <ng-include src="'views/dashboard/div-ack-status.html'"></ng-include>
+    </md-dialog-content>
+</md-dialog>

@@ -1,0 +1,85 @@
+<md-dialog aria-label="{{action}} SMS PROVIDER" class="sms-pro-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>{{action}} SMS PROVIDER</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content style="min-width:570px;max-width:570px">
+        <form name="smsProviderForm" novalidate>
+            <label class="heading">
+                To provision an account, select one or more<br>
+                SMS providers below
+            </label>
+            <div layout="column" layout-align="space-around start">
+                <md-checkbox aria-label="Burst SMS" ng-model="smsdata.burst" ng-true-value="'yes'" ng-false-value="'no'" ng-disabled="disableBurst === 'yes'">
+                    <div class="img-wrap" ng-class="{disabled : disableBurst === 'yes'}">
+                        <img src="//static.enboarder.net/images/Burst.png" alt="Burst" />
+                    </div>
+                    <span class="tooltip-wrap">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip status-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">Countries supported by burst</h4>
+                                <p>
+                                    Australia<br>
+                                    Bahrain<br>
+                                    Greece<br>
+                                    Grenada<br>
+                                    Hong Kong<br>
+                                    Indonesia<br>
+                                    Israel<br>
+                                    New Zealand<br>
+                                    Philippines<br>
+                                    Singapore<br>
+                                    Thailand<br>
+                                    United Kingdom
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    	        </md-checkbox>
+                <md-checkbox aria-label="twilio" ng-model="smsdata.twilio" ng-true-value="'yes'" ng-false-value="'no'" ng-disabled="disableTwilio === 'yes'" ng-change="twilioSelected();">
+                    <div class="img-wrap" ng-class="{disabled : disableTwilio === 'yes'}">
+                        <img class="twi" src="//static.enboarder.net/images/twilio.png" alt="twilio" />
+                    </div>
+    	        </md-checkbox>
+            </div>
+            <div layout="row" layout-align="center" ng-if="smsdata.twilio === 'yes'" class="ccwrp">
+                <div class="mask" ng-if="disableTwilio === 'yes'"></div>
+                <div flex="45">
+                    <md-input-container class="cctwilio-dropdown" md-no-float>
+                        <label>Country code for Twilio number</label>
+                        <md-select md-no-asterisk md-container-class="fixed-dd" ng-model="smsdata.twilioccode" placeholder="Select" required>
+                            <md-option value="{{cntryRec.code}}" ng-repeat="cntryRec in countryCodeMap track by $index">{{cntryRec.name}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+        <form>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-disabled="true" md-autofocus ng-if="state === 'bothdisabled'">
+            <span class="text">PROVISION ACCOUNT</span>
+        </md-button>
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="provSMSAccounts();" ng-disabled="(state === 'burstdisabled' && smsdata.twilio !== 'yes' ) ||  (state === 'twiliodisabled' &&  smsdata.burst !== 'yes' )" md-autofocus ng-if="state === 'burstdisabled' || state === 'twiliodisabled'">
+            <span class="text">PROVISION ACCOUNT</span>
+            <span class="text-save">PROVISIONING...</span>
+            <span class="text-saved">PROVISIONED <span class="icon-notification-ok"></span></span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="provSMSAccounts();" ng-disabled="smsdata.twilio !== 'yes'  &&  smsdata.burst !== 'yes'" md-autofocus ng-if="state === 'nonedisabled'">
+            <span class="text">PROVISION ACCOUNT</span>
+            <span class="text-save">PROVISIONING...</span>
+            <span class="text-saved">PROVISIONED <span class="icon-notification-ok"></span></span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+    </md-dialog-actions>
+</md-dialog>

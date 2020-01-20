@@ -1,0 +1,190 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}" ng-if="wfid !== 'default'">{{wfname}}</a>
+        <a ng-href="#/settings" ng-if="wfid === 'default'">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+<!-- <div class="bread-crumb" ng-if="wfid == 'default'">
+	<span><a ng-href="#/settings">Configuration</a></span>
+</div> -->
+<div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+    <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+    <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+    <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+</div>
+
+
+<div class="container content-editor forms-editor">
+<form name="workflow3" novalidate>
+	<!-- Preview icon -->
+	<a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default' && iconname !== 'notification-small' && iconname !== 'I9'">
+		<span class="icon icon-preview-big"></span>
+	</a>
+
+    <div ng-controller="saveModuleCtrl">
+        <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid || defaultmod" ng-click="showExitEditorModal(null, true);">
+            <span class="text">Save</span>
+            <span class="text-save">save</span>
+    		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+    		<span class="spinner">
+    			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    		</span>
+        </md-button>
+        <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid && !defaultmod" ng-click="saveAndStay();">
+            <span class="text">Save</span>
+            <span class="text-save">save</span>
+    		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+    		<span class="spinner">
+    			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+    		</span>
+        </md-button>
+        <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+            <span class="text">Save and exit</span>
+        </md-button>
+    </div>
+
+
+	<div class="content-editor-content" ng-cloak>
+        <div class="maskd" ng-if="locked === 'Y'"></div>
+		<div class="heading" ng-if="iconname !== 'notification-small'">
+			<md-input-container class="md-block">
+				<label>Page title</label>
+				<input class="heading-input" ng-if="titleFocus === 'yes'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid ==='default'"></input>
+				<input ng-if="titleFocus === 'no'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid==='default'"></input>
+                <span class="blrdv wht"></span>
+			</md-input-container>
+        </div>
+
+        <div ng-include="'views/workflow/div-workflow3-widgets.html'"></div>
+
+        <div class="expimgwrp" ng-if="contentType === 'content' && features && features.exp === 'yes' && module.expenb === 'yes'">
+            <img src="//static.enboarder.net/images/exp-platform.png" alt="Experience">
+        </div>
+
+        <!-- <div class="advanced-option-wrap embd-adv-opt">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Advanced settings</span>
+            </div>
+            <div class="detail-section">
+                <div class="slnk-wrap">
+                    <md-checkbox aria-label="Do not allow selecting several in 'Group Processing'" ng-model="embed.grpprocess" ng-true-value="'yes'" ng-false-value="'no'">
+                        <span>Do not allow selecting several in 'Group Processing'</span>
+                    </md-checkbox>
+                </div>
+            </div>
+        </div> -->
+
+        <div class="advanced-option-wrap embd advrc" ng-show="contentType === 'video-rec'">
+            <div layout="row" layout-align="space-between center" class="lblhdng">
+                <div flex="75">Create topics for the recording</div>
+                <div flex="15">&nbsp;&nbsp;&nbsp;&nbsp;Rec</div>
+                <div flex="10">&nbsp;</div>
+            </div>
+            <div layout="row" layout-align="space-between center" class="recinptwrp" ng-repeat="topic in recordingTopics track by $index">
+                <div flex="75" ng-click="topicNameClick($index)">
+                    <span class="nmbr">{{$index+1}}.</span>
+                    <md-input-container md-no-float class="md-block">
+                        <textarea placeholder="Write a question..." ng-model="topic.name" ng-blur="topicNameBlur($index)"></textarea>
+                    </md-input-container>
+                </div>
+                <div flex="15" class="minstxt" ng-click="minsClick($index)">
+                    <span class="min" ng-show="!(mininput && (topicIndex === $index))">{{topic.time}}</span>
+                    <input ng-show="(mininput && (topicIndex === $index))" ng-blur="minsBlur($index)" class="mins" type="number" min="0.000000000001" max="999" ng-model="topic.time">
+                    mins
+                </div>
+                <div flex="10">
+                    <md-button class="delete-btn" ng-click="removeTopic($index)" aria-label="Delete">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </div>
+            </div>
+            <div class="add-more-new-wrap">
+                <md-button class="add-more" ng-click="addTopicForRecording()">
+                    <span class="icon icon-plus"></span>
+                    <span class="text">add</span>
+                </md-button>
+                <span class="spr">/</span>
+                <md-input-container md-no-float class="usesmpl-dropdown">
+                    <md-select md-no-asterisk md-container-class="smpls-dd" aria-label="USE SAMPLES" placeholder="USE SAMPLES" ng-model="use.smpl" ng-change="onSampleTopicSelect(use.smpl);">
+                        <md-optgroup label="Manager">
+                            <md-option value="{{opt}}" ng-repeat="opt in videosamples.manager track by $index">
+                                {{opt.title}}
+                            </md-option>
+                        </md-optgroup>
+                        <md-optgroup label="Employee">
+                            <md-option value="{{opt}}" ng-repeat="opt in videosamples.employee track by $index">
+                                {{opt.title}}
+                            </md-option>
+                        </md-optgroup>
+                    </md-select>
+                </md-input-container>
+            </div>
+        </div>
+
+        <div class="error error-form ack-error" ng-if="reqFldErr === 'yes'" ng-class="{vderr : contentType === 'video-rec'}">
+            <span class="icon icon-notification-alert"></span>
+            <span ng-if="!otherErrMsg" class="text">Before you exit and save, please add text into all fields options.</span>
+            <span ng-if="otherErrMsg" class="text">{{otherErrMsg}}</span>
+        </div>
+
+        <div class="advanced-option-wrap" ng-if="contentType === 'acknowledge'">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Advanced settings</span>
+            </div>
+            <div class="detail-section">
+                <div class="action-wrap">
+                    <span class="icon-advanced icon-notification-ok"></span>
+                    <span class="info">Customise confirmation message</span>
+                    <md-button class="md-raised refresh" ng-click="editConfirmationMsgModal($event);">
+                        <span class="text">edit message</span>
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="advanced-option-wrap embd" ng-show="contentType === 'content' && features && features.exp === 'yes'">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Advanced settings</span>
+            </div>
+            <div class="detail-section">
+                <md-checkbox aria-label="Experience enboarder" ng-model="module.expenb" ng-true-value="'yes'" ng-false-value="'no'">
+                    <span>Add prompts & instructions to save shortcut as app</span>
+                </md-checkbox>
+            </div>
+        </div>
+        <div class="advanced-option-wrap embd" ng-show="contentType === 'embed-link' && bulkhire === 'yes'">
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-1"></span>
+                <span class="text">Advanced settings</span>
+            </div>
+            <div class="detail-section">
+                <md-checkbox aria-label="Sample checkbox here.." ng-model="onlyone" ng-true-value="'yes'" ng-false-value="'no'">
+                    <span>Force 1-by-1 name selection in 'Bulk process'</span>
+                </md-checkbox>
+            </div>
+        </div>
+        <div class="error error-form ack-error" ng-if="httpsUriError === true">
+            <span class="icon icon-notification-alert"></span>
+            <span class="text">Please use a URL with 'https'.<br>We only display certified and secure web content.</span>
+        </div>
+    </div>
+</form>
+</div>

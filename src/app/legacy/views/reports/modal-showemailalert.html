@@ -1,0 +1,24 @@
+<md-dialog aria-label="Enboarder Agreement" class="modal-showemailalert md-default-theme">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Exporting CSV File</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+        <span class="icon icon-close-2"></span>
+      </md-button>
+    </div>
+  </md-toolbar>
+
+  <md-dialog-content style="min-width:460px;max-width:460px;max-height:810px;">
+
+      Your CSV file is getting compiled from the database. We will send you an email to your inbox as soon as it is ready to download
+
+  </md-dialog-content>
+
+  <md-dialog-actions layout="row">
+    <md-button aria-label="Cancel" class="md-raised save" ng-click="cancel()" md-autofocus>
+    	ok, thanks!
+    </md-button>
+  </md-dialog-actions>
+
+</md-dialog>

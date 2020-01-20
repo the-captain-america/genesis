@@ -1,0 +1,274 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+<div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+    <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+    <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+    <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+</div>
+
+<div class="container content-editor">
+    <!-- Preview icon -->
+    <!-- <a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default'">
+        <span class="icon icon-preview-big"></span>
+    </a> -->
+
+    <form name="esignModuleForm" novalidate>
+        <div class="content-editor-content senddata-editor esign-editor" ng-cloak>
+            <div class="maskd" ng-if="locked === 'Y'"></div>
+            <div class="heading">
+                <md-input-container class="md-block">
+                    <label>Page title</label>
+                    <input class="heading-input" placeholder="Write a description" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();"></input>
+                    <span class="blrdv esgn"></span>
+                </md-input-container>
+            </div>
+
+            <div ng-if="hasenvelopeTemplates !=='y'" class="info-text">
+                You don't seem to have any templates yet. Create a template in your {{esigndata.prov}} account to access it here.
+            </div>
+            <md-input-container md-no-float ng-if="envelopeTemplates.length > 0" class="tmpltdrpdwn">
+                <label ng-if="esigndata.prov !== 'echosign'">{{esigndata.prov}} templates</label>
+                <label ng-if="esigndata.prov === 'echosign'">Adobe sign templates</label>
+                <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select template" ng-model="esigndata.templateid" ng-change="fetchTemplateDetails();" placeholder="Select template" required>
+                    <md-option ng-repeat="template in envelopeTemplates" value="{{template.templateId}}" ng-if="esigndata.prov === 'docusign' || esigndata.prov === 'docusign_test' || esigndata.prov === 'docusign_prod'">{{template.name}}</md-option>
+                    <md-option ng-repeat="template in envelopeTemplates" value="{{template.template_id}}" ng-if="esigndata.prov === 'hellosign'">{{template.title}}</md-option>
+                    <md-option ng-repeat="template in envelopeTemplates" value="{{template.libraryDocumentId}}" ng-if="esigndata.prov === 'echosign'">{{template.name}}</md-option>
+                    <md-option ng-repeat="template in envelopeTemplates" value="{{template.Reference}}" ng-if="esigndata.prov === 'securedsign'">{{template.Name}}</md-option>
+                </md-select>
+            </md-input-container>
+            <div class="notmplt" ng-if="!esigndata.templateid">
+                <h4>Select a template to begin<h4>
+            </div>
+            <div class="content esign-content" ng-if="esigndata.templateid">
+                <div class="spinner-overlay-esign" ng-class="{ show : esigndata.templateid}">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="45px"></md-progress-circular>
+                    </span>
+                </div>
+                <div class="doc-list-wrap" ng-if="templateDetail.deleted !== 'yes' && (esigndata.signers || esigndata.prov === 'echosign') && templateDetail.documents.length > 0">
+                    <h4>Template contains</h4>
+                    <ul>
+                        <li ng-repeat="doc in templateDetail.documents track by $index">{{doc.name}}</li>
+                    </ul>
+                </div>
+                <div class="notmplt" ng-if="templateDetail.deleted === 'yes'">
+                    <h4>Template is no more present in esign system<h4>
+                </div>
+                <hr ng-if="templateDetail.deleted !== 'yes' && (esigndata.signers || esigndata.prov === 'echosign') && templateDetail.documents.length > 0">
+                <div class="mapwrap" ng-if="(esigndata.prov === 'docusign_prod' || esigndata.prov === 'docusign_test') && templateDetail.documents.length > 0 &&esigndata.dsprefldstot>0">
+                    <div ng-if="esigndata.dsprefldstot !== esigndata.dsprefldsunsup">
+                        <span class="info" ng-if="esigndata.dsprefldsunsup > 0">{{esigndata.dsprefldsunsup}} Unsupported field(s) detected</span>
+                        <span class="info" ng-if="esigndata.dsprefldsmap < 1">{{esigndata.dsprefldssup}} Supported field(s) detected (map fields to pre-populate)</span>
+                        <span class="info" ng-if="esigndata.dsprefldsmap > 0">
+                            {{esigndata.dsprefldsmap}}/{{esigndata.dsprefldssup}} Supported field(s) mapped
+                            <span class="icnok icon-notification-ok"></span>
+                        </span>
+                        <md-button aria-label="Map supported fields" class="prfll-flds md-default-theme" ng-click="showPrefillFieldsModal();">
+                            <span class="icn icon-embed-url"></span>
+                            <span class="text">Map supported fields</span>
+                        </md-button>
+                    </div>
+                    <div ng-if="esigndata.dsprefldstot === esigndata.dsprefldsunsup">
+                        <span class="info">{{esigndata.dsprefldsunsup}} Unsupported field(s) detected</span>
+                    </div>
+                    <hr class="bfrdr">
+                </div>
+
+                <div layout="column" ng-if="esigndata.prov === 'echosign' && templateDetail.documents.length > 0">
+
+                    <table class="table">
+                        <thead>
+                            <th>ADOBE SIGN</th>
+                            <th class="connect-header">&nbsp;</th>
+                            <th>ENBOARDER</th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="selRecp in esigndata.participants track by $index">
+                                <td class="td-container label">
+                                    <div>
+                                        Participant {{$index + 1}}
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="connector"></span>
+                                    </div>
+                                </td>
+                                <td class="td-container">
+                                    <div>
+                                        <md-input-container ng-class="{'echosign-dd' : $index > 0}" md-no-float>
+                                            <md-select md-container-class="fixed-dd" md-no-asterisk aria-label="Select participant" ng-model="selRecp.en_roleid" placeholder="Select participant" required>
+                                                <md-option ng-repeat="participant in en_list" value="{{participant.uid}}">{{participant.l}}</md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                        <md-button class="delete-btn" ng-click="deletEchosignParticipant($index);" aria-label="Close" ng-if="$index > 0">
+                                            <span class="icon-close-5"></span>
+                                        </md-button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="addEchosignParticipant();">
+                            <span class="icon-plus"></span>
+                            <span class="text">add more</span>
+                        </md-button>
+                    </div>
+
+                    <div class="echosign-inpt-wrap" ng-if="esigndata.prov === 'echosign'">
+                        <hr>
+                        <md-checkbox aria-label="Add CC' email" ng-model="esigndata.ccemail" ng-true-value="'yes'" ng-false-value="'no'">
+            	            <span>Add CC' email</span>
+            	        </md-checkbox>
+                        <div class="inpt-wrap" ng-if="esigndata.ccemail === 'yes'">
+                            <span class="plhldr">Email:</span>
+                            <input class="txtinpt" type="text" ng-model="esigndata.cclist">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="roles-wrap" ng-if="esigndata.signers">
+                    <table class="table">
+                        <thead>
+                            <th>document roles</th>
+                            <th class="connect-header">&nbsp;</th>
+                            <th>participants</th>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="signer in templateDetail.recipients.signers track by $index">
+                                <td class="td-container label">
+                                    <div ng-if="signer.roleName" ng-class="{'cc-wrap' : signer.ccrole === 'yes'}">
+                                        {{signer.roleName}}
+                                        <span ng-if="signer.ccrole === 'yes'" class="cc"> CC</span>
+                                    </div>
+                                    <div ng-if="!signer.roleName">
+                                        [ Empty ]
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        <span class="connector"></span>
+                                    </div>
+                                </td>
+                                <td class="td-container label participant" ng-if="signer.email">
+                                    <div>
+                                        {{signer.name}} - {{signer.email}}
+                                    </div>
+                                </td>
+                                <td class="td-container" ng-if="!signer.email">
+                                    <div>
+                                        <md-input-container md-no-float>
+                                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Select participant" ng-model="esigndata.signers[$index]['en_roleid']" placeholder="Select participant" required>
+                                                <md-option ng-repeat="participant in en_list" value="{{participant.uid}}">{{participant.l}}</md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+
+            <div class="advanced-option-wrap" ng-if="(esigndata.prov === 'docusign_prod' || esigndata.prov === 'docusign_test') && dynTemplateAvailable==='yes'">
+
+        		<div class="show-hide">
+        			<span class="arrow-toggle icon-arrow-1"></span>
+        			<span class="text">Advanced options</span>
+        		</div>
+        		<div class="detail-section">
+                    <!-- <textarea class="editor" ng-model="esigndata.msgText" required=""></textarea> -->
+                    <md-checkbox aria-label="Replace this template for another version" ng-model="esigndata.isdynamic" ng-true-value="'yes'" ng-false-value="'no'">
+        	            <span>Replace this template for another version</span>
+        	        </md-checkbox>
+
+                    <div class="more-info-wrap" ng-if="esigndata.isdynamic === 'yes'">
+                        <span class="text-info">Create a new template name by Inserting dynamic and static text below: ( E.g. The name <em>"State_formpack"</em> would look for a template named: "NSW_formpack", "QLD_formpack", etc. )</span>
+                        <div class="text-box-wrap">
+                            <div class="dropdown-wrap">
+
+
+                                <div class="custom-dropdown-wrap">
+                                    <button class="mm-dropdown">
+                                        <span class="icon-dropdown icon-dynamic-text"></span>
+                                        <span class="text">Insert dynamic text</span>
+                                        <span class="icon-dropdown icon-arrow-4"></span>
+                                    </button>
+                                    <ul class="list-wrap multi">
+                                        <li>
+                                            <span class="truncate">Categories</span>
+                                            <span class="more-arrow icon-arrow-1"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="cf in cfOptions track by $index" ng-click="customFieldSelected(cf);">
+                                                    <span class="truncate">{{cf.value}}</span>
+                                                </li>
+
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="input-wrap">
+                                <input class="text-input" type="text" ng-model="esigndata.dynamicname">
+                            </div>
+                        </div>
+                        <div class="small-text">
+                            <small>To avoid errors, make sure:</small>
+                            <small>1) The new name matches an existing Docusign template.</small>
+                            <small>2) The order of participants matches between template versions.</small>
+                        </div>
+                    </div>
+        		</div>
+
+        	</div>
+
+
+        </div>
+
+        <!-- Exit button -->
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);" ng-disabled="esignModuleForm.$invalid || !templateDetail">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();" ng-disabled="esignModuleForm.$invalid || !templateDetail">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();" ng-disabled="esignModuleForm.$invalid || !templateDetail">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+    </form>
+</div>

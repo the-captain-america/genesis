@@ -1,0 +1,116 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+
+    <div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+        <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+        <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+        <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+    </div>
+
+    <div class="container content-editor forms-editor">
+    <form name="workflow3" novalidate>
+        <!-- Preview icon -->
+        <a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default' && iconname !== 'notification-small' && iconname !== 'I9'">
+            <span class="icon icon-preview-big"></span>
+        </a>
+
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+
+        <div class="content-editor-content" ng-cloak>
+            <div class="maskd" ng-if="locked === 'Y'"></div>
+            <div class="heading" ng-if="iconname !== 'notification-small'">
+                <md-input-container class="md-block">
+                    <label>Page title</label>
+                    <input class="heading-input" ng-if="titleFocus === 'yes'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid ==='default'"></input>
+                    <input ng-if="titleFocus === 'no'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid==='default'"></input>
+                    <span class="blrdv wht"></span>
+                </md-input-container>
+            </div>
+            <div ng-include="'views/workflow/div-workflow3-widgets.html'"></div>
+            <div class="advanced-option-wrap embdcrs">
+                <div class="show-hide" ng-if="contentType === 'embed-course' && embedType ==='link' ">
+                    <span class="arrow-toggle icon-arrow-1"></span>
+                    <span class="text">Advanced settings</span>
+                </div>
+                <div class="detail-section" ng-if="contentType === 'embed-course' && embedType ==='link'">
+                    <div class="action-wrap">
+                        <md-button class="md-raised cofig" ng-click="setupEmbedParams();" ng-disabled="disable === 'yes'">
+                            <span class="text">Configure URL Data</span>
+                            <span class="icon icon-embed-url"></span>
+                        </md-button>
+                    </div>
+                    <div ng-if="embedParams && embedParams.length>0">
+                        <div layout="row" layout-align="space-between center" class="lblhdng">
+                            <div flex="90">NEW Enboarder URL:</div>
+                            <div flex="10">&nbsp;</div>
+                        </div>
+                        <div layout="row" layout-align="space-between center" class="recinptwrp">
+                            <div flex="90">
+                                <md-input-container md-no-float class="md-block">
+                                    <textarea placeholder="URL" ng-model="embedEnhancedUrl"></textarea>
+                                </md-input-container>
+                            </div>
+                            <div flex="10">
+                                <md-button class="delete-btn" ng-click="deleteAllEmbedParams()" aria-label="Delete">
+                                    <span class="icon icon-close-5"></span>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="error error-form ack-error" ng-if="reqFldErr === 'yes'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Create at least 1 flashcard to save module.</span>
+                </div>
+                <div class="error error-form ack-error" ng-if="validUriError === true">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Wrong URL link.<br>Try to copy the online link as directed from the platform.</span>
+                </div>
+                <div class="error error-form ack-error" ng-if="httpsUriError === true">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Please use a URL with 'https'.<br>We only display certified and secure web content.</span>
+                </div>
+            </div>
+        </div>
+
+    </form>
+</div>

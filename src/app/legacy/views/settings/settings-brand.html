@@ -1,0 +1,88 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Branding</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','branding')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','branding')">
+	<h4>Add new brands to your platform and customise the look and feel.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<div class="settings-wrap-inner">
+		<div class="table-responsive">
+			<table class="table table-hover company-branding-table" st-table="displayedCollection" st-safe-src="rowCollection">
+				<thead>
+					<tr>
+						<th>Brand Name</th>
+                        <th>Logo</th>
+						<th>Header colours</th>
+						<th>Button colours</th>
+						<th>Icon</th>
+						<th>Sms name</th>
+						<th>Email name</th>
+                        <th>Default</th>
+                        <th>&nbsp;</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in displayedCollection track by $index">
+						<td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+							<div>{{row.name}}</div>
+						</td>
+
+                        <td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+							<div><img ng-src='{{row.logoCdn||row.logo}}' alt=""></div>
+						</td>
+						<td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);" ng-style="{'color':row.headerfg}">
+							<div ng-style="{'background-color': row.headerbg}">Header Text</div>
+						</td>
+						<td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);" ng-style="{'color':row.btnfg}">
+							<div ng-style="{'background-color': row.btnbg}">Button</div>
+						</td>
+                        <td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+							<div ng-if="row.icon" class="icnwrp">
+                                <img ng-src='{{row.iconCdn||row.icon}}512' alt="">
+                            </div>
+						</td>
+                        <td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+                            <div>{{row.smsfrom}}</div>
+                        </td>
+                        <td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+                            <div>{{row.emailfrom}}</div>
+                        </td>
+                        <td class="td-container" ng-click="showNewAddBrandModal($event,'update',$index);">
+							<md-radio-group ng-model="row.default">
+                                <md-radio-button ng-if="row.default ==='Y'" aria-label="..." disabled value="Y"></md-radio-button>
+                            </md-radio-group>
+
+						</td>
+
+						<td class="td-container delete-col">
+							<div>
+								<md-button ng-disabled="false" class="delete-btn" aria-label="Close" ng-click="deleteRow($event,$index);" ng-if="row.default !='Y'">
+									<span class="icon icon-close-5"></span>
+								</md-button>
+							</div>
+						</td>
+
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="btnDiv">
+			<md-button class="md-raised" ng-click="showNewAddBrandModal($event,'add new');">
+				<span class="icon icon-plus"></span>
+				Add New
+			</md-button>
+		</div>
+
+	</div>
+</div>

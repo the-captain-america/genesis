@@ -1,0 +1,29 @@
+<md-dialog aria-label="Disable Link" class="disablelink-modal delete-senddata md-default-theme">
+    <!-- <form name="myForm" novalidate> -->
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2>KEEP OR DELETE FILES</h2>
+                <span flex></span>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:590px;max-width:590px;max-height:810px">
+            <div layout="column" layout-align="space-around center" layout-wrap>
+                <label class="heading heading-inside">Would you like to keep the files that were attached using the<br>module, or delete them all for security reasons?</label>
+                <md-radio-group class="rd-wrap" ng-model="localdata.delfiles">
+                    <md-radio-button value="no">
+                        <span class="text">Keep the files.</span>
+                    </md-radio-button>
+                    <md-radio-button value="yes">
+                        <span class="text">Delete the files. (All download links will stop working)</span>
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+        </md-dialog-content>
+        <md-dialog-actions layout="row">
+            <md-button aria-label="Apply now" class="save md-default-theme" ng-click="applyNow();" md-autofocus>
+                <span>Apply now</span>
+            </md-button>
+        </md-dialog-actions>
+    <!-- </form> -->
+</md-dialog>

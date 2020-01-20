@@ -1,0 +1,49 @@
+<div class="status-wrap-inner">
+    <!-- <div class="meta-info status">
+        <span class="text"><em>Viewed:</em> {{formsData.status155}}</span>
+        <span class="text">Once the form is submitted, it will be forwarded to assigned participants.</span>
+    </div> -->
+    <div ng-if="formsData.status155 === 'sbt'" class="meta-info status">
+        <span class="text"><em>Submitted:</em></span>
+        <span class="text">Form data will be sent to a participant once their email address is captured.</span>
+    </div>
+    <div ng-if="formsData.status155 === 'comp'" class="meta-info status">
+        <span class="text"><em>Complete:</em></span>
+        <span class="text">Awesome, its all done!</span>
+    </div>
+    <div class="collapse-wrap" ng-if="emailRecpList.length > 0">
+        <div class="show-hide-dashboard">
+            <span class="text">Email (HTML)</span>
+            <span class="arrow-toggle icon-arrow-3"></span>
+        </div>
+        <div class="detail-section-dashboard show-row" ng-repeat="recp in emailRecpList">
+            <span class="info">{{recp.n}} , {{recp.e}}</span>
+            <span class="status wait" ng-if="!recp.e">
+                <span class="icon icon-close-5"></span>
+                <span class="text" ng-if="recp.sent !=='notavailable'">Awaiting email capture</span>
+                <span class="text" ng-if="recp.sent ==='notavailable'">Recipient not available</span>
+            </span>
+            <span class="status received" ng-if="recp.e">
+                <span class="icon icon-notification-ok"></span>
+                <span class="text">Forwarded</span>
+            </span>
+        </div>
+    </div>
+    <div class="collapse-wrap" ng-if="webhookurl != 'none'">
+        <div class="show-hide-dashboard">
+            <span class="text">Webhook</span>
+            <span class="arrow-toggle icon-arrow-2"></span>
+        </div>
+        <div class="detail-section-dashboard">
+            <span class="info">{{webhookurl}}</span>
+            <span class="status webhook">
+                <span class="text">{{webhookres}}</span>
+            </span>
+        </div>
+    </div>
+</div>
+
+
+<!-- <div class="no-data">
+    No form data has been submitted.
+</div> -->

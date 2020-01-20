@@ -1,0 +1,155 @@
+<md-dialog aria-label="Enboarder Agreement" class="modal-load-data md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>sequence status</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+
+    <md-dialog-content style="min-width:600px;max-width:600px">
+        <div layout="row" layout-align="center center" layout-wrap>
+            <div class="chrt">
+                <span>
+                    <div class="pie-chart" ng-if="hasData === 'yes'" google-chart chart="chartObject"></div>
+                    <div class="ndt-chart" ng-if="hasData === 'no'">
+                        <span class="text">No data</span>
+                    </div>
+                </span>
+                <div class="legend-wrp">
+                    <span class="lw-inn ot">
+                        <span class="crcl"></span>
+                        <span class="text">On time: <span>{{ot}}</span></span>
+                    </span>
+                    <span class="lw-inn lt">
+                        <span class="crcl"></span>
+                        <span class="text">Late: <span>{{late}}</span></span>
+                    </span>
+                    <span class="lw-inn dis">
+                        <span class="crcl"></span>
+                        <span class="text">Dismissed: <span>{{dis}}</span></span>
+                    </span>
+                    <span class="lw-inn od">
+                        <span class="crcl"></span>
+                        <span class="text">Overdue: <span>{{od}}</span></span>
+                    </span>
+                    <span class="lw-inn ttl">
+                        <span class="crcl"></span>
+                        <span class="text">Total: <span>{{od -- dis -- late -- ot}}</span></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <div class="progress" ng-if="progress === 'yes'">
+                <div class="img-wrap">
+                    <md-progress-circular md-diameter="35px"></md-progress-circular>
+                </div>
+            </div>
+			<table class="table ldata-table">
+				<thead>
+					<tr>
+						<th>
+                            <span ng-if="seqfor === 'M'" class="icon icon-manager"></span>
+                            <span ng-if="seqfor === 'NH'"  class="icon icon-newhire"></span>
+                            {{name}} | {{seqname}}
+                        </th>
+                        <th>Count</th>
+                        <th>Percent</th>
+					</tr>
+				</thead>
+                <tbody class="collapse-wrap" ng-if="seqlinkoff === 'yes'">
+                    <tr class="lnkoffrow" ng-if="seqlinkoff === 'yes'">
+                        <td colspan="3">
+                            <div class="maskwrap">
+                                <div class="msk"></div>
+                                <div class="txt">URL sequence link turned off</div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+				<tbody class="collapse-wrap"  ng-repeat="modData in modEngagements track by $index">
+
+                    <tr ng-class="{ 'logicin show-row' : modData.iscrit === 'yes' || modData.isbranch === 'yes', 'logicotr' : modData.islogic === 'yes', 'nologic' : modData.count === 0}">
+                        <td class="td-container">
+                            <div class="truncate">
+                                <span ng-if="modData.iscrit !== 'yes' && modData.icon !== 'multiple'" class="icon icon-{{modData.icon}}"></span>
+                                <span ng-if="modData.iscrit !== 'yes' && modData.icon === 'multiple'" class="icon icon-embed-small"></span>
+                                <span ng-if="modData.iscrit !== 'yes' && modData.name.length > 0 && modData.name.length <= 50" class="text">{{modData.name}}</span>
+                                <span ng-if="modData.iscrit !== 'yes' && modData.name.length > 50" class="text">...
+                                    <a title="{{modData.name}}">{{modData.name.substring(modData.name.length-50,modData.name.length)}}</a>
+                                </span>
+                                <a title="New module found" ng-if="modData.addedlater === 'yes'"><span class="icon nfction icon-notification-alert"></span></a>
+                                <span ng-if="modData.iscrit !== 'yes' && modData.icon !== 'multiple' && createWfPerms" class="icon goto icon-go-to-small" ng-click="gotoModule(modData.modid, modData.modtype,modData.seqid);"></span>
+                                <span ng-if="modData.iscrit === 'yes'" class="icon icon-logic-small"></span>
+                                <span ng-if="modData.islogic === 'yes'" class="arrow-toggle icon-arrow-3"></span>
+                                <span ng-if="modData.iscrit === 'yes'" class="text"></span>
+                                <div class="box cndn" ng-if="modData.iscrit === 'yes'">
+                                    <span class="text" ng-if="modData.name.length > 0 && modData.name.length <= 50">
+                                        <a title="{{modData.name}}">{{modData.name}}</a>
+                                    </span>
+                                    <span class="text" ng-if="modData.name.length > 50">
+                                        ...<a title="{{modData.name}}">{{modData.name.substring(modData.name.length-50,modData.name.length)}}</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-container">
+                            {{modData.count}}
+						</td>
+                        <td class="td-container">
+							<div class="box" ng-attr-style="background-color:{{modData.color}}">
+                                <span ng-if="modData.perc !== 'na'" class="text">{{modData.perc}}%</span>
+                                <span ng-if="modData.perc === 'na'" class="text">{{modData.perc}}</span>
+                            </div>
+						</td>
+                    </tr>
+
+                    <tr ng-class="{ 'logicin show-row' : modLogicData.iscrit === 'yes' || modLogicData.isbranch === 'yes', 'logicotr' : modLogicData.islogic === 'yes', 'nologic' : modLogicData.count === 0}" ng-repeat="modLogicData in modData.logicContent track by $index">
+                        <td class="td-container">
+                            <div class="truncate">
+                                <span ng-if="modLogicData.iscrit !== 'yes' && modLogicData.icon !== 'multiple'" class="icon icon-{{modLogicData.icon}}"></span>
+                                <span ng-if="modLogicData.iscrit !== 'yes' && modLogicData.icon === 'multiple'" class="icon icon-embed-small"></span>
+                                <span ng-if="modLogicData.iscrit !== 'yes' && modLogicData.name.length > 0 && modLogicData.name.length <= 50" class="text">{{modLogicData.name}}</span>
+                                <span ng-if="modLogicData.iscrit !== 'yes' && modLogicData.name.length > 50" class="text">...
+                                    <a title="{{modLogicData.name}}">{{modLogicData.name.substring(modLogicData.name.length-50,modLogicData.name.length)}}</a>
+                                </span>
+                                <a title="New module found" ng-if="modLogicData.addedlater === 'yes'"><span class="icon nfction icon-notification-alert"></span></a>
+                                <span ng-if="modLogicData.iscrit !== 'yes' && modLogicData.icon !== 'multiple' && createWfPerms" class="icon goto icon-go-to-small" ng-click="gotoModule(modLogicData.modid, modLogicData.modtype,modLogicData.seqid);"></span>
+                                <span ng-if="modLogicData.iscrit === 'yes'" class="icon icon-logic-small"></span>
+                                <span ng-if="modLogicData.islogic === 'yes'" class="arrow-toggle icon-arrow-3"></span>
+                                <span ng-if="modLogicData.iscrit === 'yes'" class="text"></span>
+                                <div class="box cndn" ng-if="modLogicData.iscrit === 'yes'">
+                                    <span class="text" ng-if="modLogicData.name.length > 0 && modLogicData.name.length <= 50">
+                                        <a title="{{modLogicData.name}}">{{modLogicData.name}}</a>
+                                    </span>
+                                    <span class="text" ng-if="modLogicData.name.length > 50">
+                                        ...<a title="{{modLogicData.name}}">{{modLogicData.name.substring(modLogicData.name.length-50,modLogicData.name.length)}}</a>
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="td-container">
+                            {{modLogicData.count}}
+						</td>
+                        <td class="td-container">
+							<div class="box" ng-attr-style="background-color:{{modLogicData.color}}">
+                                <span ng-if="modLogicData.perc !== 'na'" class="text">{{modLogicData.perc}}%</span>
+                                <span ng-if="modLogicData.perc === 'na'" class="text">{{modLogicData.perc}}</span>
+                            </div>
+						</td>
+                    </tr>
+				</tbody>
+			</table>
+            <span ng-if="modulesRemoved === 'yes' || modulesAdded === 'yes'" class="error-ldata">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">
+                    This sequence has changed during the report period.<br/>We only show the most up to date sequence.
+                </span>
+            </span>
+		</div>
+    </md-dialog-content>
+
+</md-dialog>

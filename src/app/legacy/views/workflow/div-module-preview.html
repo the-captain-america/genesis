@@ -1,0 +1,97 @@
+<div class="preview-overlay" ng-class="{wht : preview.bg === 'white', 'quizpreview fullprv' : showmultitab === 'yes'}" ng-if="preview.show === 'yes'">
+    <div class="gradient" ng-if="preview.bg === 'transparent'" ng-class="{black : preview.gradient === 'theme-gradient-black', lg : preview.gradient === 'theme-gradient-lightgray', dg : preview.gradient === 'theme-gradient-darkgray'}">
+        <div class="thmbg" ng-style="{'background-image': 'url(' + (backgroundImgCdn || backgroundImg) + ')'}"></div>
+    </div>
+
+
+    <div class="preview-content">
+
+        <div class="preview-action-wrap">
+            <a title="Close">
+                <span class="icon close icon-close-2" ng-click="closePreview();"></span>
+            </a>
+            <a title="Go to module" ng-if="logicprevgoto === 'yes'">
+                <span class="icon goto icon-go-to-big" ng-click="gotoPreviewModule();"></span>
+            </a>
+            <span class="icon more-action mobile-preview icon-mobiletest-big"></span>
+            <div class="action-popover" ng-class="{ifgoto : logicprevgoto === 'yes'}">
+                <form name="SmsForm" class="sms-form">
+                    <intl-tel ng-model="model.telnr"></intl-tel>
+                    <div class="icon-wrap">
+                        <span class="icon icon-notification-ok"></span>
+                        <span class="icon icon-close-5"></span>
+                    </div>
+                    <div class="message">
+                        <span ng-if="mobileErrType==='WRONG_MOBILE'">Invalid number</span>
+                        <span ng-if="mobileErrType!=='WRONG_MOBILE'">SMS gateway down</span>
+                    </div>
+                    <md-button class="md-raised send-sms-btn" ng-click="sendModulePreviewSms();" md-autofocus>
+                        <span class="text">send</span>
+                        <span class="spinner">
+                            <md-progress-circular md-diameter="20px"></md-progress-circular>
+                        </span>
+                    </md-button>
+                </form>
+            </div>
+        </div>
+
+        <div class="preview-spinner">
+            <span class="spinner">
+                <md-progress-circular md-diameter="65px"></md-progress-circular>
+            </span>
+        </div>
+
+        <div class="preview-tabs" ng-if="showmultitab === 'yes'" ng-cloak>
+            <md-content>
+                <md-tabs md-selected="assmntTabIndex">
+                    <md-tab label="CONTENT" md-on-select="resetMultipagePreviewMode('content');"></md-tab>
+                    <md-tab label="ASSESSMENT" md-on-select="resetMultipagePreviewMode('assessment');"></md-tab>
+                </md-tabs>
+            </md-content>
+        </div>
+
+        <div class="device-wrap">
+            <div class="device-container">
+                <div class="device animate-if {{preview.device_type}}" ng-class="{whtd : preview.device_frame === 'white'}">
+                    <div class="frmwrp {{preview.device_type}}">
+                        <iframe title="preview" id="previewFrame" ng-src="{{previewurl}}"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel-settings">
+            <span class="icn more-action icon-adjustment"></span>
+            <div class="preivew-popover">
+                <span class="btnwrp">
+                    <span class="txt">Device</span>
+                    <span class="chcs blk" ng-class="{act : preview.device_frame === 'black'}" ng-click="frameClick('black');"></span>
+                    <span class="chcs wht" ng-class="{act : preview.device_frame === 'white'}" ng-click="frameClick('white');"></span>
+                </span>
+                <span class="btnwrp">
+                    <span class="txt">Background</span>
+                    <span class="chcs tran" ng-class="{act : preview.bg === 'transparent'}" ng-click="bgClick('transparent');"></span>
+                    <span class="chcs blk" ng-class="{act : preview.bg === 'black'}" ng-click="bgClick('black');"></span>
+                    <span class="chcs wht" ng-class="{act : preview.bg === 'white'}" ng-click="bgClick('white');"></span>
+                </span>
+                <span class="btnwrp rt">
+                    <span class="icn icon-adjustment"></span>
+                </span>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="action-panel">
+                <a href="" class="device mobile" ng-class="{active : preview.device_type === 'mobile'}" ng-click="deviceClick('mobile');">
+                    <span class="icon icon-preview-mobile"></span>
+                </a>
+                <a href="" class="device tablet" ng-class="{active : preview.device_type === 'tablet'}" ng-click="deviceClick('tablet');">
+                    <span class="icon icon-preview-tablet"></span>
+                </a>
+                <a href="" class="device desktop" ng-class="{active : preview.device_type === 'desktop'}" ng-click="deviceClick('desktop');">
+                    <span class="icon icon-preview-laptop"></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

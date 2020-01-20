@@ -1,0 +1,63 @@
+<md-dialog aria-label="Add new category" class="add-category-modal md-default-theme">
+<form name="AddOptionModalForm" ng-submit="saveOptional();" novalidate>
+<md-toolbar>
+<div class="md-toolbar-tools">
+	<h2>ADD NEW CATEGORY</h2>
+	<span flex></span>
+	<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+		<span class="icon icon-close-2"></span>
+	</md-button>
+</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px;">
+	<div layout layout-sm="column">
+		<md-input-container flex class="required">
+			<label>Category name</label>
+			<input md-no-asterisk ng-model="newData.name" focus="true" required>
+		</md-input-container>
+	</div>
+
+	<label class="heading">Add at least one Option for this Category</label>
+
+	<div class="add-option-wrap">
+		<table class="table">
+			<tbody>
+				<tr ng-repeat="data in newData.attr" ng-class="{last : $last}">
+					<td>
+						<div>
+							<md-input-container class="required">
+								<label>Enter an option</label>
+								<input md-no-asterisk ng-model="data.value" focus="true" required>
+							</md-input-container>
+							<md-button class="delete-btn" ng-click="deleteNewCatValue();" md-autofocus>
+								<span class="icon icon-close-5"></span>
+							</md-button>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<div class="btndiv">
+							<md-button class="add-option" ng-click="addAnother();" md-autofocus>
+							<span class="icon icon-plus"></span>
+							Add Another Option
+							</md-button>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="error" ng-if="optionalSaveError">
+		<span class="icon icon-notification-alert"></span>
+		<span class="text">{{optionalSaveErrorMsg}}</span>
+	</div>
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button type="submit" aria-label="Save" class="save md-default-theme" ng-disabled="AddOptionModalForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

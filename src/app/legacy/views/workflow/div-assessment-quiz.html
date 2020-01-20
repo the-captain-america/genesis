@@ -1,0 +1,188 @@
+<form name="quizForm" ng-if="quiz.test_type === 'quiz'">
+    <md-sidenav class="md-sidenav-left quizsidenav" md-component-id="quiz-dialog-id" md-whiteframe="4" md-disable-close-events>
+        <md-content>
+            <!-- <span class="cls icon-close-1" ng-click="closeSidNnav()"></span> -->
+            <div class="title">
+                <span class="icn icon-flashcards"></span>
+                <h3>Flashcards</h3>
+            </div>
+            <h4>When should the assessment begin?</h4>
+            <div layout="row" class="ddwrp" layout-align="space-between">
+                <div flex="45">
+                    <span class="lbl">Start assessment</span>
+                    <md-input-container md-no-float class="md-block" flex>
+                        <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Start Assessment" placeholder="Select" ng-model="quiz.delivery">
+                            <md-option value="next_seq">In next sequence</md-option>
+                            <md-option value="after_mod">Directly after module is marked as complete</md-option>
+                        </md-select>
+                    </md-input-container> 
+                </div>
+                <div class="tltp" flex="5">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top">
+                        <span class="copy">
+                            <h4 class="title">Start assessment</h4>
+                            <p>
+                                Minimum time ({{lrnassmtmin}}) is the when this assessment can start after the module is marked as complete.
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </div>
+                <div flex="45">
+                    <span class="lbl">Score to pass (Answer correctly {{pass_ques_count}}/{{quiz.questions.length}} cards to pass)</span>
+                    <md-input-container md-no-float class="md-block" flex>
+                        <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Score to pass" placeholder="Select" ng-model="quiz.pass_score" ng-change="computeQuesPass()">
+                            <md-option value="0">Everyone passes</md-option>
+                            <md-option value="25">At least 25%</md-option>
+                            <md-option value="50">At least 50%</md-option>
+                            <md-option value="75">At least 75%</md-option>
+                            <md-option value="80">At least 80%</md-option>
+                            <md-option value="90">At least 90%</md-option>
+                            <md-option value="100">100% to pass</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div class="tltp" flex="5">
+                    <span class="icon icon-tooltip"></span>
+                    <md-tooltip class="manager-tooltip" md-direction="top">
+                        <span class="copy">
+                            <h4 class="title">score to pass</h4>
+                            <p>
+                                Answer correctly {{pass_ques_count}}/{{quiz.questions.length}} cards to pass
+                            </p>
+                        </span>
+                    </md-tooltip>
+                </div>
+            </div>
+            <div class="quiz-wrp-main">
+                <div class="quiz-wrp pg2" ng-if="quiz.questions.length > 2"></div>
+                <div class="quiz-wrp pg1" ng-if="quiz.questions.length > 1"></div>
+                <div class="quiz-wrp close-enabled">
+                    <div class="multipagination-wrap tp">
+                        <span class="icn icon-button-arrow-left" ng-click="clickPrev()"></span>
+                        <md-button class="whtbtn more-action md-raised" ng-click="">
+                            <span class="btntxt">{{curr_ques + 1}} / {{quiz.questions.length}}</span>
+                        </md-button>
+                        <div class="preivew-popover">
+                            <span dnd-list="quiz.questions" dnd-drop="dropCallbackQuizQuestion(event, index, item);">
+                                <span ng-repeat="i in [].constructor(quiz.questions.length) track by $index" dnd-draggable="$index" dnd-effect-allowed="move" style="display: block">
+                                    <span class="btnwrp" ng-click="dndclicked($index);" ng-class="{act: curr_ques === $index}">
+                                        <span class="txt">{{$index+1}}. {{quiz.questions[$index].q}}</span>
+                                        <span class="drgicn icon-drag-small"></span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                        <span class="icn icon-button-arrow-right" ng-click="clickNext()"></span>
+                    </div>
+                    <div layout="row" class="imgwrp" layout-align="space-between">
+                        <div flex="15" class="imginn">
+                            <span ng-if="!quiz.questions[curr_ques].img" ngf-select="upload($file, quiz.questions[curr_ques])" ngf-drop="upload($file, quiz.questions[curr_ques])" accept="image/*" class="img-icon icon-image-bigger"></span>
+                            <div class="prgrs" ng-if="quiz.spinner === 'yes'">
+                                <div class="msk"></div>
+                                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                            </div>
+                            <div class="bgimg" ngf-select="upload($file, quiz.questions[curr_ques])" ngf-drop="upload($file, quiz.questions[curr_ques])" accept="image/*" ng-if="quiz.questions[curr_ques].img" ng-attr-style="background-image: url({{quiz.questions[curr_ques].imgCdn || quiz.questions[curr_ques].img}})"></div>
+                        </div>
+                        <div flex="85" class="qstnwrp">
+                            <md-input-container flex md-no-float class="required">
+                                <textarea md-no-asterisk ng-model="quiz.questions[curr_ques].q" ng-blur="refreshAssessmentPreview()" placeholder="Write a question..." required></textarea>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div class="ans-wrp">
+                        <div layout="row" layout-align="space-between center">
+                            <div flex="10" class="cbwrp">
+                                <span class="lbl">Correct<br>answer</span>
+                            </div>
+                            <div flex="90"></div>
+                        </div>
+                        <div layout="row" layout-align="space-between center">
+                            <div flex="10" class="cbwrp">
+                                <!-- <md-checkbox class="md-primary" ng-model="checkbox_sel[0]" ng-true-value="'yes'" ng-false-value="'no'" ng-change="ansSel(0);" ng-disabled="!quiz.questions[curr_ques].ans[0]"></md-checkbox> -->
+                                <md-radio-group ng-model="checkbox_sel[0]" class="md-primary" ng-change="ansSel(0);" >
+                                    <md-radio-button ng-disabled="!quiz.questions[curr_ques].ans[0]" value="yes"></md-radio-button>
+                                </md-radio-group>
+                            </div>
+                            <div flex="90">
+                                <md-input-container flex class="required">
+                                    <textarea md-no-asterisk ng-model="quiz.questions[curr_ques].ans[0]" ng-blur="refreshAssessmentPreview()" required placeholder="A) Answer"></textarea>
+                                </md-input-container>
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="space-between center">
+                            <div flex="10" class="cbwrp">
+                                <!-- <md-checkbox class="md-primary" ng-model="checkbox_sel[1]" ng-true-value="'yes'" ng-false-value="'no'" ng-change="ansSel(1);" ng-disabled="!quiz.questions[curr_ques].ans[1]"></md-checkbox> -->
+                                <md-radio-group ng-model="checkbox_sel[1]" class="md-primary" ng-change="ansSel(1);">
+                                    <md-radio-button ng-disabled="!quiz.questions[curr_ques].ans[1]" value="yes"></md-radio-button>
+                                </md-radio-group>
+                            </div>
+                            <div flex="90">
+                                <md-input-container flex class="required">
+                                    <textarea md-no-asterisk ng-model="quiz.questions[curr_ques].ans[1]" ng-blur="refreshAssessmentPreview()" required placeholder="B) Answer"></textarea>
+                                </md-input-container>
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="space-between center">
+                            <div flex="10" class="cbwrp">
+                                <!-- <md-checkbox class="md-primary" ng-model="checkbox_sel[2]" ng-true-value="'yes'" ng-false-value="'no'" ng-change="ansSel(2);" ng-disabled="!quiz.questions[curr_ques].ans[2]"></md-checkbox> -->
+                                <md-radio-group ng-model="checkbox_sel[2]" class="md-primary" ng-change="ansSel(2);" >
+                                    <md-radio-button ng-disabled="!quiz.questions[curr_ques].ans[2]" value="yes"></md-radio-button>
+                                </md-radio-group>
+                            </div>
+                            <div flex="90">
+                                <md-input-container flex>
+                                    <textarea md-no-asterisk ng-model="quiz.questions[curr_ques].ans[2]" ng-blur="refreshAssessmentPreview()" placeholder="C) Answer"></textarea>
+                                </md-input-container>
+                            </div>
+                        </div>
+                        <div layout="row" layout-align="space-between center">
+                            <div flex="10" class="cbwrp">
+                                <!-- <md-checkbox class="md-primary" ng-model="checkbox_sel[3]" ng-true-value="'yes'" ng-false-value="'no'" ng-change="ansSel(3);" ng-disabled="!quiz.questions[curr_ques].ans[3]"></md-checkbox> -->
+                                <md-radio-group ng-model="checkbox_sel[3]" class="md-primary" ng-change="ansSel(3);">
+                                    <md-radio-button ng-disabled="!quiz.questions[curr_ques].ans[3]" value="yes"></md-radio-button>
+                                </md-radio-group>
+                            </div>
+                            <div flex="90">
+                                <md-input-container flex>
+                                    <textarea md-no-asterisk ng-model="quiz.questions[curr_ques].ans[3]" ng-blur="refreshAssessmentPreview()" placeholder="D) Answer"></textarea>
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="multipagination-wrap">
+                        <span class="icn icon-button-arrow-left" ng-click="clickPrev()"></span>
+                        <md-button class="whtbtn more-action md-raised" ng-click="">
+                            <span class="btntxt">{{curr_ques + 1}} / {{quiz.questions.length}}</span>
+                        </md-button>
+                        <div class="preivew-popover">
+                            <span dnd-list="quiz.questions" dnd-drop="dropCallbackQuizQuestion(event, index, item);">
+                                <span ng-repeat="i in [].constructor(quiz.questions.length) track by $index" dnd-draggable="$index" dnd-effect-allowed="move" style="display: block">
+                                    <span class="btnwrp" ng-click="dndclicked($index);" ng-class="{act: curr_ques === $index}">
+                                        <span class="txt">{{$index+1}}. {{quiz.questions[$index].q}}</span>
+                                        <span class="drgicn icon-drag-small"></span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
+                        <span class="icn icon-button-arrow-right" ng-click="clickNext()"></span>
+                    </div>
+                    <span ng-click="removeCard()" class="icn-rmv icon-close-4" ng-if="quiz.questions.length > 1"></span>
+                </div>
+                <md-button class="whtbtn addbtn md-raised" ng-click="addNewCard()">
+                    <a title="Add page">
+                        <span class="icn icon-plus"></span>
+                    </a>
+                </md-button>
+            </div>
+            <md-button ng-click="closeSidNnav()" class="addcard-btn">
+                <span class="text">Save and close</span>
+            </md-button>
+        </md-content>
+    </md-sidenav>
+
+    <!-- Preivew frame -->
+    <div class="phoneframe" ng-if="quiz.showmobilepreview">
+        <div ng-include="'views/workflow/div-quiz-preview.html'"></div>
+    </div>
+</form>

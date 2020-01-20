@@ -1,0 +1,369 @@
+<md-dialog aria-label="SSO Settings" class="embed-params-modall sso-modal md-default-theme">
+    <form name="ssoForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="!updSso && deleteSSOSettings === 'no'">
+                    SSO settings
+                </h2>
+                <h2 ng-if="updSso === 'yes' && deleteSSOSettings === 'no'">
+                    Update SSO settings
+                </h2>
+                <h2 ng-if="updSso === 'yes' && deleteSSOSettings === 'yes'">
+                    Delete SSO settings
+                </h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:620px; max-width:620px">
+            <div layout="column" ng-if="deleteSSOSettings === 'no'">
+                <label class="heading heading-inside">
+                    <span>
+                        To create a Service Provider (SP) profile within your
+                        SAML Identity Provider (IdP) enviroment, enter your
+                        details into the fields below.
+                    </span>
+                </label>
+
+                <div class="sml-lbl">
+                    <span class="lbl-inn">
+                        <span class="lbl">Enboarder Entity Id :</span>
+                        <span class="info">{{
+                            ssoSettingsData.spentityurl
+                        }}</span>
+                    </span>
+                    <span class="lbl-inn">
+                        <div class="lbl flex-label">
+                            <div class="flex-label__item">
+                                <span class="icon icon-tooltip"></span>
+                                <md-tooltip class="manager-tooltip tooltip-adjustment" md-direction="bottom">
+                                    <span class="copy">
+                                        <h4 class="title">SSO LOGIN URL</h4>
+                                        <p>
+                                            This URL enables login into
+                                            Enboarder through the web browser,
+                                            via SSO.
+                                        </p>
+                                    </span>
+                                </md-tooltip>
+                            </div>
+
+
+
+                            <span class="lbl flex-label__item">
+                                SSO login URL :
+                            </span>
+                        </div>
+
+                        <span class="info sso-url">{{
+                            ssoSettingsData.loginurl
+                        }}</span>
+                    </span>
+                    <span class="lbl-inn">
+                        <span class="lbl">ACS URL :</span>
+                        <span class="info acs-url">{{
+                            ssoSettingsData.acsurl
+                        }}</span>
+                    </span>
+
+                    <span class="lbl-inn">
+                        <div class="lbl flex-label">
+                            <div class="flex-label__item">
+                                <span class="icon icon-tooltip"></span>
+                                <md-tooltip class="manager-tooltip tooltip-adjustment" md-direction="bottom">
+                                    <span class="copy">
+                                        <h4 class="title">RELAY STATE</h4>
+                                        <p>
+                                            Use this field if your IdP supports
+                                            relay state value to be provided for
+                                            the SP application. If used, to
+                                            access Enboarder via SSO,
+                                            Enboarder's application icon or URL
+                                            in IdP can be used instead of using
+                                            SSO login URL provided above.
+                                        </p>
+                                    </span>
+                                </md-tooltip>
+                            </div>
+
+                            <span class="flex-label__item">Relay state:</span>
+                        </div>
+                        <span class="info relay-state">{{
+                            ssoSettingsData.relay_state
+                        }}</span>
+                    </span>
+
+                    <span class="lbl-inn">
+                        <div class="lbl flex-label is-button">
+                            <a class="flex-label__item is-button" href="{{ssoSettingsData.spmetadataurl}}" download>
+                                <span class="icon icon-download"></span>
+                                <span class="content-text">Download Metadata</span>
+                            </a>
+                        </div>
+                    </span>
+                </div>
+
+                <div class="otrinpt-wrap">
+                    <md-input-container class="required">
+                        <label>Issuer ID / Entity Id</label>
+                        <input md-no-asterisk ng-model="ssoSettingsData.idpentid" required />
+                        <span class="blrdv"></span>
+                    </md-input-container>
+                    <md-input-container class="required">
+                        <label>IdP log in URL</label>
+                        <input md-no-asterisk ng-model="ssoSettingsData.idpsignonurl" type="url" required />
+                        <span class="blrdv"></span>
+                    </md-input-container>
+                    <md-input-container>
+                        <label>Log out URL</label>
+                        <input md-no-asterisk ng-model="ssoSettingsData.logoutrdrcturl" type="url" />
+                        <span class="blrdv"></span>
+                    </md-input-container>
+                    <md-input-container class="md-block required">
+                        <label>IdP Certificate</label>
+                        <textarea ng-model="ssoSettingsData.idpsigncert" md-no-asterisk required></textarea>
+                    </md-input-container>
+
+                    <div class="switch-wrap">
+                        <md-switch ng-model="ssoSettingsData.signasrt" ng-true-value="'yes'" ng-false-value="'no'"
+                            aria-label="Assertions signed" ng-disabled="true">
+                            Assertions signed
+                        </md-switch>
+                        <md-switch ng-model="ssoSettingsData.encasrt" ng-true-value="'yes'" ng-false-value="'no'"
+                            aria-label="Assertions encrypted">
+                            Assertions encrypted
+                        </md-switch>
+
+                        <span class="lbl-inn">
+                            <div class="lbl flex-label is-button" ng-show="ssoSettingsData.encasrt === 'yes'">
+                                <a class="flex-label__item is-button" ng-click="downloadPemCert();" download>
+                                    <span class="icon icon-download"></span>
+                                    <span class="content-text">Download Enboarder certificate</span>
+                                </a>
+                            </div>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="att-wrap">
+                    <div layout="row" layout-align="start center" class="ssolbl-wrap">
+                        <div flex="40">
+                            <label>ATTRIBUTES</label>
+                        </div>
+                        <div flex="60">
+                            <label class="new-val">IDP, ATTRIBUTE NAMES</label>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">First name</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type attribute name" ng-model="ssoSettingsData.fnmatr"
+                                    required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Last name</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type attribute name" ng-model="ssoSettingsData.lnmatr"
+                                    required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Email</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type attribute name" ng-model="ssoSettingsData.emlatr"
+                                    required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">
+                                Role
+                                <span class="icon-tooltip__group">
+                                    <span class="icon icon-tooltip"></span>
+                                    <md-tooltip class="manager-tooltip" md-direction="bottom">
+                                        <span class="copy">
+                                            <h4 class="title">ROLE</h4>
+                                            <p>
+                                                Use this Role-attribute if you
+                                                like to provision Enboarder
+                                                Admins at your IdP. You can set
+                                                the Role with any of the Role
+                                                names from the section below.
+
+                                                <br />
+                                                <br />
+                                                If no Roles are defined, then
+                                                all admins have to be created
+                                                within Enboarder. Admins within
+                                                Enboarder require a unique email
+                                                ID of the user in IdP for the
+                                                right roles.
+                                            </p>
+                                        </span>
+                                    </md-tooltip>
+                                </span>
+                            </span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type attribute name" ng-model="ssoSettingsData.roleatr"
+                                    required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- broken markup -->
+
+                <div class="role-wrap">
+                    <div layout="row" layout-align="start center" class="ssolbl-wrap">
+                        <div flex="40">
+                            <label>ROLES
+
+                                <span class="icon-tooltip__group">
+                                    <span class="icon icon-tooltip"></span>
+                                    <md-tooltip class="manager-tooltip" md-direction="bottom">
+                                        <span class="copy">
+                                            <h4 class="title">ROLES</h4>
+                                            <p>
+                                                Ignore this setup if you
+                                                provision and manage your Admins
+                                                within Enboarder.
+                                            </p>
+                                        </span>
+                                    </md-tooltip>
+                                </span>
+                            </label>
+                        </div>
+                        <div flex="60">
+                            <label class="new-val">IdP, ROLE NAMES</label>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Admin</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type role name" ng-model="ssoSettingsData.role.admin"
+                                    required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Restricted Admin</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type role name"
+                                    ng-model="ssoSettingsData.role.restrictedadmin" required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Reporting Admin</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type role name"
+                                    ng-model="ssoSettingsData.role.reportingadmin" required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Restricted Content Admin</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type role name"
+                                    ng-model="ssoSettingsData.role.restrictedcontentadmin" required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                    <div layout="row" layout-align="start center" class="ssofld-wrap">
+                        <div flex="40" class="fldnamedd">
+                            <span class="fxatt">Initiator</span>
+                            <span class="connector"></span>
+                        </div>
+                        <div class="fldname att-nme" flex="60">
+                            <md-input-container md-no-float class="md-block required">
+                                <input type="text" placeholder="Type role name"
+                                    ng-model="ssoSettingsData.role.initiator" required />
+                                <span class="blrdv ssofld"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+                </div>
+
+                <md-button class="md-raised refresh" ng-if="updSso ==='yes'" ng-click="deleteSSObtn();">
+                    <span class="text">delete sso-settings</span>
+                </md-button>
+
+                <div layout="column" ng-if="deleteSSOSettings === 'yes'" class="cnfrm-copy">
+                    <p>
+                        Are you sure you want to delete your SSO sectury
+                        settings?
+                    </p>
+                </div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row" ng-if="deleteSSOSettings === 'no'">
+            <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveSsoSettings();"
+                ng-disabled="ssoForm.$invalid" md-autofocus>
+                <span class="text">Save</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved
+                    <span class="icon-notification-ok"></span>
+                </span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="deleteSSOSettings === 'yes'" class="cnrfm-btn">
+            <md-button aria-label="No" class="md-raised md-default-theme" ng-click="backbtn();">
+                no
+            </md-button>
+            <md-button ng-click="deleteSSOConfirm();" class="save md-default-theme" aria-label="Yes, Delete"
+                md-autofocus>
+                <span class="text">yes, delete</span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

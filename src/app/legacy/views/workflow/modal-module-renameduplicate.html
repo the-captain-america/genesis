@@ -1,0 +1,44 @@
+<md-dialog aria-label="Rename Document" class="level3-exit-modal md-default-theme">
+<form name="RenameDocumentForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>{{renamdupl.type}} Document</h2>
+		<span flex></span>
+		<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+
+	<div layout="column">
+
+		<md-input-container class="required">
+			<label>Document name</label>
+			<input md-no-asterisk ng-model="renamdupl.newmodname" required>
+		</md-input-container>
+	</div>
+
+	<div class="error" ng-if="renamdupl.error === 'yes'">
+		<span class="icon icon-notification-alert"></span>
+		<span class="text">{{renamdupl.errorMessage}}</span>
+	</div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+
+	<md-button flex="95" aria-label="Save" class="save save-spinner md-default-theme" ng-click="renameDuplicateSave();" ng-disabled="RenameDocumentForm.$invalid" md-autofocus>
+		<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+	</md-button>
+
+</md-dialog-actions>
+
+</form>
+</md-dialog>

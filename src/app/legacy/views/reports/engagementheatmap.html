@@ -1,0 +1,175 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Engagement heatmap</a>
+    </span>
+</div>
+
+<div class="reports-wrap formdetails lngtbl heampwrap engrpt-tbl">
+    <div class="reports-wrap-inner rw-innerht">
+        <div class="mask"></div>
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <form name="reportForm" novalidate>
+            <div class="heading-panel">
+                <h4>&nbsp;</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+            <div class="search-panel detail-section" style="display:block">
+                <div layout="row" layout-align="start center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Workflow name</label>
+                            <md-select md-container-class="reports-dd" aria-label="Workflow name" ng-model="reportSearch.wfid" ng-change="changeWorkflow();">
+                                <md-option ng-repeat="wf in wflist | orderBy:['name']" value="{{wf.uid}}">{{wf.name}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex>
+                        <md-input-container>
+                            <label>Time frame</label>
+                            <md-select md-container-class="reports-dd" aria-label="Select" ng-model="reportSearch.timeframe" ng-change="changeTimeframe();">
+                                <md-option value="LAST7D">Last 7 days</md-option>
+                                <md-option value="LAST6">Last 6 months</md-option>
+                                <md-option value="LAST12">Last 12 months</md-option>
+                                <md-option value="CY">Current year</md-option>
+                                <md-option value="PY">Previous year</md-option>
+                                <md-option value="CM">Current month</md-option>
+                                <md-option value="PM">Previous month</md-option>
+                                <md-option value="CUSTOM">Custom</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, From</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_from" md-placeholder="Select" ng-change="changeDate();"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, To</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_to" md-placeholder="Select" ng-change="changeDate();"></md-datepicker>
+                    </div>
+                </div>
+                <div layout="row" layout-align="start center">
+                    <div flex>
+                        <md-input-container flex>
+                            <label>Dashboard filter</label>
+                            <md-select md-no-asterisk aria-label="Select" ng-model="reportSearch.customfilterid" required>
+                                <md-option value="{{filter.filterid}}" ng-repeat="filter in dashfilter.filters track by $index">{{filter.name}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex>&nbsp;</div>
+                    <div class="datepicker-wrap" flex>&nbsp;</div>
+                    <div class="datepicker-wrap" flex>&nbsp;</div>
+                </div>
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="heatmap heatmapht">
+            <div class="heatmap-content">
+                <div class="main-table">
+
+                    <div class="line linemain"></div>
+
+                    <div class="area-icon-wrap manager">
+                        <div class="content-manager">
+                            <span class="icon icon-manager"></span>
+                            <span class="text">{{custlabels.Manager || 'Manager'}} area</span>
+                        </div>
+                    </div>
+                    <div class="area-icon-wrap new-hire">
+                        <div class="content-new-hire">
+                            <span class="icon icon-newhire"></span>
+                            <span class="text">{{custlabels.Employee || 'Employee'}} area</span>
+                        </div>
+                    </div>
+                    <div class="wfinfowrap">
+                        <h3>Engagement heatmap</h3>
+                        <span class="wftxt">{{wfname}}  {{reportSearch.fromdtdisplay}} - {{reportSearch.todtdisplay}}</span>
+                    </div>
+                    <div class="wfinfowrap btm">
+                        <span class="wftxt">{{totalinit}} Workflows</span>
+                        <span class="wftxt cn">Cancelled workflows are not included</span>
+                        <span ng-if="wfchanged === 'yes'" class="wftxt cn ldata">
+                            <span class="icon icon-notification-alert"></span>
+                            <span class="text">
+                                This workflow has changed during the report period, we only show the most up to date workflow.
+                            </span>
+                        </span>
+                    </div>
+                    <div class="main-table-in">
+                        <div class="main-cell {{phase}}-phase" ng-repeat="(phase, innerTable) in timeline track by $index">
+                            <div class="line"></div>
+                            <span class="pipe pipe-start"></span>
+                            <div class="text-info text-start" ng-if="phase === 'start'">
+                                <span class="sdatetxt">Start phase</span>
+                            </div>
+                            <div class="inner-table" ng-repeat="tableItem in innerTable track by $index">
+                                <div class="inner-cell">
+                                    <div class="wrap-height">
+                                        <div ng-class="{'manager-area': tableCell.seqfor === 'M', 'emp-area': tableCell.seqfor === 'NH', 'onstrt' : tableCell.hasstart === 'yes', 'onstartpre' : tableCell.sametable === 'yes'}" ng-repeat="tableCell in tableItem track by $index">
+                                            <div class="box-wrap" ng-class="{'connected': tableCell.critseq , 'mm': tableCell.critseq && tableCell.parenttype === 'M', dotted: tableCell.dotted === 'dotted'}" ng-if="tableCell.seqfor === 'NH' || tableCell.seqfor === 'M'">
+                                                <div class="info-text more-action msktrig" ng-class="{'opt' : alertid.startsWith(tableCell.uid)}" ng-click="LoadModuleData(tableCell.uid, tableCell.name, tableCell.seqfor, tableCell.nm, tableCell.ontime , tableCell.late, tableCell.dis, tableCell.od, reportSearch.wfid, wfname);">
+                                                    <span class="info">
+                                                        <span ng-if="tableCell.seqfor === 'M'">
+                                                            <span class="date truncate" ng-if="tableCell.seqdt"><a title="{{tableCell.seqdt}}">{{tableCell.seqdt}}</a></span>
+                                                            <span class="date truncate" ng-if="!tableCell.seqdt"><a title="Start date">Start date</a></span>
+                                                            <span class="text truncate"><a title="{{tableCell.name}}">{{tableCell.name}}</a></span>
+                                                        </span>
+                                                        <span ng-if="tableCell.seqfor === 'NH'">
+                                                            <span class="text truncate"><a title="{{tableCell.name}}">{{tableCell.name}}</a></span>
+                                                            <span class="date truncate" ng-if="tableCell.seqdt"><a title="{{tableCell.seqdt}}">{{tableCell.seqdt}}</a></span>
+                                                            <span class="date truncate" ng-if="!tableCell.seqdt"><a title="Start date">Start date</a></span>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                                <div class="box boxht" ng-class="{'opt' : alertid.startsWith(tableCell.uid)}" ng-attr-style="background-color:{{tableCell.seqColor}}">
+                                                    <span class="text" ng-if="tableCell.engper !=='na'">{{tableCell.engper}}%</span>
+                                                    <span class="text" ng-if="tableCell.engper ==='na'">{{tableCell.engper}}</span>
+                                                </div>
+                                                <div class="group {{tableCell.groupbndry}} {{tableCell.grpalrt}}" ng-if="tableCell.grouptype === 'group' && tableCell.seqfor === 'M'"></div>
+                                                <div class="shape-wrap shape-full-wrap {{tableCell.groupbndry}}" ng-class="{noshape : tableCell.grouptype === 'group' && tableCell.seqfor === 'M'}">
+                                                    <span class="shape"></span>
+                                                    <div class="blurb"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                         </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

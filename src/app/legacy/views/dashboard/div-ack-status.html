@@ -1,0 +1,37 @@
+<span class="label">{{localdata.ackdata.dec_title}}</span>
+<div class="status-wrap">
+    <div ng-if="localdata.ackdata.dec_show === 'yes'">
+        <div class="multiple-choice" ng-if="localdata.ackdata.dec_type==='check'">
+            <span class="checkbox-wrap" ng-class="{canceled : opt.sel!=='yes' && localdata.status ==='ack_comp'}" ng-repeat="opt in localdata.ackdata.dec_opt track by $index">
+                <span class="icon icon-secure-confirm" ng-if="opt.sel==='yes'"></span>
+                <span class="icon icon-tick-off" ng-if="opt.sel!=='yes' && localdata.status !=='ack_comp'"></span>
+                <span class="icon icon-close-3" ng-if="opt.sel!=='yes' && localdata.status ==='ack_comp'"></span>
+                <span class="text">{{opt.val}}</span>
+            </span>
+        </div>
+
+        <div class="multiple-choice" ng-if="localdata.ackdata.dec_type==='radio'">
+            <span class="checkbox-wrap" ng-class="{canceled : opt.val!==localdata.ackdata.dec_val && localdata.status ==='ack_comp'}" ng-repeat="opt in localdata.ackdata.dec_opt track by $index">
+                <span class="icon icon-secure-confirm" ng-if="opt.val===localdata.ackdata.dec_val"></span>
+                <span class="icon icon-radio-off" ng-if="opt.val!==localdata.ackdata.dec_val && localdata.status !=='ack_comp'"></span>
+                <span class="icon icon-close-3" ng-if="opt.val!==localdata.ackdata.dec_val && localdata.status ==='ack_comp'"></span>
+                <span class="text">{{opt.val}}</span>
+            </span>
+        </div>
+
+        <div class="copy" ng-if="localdata.ackdata.dec_type==='text'">
+            <p>
+                <span ng-bind-html="localdata.ackdata.dec_text"></span>
+            </p>
+        </div>
+    </div>
+
+    <div class="status received" ng-if="localdata.status ==='ack_comp'">
+        <span class="icon icon-notification-ok"></span>
+        <span class="text">{{localdata.by}}, {{localdata.ackdt}}</span>
+    </div>
+
+    <div class="status not-received" ng-if="localdata.status !=='ack_comp'">
+       <span class="text">Not acknowledged yet</span>
+   </div>
+</div>

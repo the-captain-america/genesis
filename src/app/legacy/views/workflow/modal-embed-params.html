@@ -1,0 +1,282 @@
+<md-dialog aria-label="Add recipient" class="embed-params-modal md-default-theme">
+<form name="EmbedParamsForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2 ng-if="scanprogress === 'none'">configure url data</h2>
+		<h2 ng-if="scanprogress === 'start' || scanprogress === 'end'">scan pdf file</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:620px;max-width:620px">
+
+	<div layout="column" ng-if="scanprogress === 'none'">
+		<label class="heading heading-inside">
+            <span ng-if="metaFields.length > 0">We detected <em>{{metaFields.length}} fields</em>.<br></span>
+            <span>Add/edit fields below, or scan a PDF file with fillable fields.</span>
+        </label>
+
+        <div layout="row" layout-align="start center" class="embdlbl-wrap">
+            <div flex="50">
+                <label>URL FIELD NAMES</label>
+            </div>
+            <div flex="50">
+                <label class="new-val">ENBOARDER</label>
+            </div>
+        </div>
+
+        <div ng-repeat="embedParam in embedParams track by $index" class="embd-mainwrap embdmdl">
+            <div layout="row" layout-align="start center" class="embdfld-wrap">
+                <div flex="50" class="fldname">
+                    <!-- <input type="text" placeholder="Enter Field Name" ng-model="embedParam.param" required> -->
+                    <md-input-container md-no-float class="md-block">
+                        <input type="text" placeholder="Enter Field Name" ng-model="embedParam.param" required>
+                    </md-input-container>
+                    <span class="connector"></span>
+                </div>
+                <div flex="45" class="fk-menu" ng-class="{req : !embedParam.lbl}" ng-mouseover="shmn(embedParam);" ng-hide="embedParam.sm === 'yes'">
+                    <span class="text plhldr" ng-if="!embedParam.lbl">Select data</span>
+                    <span ng-if="embedParam.lbl.length > 0 && embedParam.lbl.length < 36">{{embedParam.lbl}}</span>
+                    <span ng-if="embedParam.lbl.length > 35">...<a title="{{embedParam.lbl}}">{{embedParam.lbl.substring(embedParam.lbl.length-35,embedParam.lbl.length)}}</a></span>
+                    <span class="icon icon-arrow-7"></span>
+                </div>
+                <md-menu-bar flex="45" ng-class="{required : !embedParam.lbl}" ng-if="embedParam.sm === 'yes'">
+                    <md-menu>
+                        <button ng-click="$mdOpenMenu()">
+                            <span ng-if="embedParam.lbl.length > 0 && embedParam.lbl.length < 36">{{embedParam.lbl}}</span>
+                            <span ng-if="embedParam.lbl.length > 35">...<a title="{{embedParam.lbl}}">{{embedParam.lbl.substring(embedParam.lbl.length-35,embedParam.lbl.length)}}</a></span>
+
+                            <span class="text plhldr" ng-if="!embedParam.lbl">Select data</span>
+                            <span class="icon icon-arrow-7"></span>
+                        </button>
+                        <md-menu-content>
+                            <md-menu-item>
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Names</md-button>
+                                    <md-menu-content>
+                                        <md-button ng-click="embedParamSelected('{{company_name}}', 'Company Name', embedParam)">
+                                            <span class="icon-dtype icon-f-shorttext"></span>
+                                            <span class="text">Company name</span>
+                                        </md-button>
+                                        <md-menu ng-repeat="nameEntry in namelist track by $index">
+                                            <md-button ng-click="$mdOpenMenu()">
+                                                <span class="text">{{nameEntry.lbl}}</span>
+                                            </md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                        <md-button ng-click="embedParamSelected(namedtl.key, 'Name / '+nameEntry.lbl+' / '+namedtl.value,embedParam)">
+                                                            <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                            <span class="text">{{namedtl.value}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                        </md-menu>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="catlist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cat in catlist track by $index">
+                                            <md-button ng-click="embedParamSelected(cat.key, 'Category / '+cat.value, embedParam)">
+                                                <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                <span class="text">{{cat.value}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="cflist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cf in cflist track by $index">
+                                            <md-button ng-click="embedParamSelected(cf.key, 'Custom Field / '+cf.value, embedParam)">
+                                                <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                <span class="text">{{cf.value}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="formlist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                    <md-menu-content>
+                                        <md-menu ng-repeat="formEntry in formlist track by $index">
+                                            <md-button ng-click="$mdOpenMenu()">{{formEntry.lbl}}</md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="formdtl in formEntry.dtls track by $index">
+                                                        <md-button ng-click="embedParamSelected(formdtl.key, 'Form / '+formdtl.fname+' / '+formdtl.value, embedParam)">
+                                                            <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                            <span class="text">{{formdtl.value}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                        </md-menu>
+
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-button ng-click="enterManuallySelected(embedParam);">Manual text entry</md-button>
+                            <md-button ng-click="embedParamSelected('{{newhire_startdt}}', 'Start Date', embedParam)">
+                                <span class="icon-dtype icon-f-date"></span>
+                                <span class="text">Start date</span>
+                            </md-button>
+                        </md-menu-content>
+                    </md-menu>
+                </md-menu-bar>
+
+                <md-button class="delete-btn" ng-click="deleteEmbedParams($index);" aria-label="Delete" >
+                    <span class="icon icon-close-5"></span>
+                </md-button>
+            </div>
+
+            <div layout="row" ng-if="embedParam.entry=== 'manual'" class="embdtxt-wrap">
+                <div flex="100" class="textarea-wrap">
+                    <md-input-container flex>
+                        <input name="Text" ng-model="embedParam.maunaltext" required>
+                        <span class="label">Text:</span>
+                     </md-input-container>
+                </div>
+                <md-menu-bar>
+                    <md-menu>
+                        <button class="instxt-btn" ng-click="$mdOpenMenu()">
+                            <span class="icon icon-dynamic-text"></span>
+                            <span class="text">Insert text</span>
+                            <span class="icon icon-arrow icon-arrow-7"></span>
+                        </button>
+                        <md-menu-content>
+                            <md-menu-item>
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Names</md-button>
+                                    <md-menu-content>
+                                        <md-button ng-click="manualEntrySelected('{{company_name}}', embedParam)">
+                                            <span class="icon-dtype icon-f-shorttext"></span>
+                                            <span class="text">Company name</span>
+                                        </md-button>
+                                        <md-menu ng-repeat="nameEntry in namelist track by $index">
+                                            <md-button ng-click="$mdOpenMenu()">{{nameEntry.lbl}}</md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="namedtl in nameEntry.dtls track by $index">
+                                                        <md-button ng-click="manualEntrySelected(namedtl.key, embedParam)">
+                                                            <span class="icon-dtype icon-{{namedtl.icon}}"></span>
+                                                            <span class="text">{{namedtl.value}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                        </md-menu>
+
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="catlist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cat in catlist track by $index">
+                                            <md-button ng-click="manualEntrySelected(cat.key,  embedParam)">
+                                                <span class="icon-dtype icon-{{cat.icon}}"></span>
+                                                <span class="text">{{cat.value}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="cflist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="cf in cflist track by $index">
+                                            <md-button ng-click="manualEntrySelected(cf.key, embedParam)">
+                                                <span class="icon-dtype icon-{{cf.icon}}"></span>
+                                                <span class="text">{{cf.value}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-menu-item ng-if="formlist.length > 0">
+                                <md-menu>
+                                    <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                    <md-menu-content>
+                                        <md-menu ng-repeat="formEntry in formlist track by $index">
+                                            <md-button ng-click="$mdOpenMenu()">
+                                                {{formEntry.lbl}}
+                                            </md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="formdtl in formEntry.dtls track by $index">
+                                                        <md-button ng-click="manualEntrySelected(formdtl.key,  embedParam)">
+                                                            <span class="icon-dtype icon-{{formdtl.icon}}"></span>
+                                                            <span class="text">{{formdtl.value}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                        </md-menu>
+
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-item>
+                            <md-button ng-click="manualEntrySelected('{{newhire_startdt}}', embedParam)">
+                                <span class="icon-dtype icon-f-date"></span>
+                                <span class="text">Start date</span>
+                            </md-button>
+                        </md-menu-content>
+                    </md-menu>
+                </md-menu-bar>
+            </div>
+        </div>
+
+        <div class="add-more-new-wrap embdmdl">
+            <md-button class="add-more" ng-click="addEmbedParams();">
+                <span class="icon icon-plus"></span>
+                <span class="text">add more</span>
+            </md-button>
+            <span class="seprator">/</span>
+            <md-button class="add-more" ng-click="keepfocus()" ngf-select="scanPdfFile($file)" accept="application/pdf" class="md-raised">
+                <span class="text">scan pdf file</span>
+            </md-button>
+        </div>
+	</div>
+
+    <div class="scan-on" ng-if="scanprogress === 'start'">
+        <div class="content">
+            <div class="inner">
+                <span class="img-wrap">
+                    <img src="//static.enboarder.net/images/document-scan.gif" alt="scanning...">
+                </span>
+                <span class="text">Uploading and scanning for text fields...</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="scan-on" ng-if="scanprogress === 'end'">
+        <div class="content">
+            <div class="inner">
+                <span class="text">We detected <em>{{parseFields.length}} fields!</em></span>
+            </div>
+        </div>
+    </div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row" ng-if="scanprogress === 'none'">
+	<!-- <md-button aria-label="Save" class="save md-default-theme" ng-click="saveEmbedParams();" ng-disabled="EmbedParamsForm.$invalid || isSaveInvalid" md-autofocus>Save</md-button> -->
+	<md-button aria-label="Save" class="save md-default-theme" ng-click="saveEmbedParams();" ng-disabled="EmbedParamsForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+<md-dialog-actions layout="row" ng-if="scanprogress === 'end'">
+	<md-button aria-label="Continue" class="save save-spinner md-default-theme" ng-click="scanContinue();" ng-disabled="EmbedParamsForm.$invalid" md-autofocus>
+        <span class="text">Continue</span>
+        <span class="text-save">Continue...</span>
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

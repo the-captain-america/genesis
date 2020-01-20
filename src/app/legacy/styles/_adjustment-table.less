@@ -1,0 +1,56 @@
+.extend-is-inactive {
+    color: #d4d4d4;
+}
+.extend-is-inactive-background {
+    background: #ececec;
+}
+
+.settings-wrap {
+    .settings-wrap-inner {
+        table.users-table.table-adjustment tbody {
+            tr.table-adjustment__row {
+                background: #f5f5f5;
+                &.is-inactive {
+                    &:extend(.extend-is-inactive);
+                    &:extend(.extend-is-inactive-background);
+                    img {
+                        opacity: 0.4;
+                    }
+                    td.hover {
+                        .is-inactive {
+                            &:extend(.extend-is-inactive);
+                        }
+                    }
+                    &:hover {
+                        color: black;
+                        background: #fafafa;
+                        img {
+                            opacity: 1;
+                        }
+                        td.hover {
+                            .is-inactive {
+                                color: black;
+                            }
+                        }
+                    }
+                }
+                span.is-sso {
+                    font-size: 13px;
+                    padding-left: 4px;
+                }
+                &:hover {
+                    background: #fafafa;
+                }
+                td.hover {
+                    background: transparent;
+                    .is-active {
+                        color: black;
+                    }
+                    .is-inactive {
+                        color: black;
+                    }
+                }
+            }
+        }
+    }
+}

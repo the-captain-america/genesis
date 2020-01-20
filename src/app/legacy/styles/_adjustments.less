@@ -1,0 +1,130 @@
+.input__adjustment {
+    color: lighten(@black, 40%);
+    &.adjustment__row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-direction: row;
+    }
+    &.adjustment__aboslute {
+        position: absolute;
+        top: 6px;
+        right: 5px;
+    }
+}
+
+.label__adjustment {
+    padding-bottom: 4px !important;
+}
+
+.hook-adjustment {
+    width: 100%;
+}
+
+.layout__group {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+
+    .layout__item {
+        width: 170px;
+        height: 150px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        border-radius: 3px;
+        position: relative;
+
+        display: flex;
+        flex-direction: column;
+        flex-basis: 100%;
+        flex: 1;
+
+        margin-right: 20px;
+        margin-bottom: 20px;
+        margin-left: 20px;
+
+        &.cmngsnwrp {
+            .cmngsn,
+            .msk {
+                display: block;
+            }
+        }
+        .cmngsn {
+            background: url('//static.enboarder.net/images/coming-soon.png')
+                no-repeat;
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 52px;
+            height: 52px;
+            z-index: 5;
+            background-size: 100%;
+            border-radius: 0 3px 0 0;
+            display: none;
+        }
+        .msk {
+            background: lighten(@black, 40%);
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 5;
+            opacity: 0.2;
+            display: none;
+        }
+
+        .transition(box-shadow, 150ms, ease);
+
+        .box-shadow(0, 1px, 2px, 0.3);
+
+        .layout__identifier {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            color: #666;
+        }
+
+        .imgwrp {
+            display: inline-block;
+
+            img {
+                max-width: 80%;
+                vertical-align: middle;
+            }
+        }
+        .stwrp {
+            width: 100%;
+            line-height: 0;
+            position: absolute;
+            bottom: 12px;
+            left: 0;
+
+            &.done {
+                color: @brand-green;
+            }
+            &.pending {
+                color: @brand-color;
+            }
+
+            .icn {
+                font-size: 16px;
+                margin: 0 2px 0 0;
+                display: inline-block;
+                position: relative;
+                top: 3px;
+            }
+        }
+        .txt {
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        &:hover {
+            .box-shadow(0, 8px, 20px, 0.3);
+        }
+    }
+}

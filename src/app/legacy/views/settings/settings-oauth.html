@@ -1,0 +1,19 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Integration</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','integration')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','integration')">
+	<h4>{{mesg}}</h4>
+	<form name="integrationForm" novalidate>
+		<div class="settings-wrap-inner integration">
+
+		</div>
+
+	</form>
+</div>

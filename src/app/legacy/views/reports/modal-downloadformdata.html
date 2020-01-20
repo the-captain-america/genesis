@@ -1,0 +1,47 @@
+<!-- <md-dialog aria-label="Download Form Data" class="modal-showemailalert md-default-theme">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>DOWNLOAD FORM DATA</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+        <span class="icon icon-close-2"></span>
+      </md-button>
+    </div>
+  </md-toolbar>
+
+  <md-dialog-content style="min-width:530px;max-width:530px;max-height:810px;">
+
+      <div ng-if="onload === 'yes'">
+          <div class="label">
+            Select the form you like to Downlaod the data for.
+          </div>
+
+          <div flex class="form-select-wrap">
+              <md-input-container md-no-float>
+                  <label>Selected form</label>
+                    <md-select aria-label="Form name" placeholder="Select form" ng-model="download.formuid">
+                        <md-option ng-repeat="form in formlist | orderBy:['name']" value="{{form.uid}}">{{form.name}}</md-option>
+                    </md-select>
+              </md-input-container>
+          </div>
+      </div>
+
+      <div class="label" ng-if="onload === 'no'">
+         <div>
+             Your data is getting prepared. We will send you an email as soon as the CSV file is ready to download.
+         </div>
+      </div>
+
+
+  </md-dialog-content>
+
+  <md-dialog-actions layout="row">
+      <md-button aria-label="Download Now" class="md-raised save" ng-click="downloadSpecificFormData()" md-autofocus ng-if="onload === 'yes'">
+      	Download
+      </md-button>
+    <md-button aria-label="Cancel" class="md-raised save" ng-click="cancel()" md-autofocus ng-if="onload === 'no'">
+    	ok, thanks!
+    </md-button>
+  </md-dialog-actions>
+
+</md-dialog> -->

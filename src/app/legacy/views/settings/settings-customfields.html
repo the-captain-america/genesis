@@ -1,0 +1,104 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Custom Fields</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','customfields')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','customfields')">
+	<h4>Add custom fields to access your own information within workflows.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<div class="settings-wrap-inner" ng-if="rowCollection.length > 0">
+		<div class="table-responsive">
+			<table class="table table-hover manager-list-table">
+				<thead>
+					<tr>
+						<!-- <th>No.</th> -->
+						<th>Field Name</th>
+						<th>Field type</th>
+						<th>Required option</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="row in rowCollection track by $index">
+
+						<td ng-click="showCustomFieldModal($event,'update',$index)" class="td-container">
+							<div>{{row.nm}}</div>
+						</td>
+                        <td ng-click="showCustomFieldModal($event,'update',$index)" class="td-container">
+                            <div ng-if="row.typ === 'f-longtext'">
+                                <span class="icon icon-f-longtext"></span>
+                                Long text
+                            </div>
+                            <div ng-if="row.typ === 'f-shorttext'">
+                                <span class="icon icon-f-shorttext"></span>
+                                Short text
+                            </div>
+                            <div ng-if="row.typ === 'f-date'">
+                                <span class="icon icon-f-date"></span>
+                                Date
+                            </div>
+                            <div ng-if="row.typ === 'f-time'">
+                                <span class="icon icon-f-time"></span>
+                                Time
+                            </div>
+                            <div ng-if="row.typ === 'f-numbers'">
+                                <span class="icon icon-f-numbers"></span>
+                                Number
+                            </div>
+                            <div ng-if="row.typ === 'f-picklist'">
+                                <span class="icon icon-f-choice"></span>
+                                Picklist
+                            </div>
+                        </td>
+
+						<td ng-if="row.req==='yes'" ng-click="showCustomFieldModal($event,'update',$index)" class="td-container">
+							<div>Required</div>
+						</td>
+                        <td ng-if="row.req!=='yes'" ng-click="showCustomFieldModal($event,'update',$index)" class="td-container">
+                            <div>-</div>
+                        </td>
+
+						<td class="td-container delete-col">
+							<div>
+								<md-button class="delete-btn" aria-label="Delete" ng-click="deleteRow($event,$index);">
+									<span class="icon icon-close-5"></span>
+								</md-button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+		<div class="btnDiv">
+			<md-button class="md-raised" ng-click="showCustomFieldModal($event,'add',-1);">
+				<span class="icon icon-plus"></span>
+				Add New
+			</md-button>
+		</div>
+
+	</div>
+
+    <div class="settings-wrap-inner settings-no-data" ng-if="rowCollection.length === 0">
+        <p>
+            No custom fields yet?<br>If you like to get advanced with your own information,<br>simply create a custom field and try it out.
+        </p>
+        <div class="img-wrap">
+            <img alt="Error" src="//static.enboarder.net/images/whooops-bouble-1.gif">
+        </div>
+        <div class="btnDiv">
+            <md-button class="md-raised refresh" ng-click="showCustomFieldModal($event,'add',-1);">
+                Create a Custom Field
+            </md-button>
+        </div>
+    </div>
+
+</div>

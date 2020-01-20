@@ -1,0 +1,50 @@
+<div ng-if="formsDefn.data.body.length > 0">
+    <div class="meta-info">
+        <span class="text">Date: {{formsData.crdt155}}</span>
+        <span class="text">Form: {{formsData.modname155}}</span>
+        <span class="text">Completed by: {{formsData.crby155}}</span>
+    </div>
+
+    <!-- <div class="rule"></div> -->
+
+    <!-- widget.uid ijs only present for form fields -->
+    <div class="other-info header">
+        <div layout="row" layout-align="space-around start">
+            <div flex="35">
+                Question
+            </div>
+            <div flex="65" class="res">
+                Response
+            </div>
+        </div>
+    </div>
+    <div class="other-info" ng-repeat="widget in formsDefn.data.body track by $index" ng-if="widget.del !== 'Y' && widget.del !== 'yes' && widget.uid">
+
+        <div ng-if= "widget.type !== 'text' && widget.type !== 'line' && widget.type !== 'image'">
+            <div layout="row" layout-align="space-around start">
+                <div flex="35" class="lable-wrap">
+                    <span class="name">{{widget.fnm}}</span><br>
+                    <!-- <span class="name">Required : {{widget.req}}</span><br> -->
+                    <span class="label">{{widget.lbl}}&nbsp;<span ng-if="widget.req === 'yes'">&nbsp;*</span></span>
+                </div>
+                <div flex="65" class="ans-wrap">
+                    <!-- <span class="ans">Answer:</span><br> -->
+                    <span class="ans-text" ng-bind-html="getFormAnswer(widget)" ng-if="widget.type !== 'fileupload'"></span>
+                    <a ng-href="{{getFormAnswer(widget).s3path}}" target="_blank" ng-if="widget.type === 'fileupload' && getFormAnswer(widget).s3path">
+                        <span class="icon icon-attachement"></span>
+                        <span class="ans-text file-name" ng-bind-html="getFormAnswer(widget).origname" ng-if="widget.type === 'fileupload'"></span>
+                    </a>
+                    <span class="ans-icon" ng-if="widget.type === 'rating' && getFormAnswer(widget) !== '[no response]'">
+                        <span class="icon icon-rate{{widget.dtype}}2"></span>
+                        <span ng-if="widget.scale === '11'">(0 - 10)</span>
+                        <span ng-if="widget.scale !== '11'">(1 - {{widget.scale}})</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-if="!formsDefn.data.body.length" class="no-data">
+    No form data has been submitted.
+</div>

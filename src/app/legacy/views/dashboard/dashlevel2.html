@@ -1,0 +1,289 @@
+<div class="bread-crumb">
+    <span><a ng-href="#/dashboard">Dashboard</a></span>
+    <span>/</span>
+    <span>
+        <a href="javascript:void(0)" class="active">
+            Workflows in progress (<span ng-if="phase === 'pre'">Pre Phase</span><span ng-if="phase === 'start'">Start Phase</span><span ng-if="phase === 'post'">Post Phase</span>)
+        </a></span>
+</div>
+
+<div class="container dashboard-level2">
+	<div class="dashboard-level2-content" ng-cloak>
+
+
+        <div class="reports-wrap formdetails dash2">
+            <div class="reports-wrap-inner">
+                <div class="spinner-overlay">
+                    <span class="spinner">
+                        <md-progress-circular md-diameter="55px"></md-progress-circular>
+                    </span>
+                </div>
+
+                <form name="reportForm" novalidate>
+
+                    <div class="heading-panel">
+                        <h4 class="phs" ng-if="phase === 'pre'">Pre Phase</h4>
+                        <h4 class="phs" ng-if="phase === 'start'">Start Phase</h4>
+                        <h4 class="phs" ng-if="phase === 'post'">Post Phase</h4>
+                        <span class="show-more">
+                            <span class="more more-action icon-more-icon"></span>
+                            <div class="action-popover">
+                                <span class="icon close-popover icon-more-icon"></span>
+                                <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}" ng-if="serverCSV === 'no'">
+                                    <span class="icon icon-download"></span>
+                                    <span class="text">Download (CSV)</span>
+                                </span>
+                                <span ng-click="exportLevel2Report();" ng-if="serverCSV !== 'no'">
+                                    <span class="icon icon-download"></span>
+                                    <span class="text">Download (CSV)</span>
+                                </span>
+                            </div>
+                        </span>
+                    </div>
+
+                    <div class="show-hide">
+                        <span class="arrow-toggle icon-arrow-1"></span>
+                        <span class="text">Advanced search / filter</span>
+                    </div>
+                    <div class="search-panel detail-section">
+
+                        <div layout="row" layout-align="start center">
+                            <div flex="25">
+                                <md-input-container>
+                                    <label>Name</label>
+                                    <input ng-model="reportSearch.nm">
+                                </md-input-container>
+                            </div>
+                        </div>
+
+                        <div layout="row" layout-align="center center">
+                            <div flex="100" class="search-button">
+                                <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                                    <span class="icon"></span>
+                                    <span class="text">Clear</span>
+                                </md-button>
+                                <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                                    <span class="icon"></span>
+                                    <span class="text">Search</span>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+                <div style="position:relative">
+                    <div class="scroll-btn-wrap">
+                        <span class="scroll-btn icon-arrow-1"></span>
+                    </div>
+                    <div class="scroll-btn-wrap-rt">
+                        <span class="scroll-btn icon-button-arrow-left"></span>
+                    </div>
+
+                    <div class="table-wrapper">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th ng-click="sortColumn('hirestdt');">
+                                        Start date
+                                        <span ng-if="sortcol === 'hirestdt'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th ng-click="sortColumn('hirenm');">
+                                        Name
+                                        <span ng-if="sortcol === 'hirenm'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="center" ng-click="sortColumn('emphealth');">
+                                        {{custlabels.Employee || 'Employee'}} Health
+                                        <span ng-if="sortcol === 'emphealth'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="center" ng-click="sortColumn('mgrhealth');">
+                                        {{custlabels.Manager || 'Manager'}} Health
+                                        <span ng-if="sortcol === 'mgrhealth'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="center" ng-click="sortColumn('health');">
+                                        Overall Health
+                                        <span ng-if="sortcol === 'health'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="center" ng-click="sortColumn('empalert');">
+                                        {{custlabels.Employee || 'Employee'}} alerts
+                                        <span ng-if="sortcol === 'empalert'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="center" ng-click="sortColumn('mgralert');">
+                                        {{custlabels.Manager || 'Manager'}} alerts
+                                        <span ng-if="sortcol === 'mgralert'">
+                                            <span ng-if="sorttype === 'asc'">
+                                                <span class="icon sort icon-arrow-3"></span>
+                                            </span>
+                                            <span ng-if="sorttype === 'desc'">
+                                                <span class="icon sort icon-arrow-2"></span>
+                                            </span>
+                                        </span>
+                                    </th>
+                                    <th class="prgrs">
+                                        Progress
+                                    </th>
+                                    <th class="extra">
+                                        &nbsp;
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="row in displayedCollection track by $index" ng-init="outerIndex=$index">
+                                    <td class="td-container" ng-click="level3Dashboard($index);">
+                                        <div>{{row.hirestdtfmt}}</div>
+                                    </td>
+                                    <td class="elps td-container" ng-click="level3Dashboard($index);">
+                                        <div>{{row.hirenm}}</div>
+                                    </td>
+                                    <td class="center td-container" ng-click="level3Dashboard($index);">
+                                        <div ng-if="row.emphealth !== 'na'">{{row.emphealth}}%</div>
+                                        <div ng-if="row.emphealth === 'na'">{{row.emphealth}}</div>
+                                    </td>
+                                    <td class="center td-container" ng-click="level3Dashboard($index);">
+                                        <div ng-if="row.mgrhealth !== 'na'">{{row.mgrhealth}}%</div>
+                                        <div ng-if="row.mgrhealth === 'na'">{{row.mgrhealth}}</div>
+                                    </td>
+                                    <td class="center td-container" ng-click="level3Dashboard($index);">
+                                        <div ng-if="row.health !== 'na'">{{row.health}}%</div>
+                                        <div ng-if="row.health === 'na'">{{row.health}}</div>
+                                    </td>
+                                    <td class="center td-container" ng-class="{pploverdue : row.empalert > 0}" ng-click="level3Dashboard($index);">
+                                        <div>{{row.empalert}}</div>
+                                    </td>
+                                    <td class="center td-container" ng-class="{pploverdue : row.mgralert > 0}" ng-click="level3Dashboard($index);">
+                                        <div>{{row.mgralert}}</div>
+                                    </td>
+                                    <td class="prgrs td-container" ng-click="level3Dashboard($index);">
+                                        <div class="pwrap">
+
+                                            <span class="pwrap-in" ng-class="{noseq : progseq.type!=='seq'}" ng-repeat="progseq in row.progress">
+                                                <a title="{{progseq.name}}"><span class="seq {{progseq.cls}}" ng-if="progseq.type==='seq'" ng-click="level3DashboardDetail(outerIndex, progseq.uid);"></span></a>
+                                                <span class="spcr" ng-if="progseq.type==='seq'"></span>
+                                                <span class="spcr sd" ng-if="progseq.type==='start'">
+                                                    <span class="sdate"></span>
+                                                </span>
+                                                <span class="spcr {{progseq.cls}}" ng-if="progseq.type==='profile'" ng-click="level3Dashboard(outerIndex);">
+                                                    <span class="prfl">
+                                                        <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                                        <img class="prfimg" src="{{row.photo}}{{refreshProfileToken}}" alt="">
+                                                    </span>
+                                                </span>
+                                            </span>
+
+                                        </div>
+                                    </td>
+                                    <td class="extra" ng-if="$first" rowspan="{{displayedCollection.length}}"></td>
+                                </tr>
+                                <tr class="nohover">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <div class="lgnd-wrp" layout="row" layout-align="space-between center">
+                                            <div class="pending">
+                                                <span class="rnd"></span>
+                                                <span class="text">Pending</span>
+                                            </div>
+                                            <div class="skipped">
+                                                <span class="rnd"></span>
+                                                <span class="text">Skipped</span>
+                                            </div>
+                                            <div class="complete">
+                                                <span class="rnd"></span>
+                                                <span class="text">Complete</span>
+                                            </div>
+                                            <div class="overdue">
+                                                <span class="rnd"></span>
+                                                <span class="text">Overdue</span>
+                                            </div>
+                                            <div class="inprogress">
+                                                <span class="rnd"></span>
+                                                <span class="text">In progress</span>
+                                            </div>
+                                            <div class="dismissed">
+                                                <span class="rnd"></span>
+                                                <span class="text">Dismissed</span>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                            <tfoot>
+                                <tr ng-if="displayedCollection.length > 0">
+                                    <td colspan="6" class="text-center">
+                                        <div class="pagination-wrap">
+
+                                            <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                                <span class="icon icon-arrow-1"></span>
+                                                <span class="text">Back</span>
+                                            </button>
+
+                                            <div class="pagination-number-wrap">
+                                                <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                                <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                                <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                            </div>
+
+                                            <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                                <span class="text">Next</span>
+                                                <span class="icon icon-arrow-1"></span>
+                                            </button>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>

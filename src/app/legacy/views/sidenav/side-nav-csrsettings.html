@@ -1,0 +1,47 @@
+<ul class="settings-side-nav" ng-controller="NavCtrl" ng-if="!isparent">
+	<li class="header">
+		<h4>Settings</h4>
+	</li>
+
+	<li ng-class="{ active: isActiveEquals('/csr/complist')}" ng-if="canAccess('csrsettings','complist')">
+		<a href="/#/csr/complist">
+			<span class="text">ACCOUNTS</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActiveEquals('/csr/userlist')}" ng-if="canAccess('csrsettings','userlist')">
+		<a href="/#/csr/userlist">
+			<span class="text">USER LIST</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActiveEquals('/csr/archiveduserlist')}" ng-if="canAccess('csrsettings','userlist')">
+		<a href="/#/csr/archiveduserlist">
+			<span class="text">USER LIST (Archived)</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActiveEquals('/csr/languagelist')}" ng-if="canAccess('csrsettings','languagelist')">
+		<a href="/#/csr/languagelist">
+			<span class="text">LANGUAGE LIST</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActiveEquals('/csr/sendmsg')}" ng-if="canAccess('csrsettings','sendmsg')">
+        <a href="/#/csr/sendmsg">
+            <span class="text">SEND MESSAGE</span>
+        </a>
+    </li>
+    <li ng-class="{ active: isActiveEquals('/csr/transferworkflow')}" ng-if="canAccess('csrsettings','transferworkflow')">
+        <a href="/#/csr/transferworkflow">
+            <span class="text">TRANSFER WORKFLOW</span>
+        </a>
+    </li>
+</ul>
+<ul class="settings-side-nav" ng-controller="NavCtrl" ng-if="isparent">
+	<li class="header">
+		<h4>Settings</h4>
+	</li>
+
+	<li class="active" ng-if="isparent && canAccess('accounts')">
+		<a href="/#/csr/childaccts">
+			<span class="text">ACCOUNTS</span>
+		</a>
+	</li>
+</ul>

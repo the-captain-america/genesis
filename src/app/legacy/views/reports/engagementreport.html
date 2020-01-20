@@ -1,0 +1,373 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Engagement report</a>
+    </span>
+</div>
+
+<div class="reports-wrap formdetails lngtbl wfrpt-tbl engrpt-tbl">
+    <div class="reports-wrap-inner">
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <form name="reportForm" novalidate>
+            <div class="heading-panel">
+                <h4>ENGAGEMENT REPORT</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+
+            <div class="search-panel detail-section" style="display:block">
+
+                <div layout="row" layout-align="start center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Workflow</label>
+                            <md-select md-container-class="reports-dd" aria-label="Select" ng-model="reportSearch.wfid" ng-change="changeWorkflow();">
+                                <!-- <md-option value="">Select Workflow</md-option> -->
+                                <md-option ng-repeat="wf in wflist | orderBy:['name']" value="{{wf.uid}}">{{wf.name}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex>
+                        <md-input-container>
+                            <label>Time frame</label>
+                            <md-select md-container-class="reports-dd" aria-label="Select" ng-model="reportSearch.timeframe" ng-change="changeTimeframe();">
+                                <md-option value="LAST7D">Last 7 days</md-option>
+                                <md-option value="LAST6">Last 6 months</md-option>
+                                <md-option value="LAST12">Last 12 months</md-option>
+                                <md-option value="CY">Current year</md-option>
+                                <md-option value="PY">Previous year</md-option>
+                                <md-option value="CM">Current month</md-option>
+                                <md-option value="PM">Previous month</md-option>
+                                <md-option value="CUSTOM">Custom</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, From</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_from" md-placeholder="Select" ng-change="changeDate();"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, To</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_to" md-placeholder="Select" ng-change="changeDate();"></md-datepicker>
+                    </div>
+                </div>
+                <div layout="row" layout-align="start center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Dashboard filter</label>
+                            <md-select md-container-class="engg-dd" md-no-asterisk aria-label="Dashboard filter" ng-model="reportSearch.customfilterid" required>
+                                <md-option value="{{filter.filterid}}" ng-repeat="filter in dashfilter.filters track by $index">{{filter.name}}</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div flex>&nbsp;</div>
+                    <div class="datepicker-wrap" flex>&nbsp;</div>
+                    <div class="datepicker-wrap" flex>&nbsp;</div>
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <div class="chrt-wrp">
+            <div class="wfinfowrap">
+                <h3>Engagement report</h3>
+                <span class="wftxt">{{wfname}}  {{reportSearch.fromdtdisplay}} - {{reportSearch.todtdisplay}}</span>
+            </div>
+            <div class="nmbr-wrap">
+                <h3>Workflows run</h3>
+                <span class="nmbr">{{totalinit}}</span>
+                <span class="info">
+                    Cancelled workflows<br>are not included
+                </span>
+            </div>
+            <div class="chrt">
+                <h3>Sequence engagement</h3>
+                <span>
+                    <div class="pie-chart" google-chart chart="chartObject"></div>
+                </span>
+                <div class="legend-wrp">
+                    <span class="lw-inn ot">
+                        <span class="crcl"></span>
+                        <span class="text">On time: <span>{{seqAuditAllData.ontimeper}}</span>%</span>
+                    </span>
+                    <span class="lw-inn lt">
+                        <span class="crcl"></span>
+                        <span class="text">Late: <span>{{seqAuditAllData.lateper}}</span>%</span>
+                    </span>
+                    <span class="lw-inn dis">
+                        <span class="crcl"></span>
+                        <span class="text">Dismissed: <span>{{seqAuditAllData.disper}}</span>%</span>
+                    </span>
+                    <span class="lw-inn od">
+                        <span class="crcl"></span>
+                        <span class="text">Overdue: <span>{{seqAuditAllData.odper}}</span>%</span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="nodata" ng-if="hasData === 'no'">
+            <p>
+                Hmmmm, can't find any relating data.
+            </p>
+            <div class="img-wrap">
+                <img src="//static.enboarder.net/images/error-bouble.gif" alt="Error" />
+            </div>
+        </div>
+        <md-tabs md-dynamic-height md-border-bottom md-selected="selectedTabIndex">
+            <md-tab label="Sequences">
+                <div class="table-wrapper seq-tbl cmn">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Total sent</th>
+                                <th colspan="2">Sequences on time</th>
+                                <th colspan="2">Sequences late</th>
+                                <th colspan="2">Sequences dismissed</th>
+                                <th colspan="2">Sequences overdue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-class="{mgrdd : seqData.seqfor === 'M' && seqData.uid !== 'mgrid'}" ng-repeat="seqData in seqAuditData track by $index">
+                                <td class="td-container">
+                                    <div class="shape" ng-if="$index < 3"></div>
+                                    <div ng-if="seqData.seqfor === 'NH'">{{custlabels.Employee || 'Employee'}}</div>
+                                    <div ng-if="seqData.seqfor === 'M'">{{seqData.nm}}</div>
+                                    <div ng-if="seqData.seqfor === 'ALL'">TOTAL</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqData.total}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqData.ontime}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqData.ontimeper !== 'na'">{{seqData.ontimeper}}%</div>
+                                    <div ng-if="seqData.ontimeper === 'na'">{{seqData.ontimeper}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqData.late}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqData.lateper !== 'na'">{{seqData.lateper}}%</div>
+                                    <div ng-if="seqData.lateper === 'na'">{{seqData.lateper}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqData.dis}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqData.disper !== 'na'">{{seqData.disper}}%</div>
+                                    <div ng-if="seqData.disper === 'na'">{{seqData.disper}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqData.od}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqData.odper !== 'na'">{{seqData.odper}}%</div>
+                                    <div ng-if="seqData.odper === 'na'">{{seqData.odper}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </md-tab>
+            <md-tab label="ALERTS">
+                <div class="table-wrapper ovrdue-tbl cmn">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Participant</th>
+                                <th>Total alerts</th>
+                                <th colspan="2">Alerts completed</th>
+                                <th colspan="2">Alerts dismissed</th>
+                                <th colspan="2">Alerts overdue</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-class="{mgrdd : seqAlert.seqfor === 'M' && seqAlert.uid !== 'mgrid'}" ng-repeat="seqAlert in seqAlertData">
+                                <td class="td-container">
+                                    <div class="shape"></div>
+                                    <div ng-if="seqAlert.seqfor === 'NH'">{{custlabels.Employee || 'Employee'}}</div>
+                                    <div ng-if="seqAlert.seqfor === 'M'">{{seqAlert.nm}}</div>
+                                    <div ng-if="seqAlert.seqfor === 'ALL'">TOTAL</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqAlert.total}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqAlert.comp}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqAlert.compper !== 'na'">{{seqAlert.compper}}%</div>
+                                    <div ng-if="seqAlert.compper === 'na'">{{seqAlert.compper}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqAlert.dis}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqAlert.disper !== 'na'">{{seqAlert.disper}}%</div>
+                                    <div ng-if="seqAlert.disper === 'na'">{{seqAlert.disper}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqAlert.od}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div ng-if="seqAlert.odper !== 'na'">{{seqAlert.odper}}%</div>
+                                    <div ng-if="seqAlert.odper === 'na'">{{seqAlert.odper}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </md-tab>
+            <md-tab label="TIMELINE">
+                <div class="table-wrapper timeline-tbl cmn">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th ng-click="sortColumn('critdays');">
+                                    Timeline
+                                    <span ng-if="sortcol === 'critdays' || !sortcol">
+                                        <span ng-if="sorttype === 'asc' || !sorttype">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('nm');">
+                                    Sequences name
+                                    <span ng-if="sortcol === 'nm'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('recipient');">Recipient
+                                    <span ng-if="sortcol === 'recipient'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('total');">Total
+                                    <span ng-if="sortcol === 'total'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('ontime');">On time
+                                    <span ng-if="sortcol === 'ontime'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('late');">Late
+                                    <span ng-if="sortcol === 'late'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('dis');">Dismissed
+                                    <span ng-if="sortcol === 'dis'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                                <th ng-click="sortColumn('od');">Overdue
+                                    <span ng-if="sortcol === 'od'">
+                                        <span ng-if="sorttype === 'asc'">
+                                            <span class="icon sort icon-arrow-3"></span>
+                                        </span>
+                                        <span ng-if="sorttype === 'desc'">
+                                            <span class="icon sort icon-arrow-2"></span>
+                                        </span>
+                                    </span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="seqTimeline in seqTimelineData">
+                                <td class="td-container">
+                                    <div>{{seqTimeline.dtl}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.nm}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.recipient}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.total}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.ontime}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.late}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.dis}}</div>
+                                </td>
+                                <td class="td-container">
+                                    <div>{{seqTimeline.od}}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </md-tab>
+        </md-tabs>
+    </div>
+</div>

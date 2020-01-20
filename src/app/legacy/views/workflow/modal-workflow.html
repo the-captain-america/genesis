@@ -1,0 +1,551 @@
+<md-dialog aria-label="{{label}}" class="edit-workflow-modal md-default-theme">
+  <form name="myForm" novalidate>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2 ng-if="showWfDetails === 'yes'">{{label}}</h2>
+      <h2 ng-if="showMgrDetails === 'yes'">Create New {{custlabels.Manager || 'Manager'}}</h2>
+      <h2 ng-if="showaddcf === 'yes'">Create New Custom Field</h2>
+      <h2 ng-class="{mgrlistheading : managerListTab === 'yes'}" ng-if="managerListTab === 'yes'">Select the {{(custlabels.Managers || 'managers') | lowercase}} you wish to add to your workflow list</h2>
+      <h2 class="mgrlistheading" ng-if="selectcfListTab === 'yes'">Select the custom fields you wish add to your workflow.</h2>
+      <span flex></span>
+      <md-button ng-if="managerListTab !== 'yes' && selectcfListTab !== 'yes'" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+        <span class="icon icon-close-2"></span>
+      </md-button>
+    </div>
+  </md-toolbar>
+  <md-dialog-content aria-label="Workflow Dialog" style="min-width:600px;max-width:600px;max-height:810px;">
+
+    <div ng-if="showWfDetails === 'yes'">
+        <div layout layout-sm="column">
+    		<md-input-container class="required" ng-if="action== 'add' || action== 'edit'  || action== 'editcriteria' || action== 'rename'  || action== 'duplicate' " flex>
+    			<label>Workflow name</label>
+    			<input md-no-asterisk name="name" ng-model="addWorkflowData.name" required focus="true">
+                <span class="blrdv"></span>
+    		</md-input-container>
+        </div>
+
+        <md-tabs md-dynamic-height md-border-bottom class="advanced-option-wrap" ng-if="action== 'add' || action== 'edit' || action=='editcriteria' ||  action=='duplicate' || action== 'catchall'" md-selected="selectedTabIndex" ng-class="{hidecrit : action== 'catchall'}">
+            <md-tab label="Criteria" ng-if="addWorkflowData.ord != '10000' || action=='duplicate'">
+                <md-content class="md-padding">
+
+                    <label class="heading" ng-if="action== 'add' || action=='editcriteria' || action=='duplicate'">Choose the criteria for New {{custlabels.Employees || 'Employees'}} to enter this workflow</label>
+                    <label class="heading" ng-if="action=== 'catchall'">Choose criteria for the previous 'default' workflow</label>
+
+                	<div layout="row" class="select-group-wrap" ng-repeat="criteria in critItem track by $index" ng-if="action== 'add' || action=='editcriteria' ||  action=='duplicate' || action== 'catchall'">
+                		<div flex="40">
+                			<md-input-container md-no-float>
+                				<md-select md-no-asterisk aria-label="Criteria" md-container-class="crit-dd" ng-change="getCriteriaValues(addWorkflowData.wfcriteria[$index].field, $index);"	 ng-model="addWorkflowData.wfcriteria[$index].field" placeholder="Select criteria" required>
+                					<md-option value="Brand">Brand</md-option>
+                					<md-option value="Location">Location</md-option>
+                					<md-option ng-repeat="item in wfcrit | filter:{purpose: 'Optional'}" value="{{item.tkey}}">{{item.name}}</md-option>
+                				</md-select>
+                			</md-input-container>
+                		</div>
+                		<div flex="20">
+                			<md-input-container md-no-float class="equal-sep">
+                				<md-select md-container-class="equal-cont" md-no-asterisk aria-label="Operator" placeholder="Select operator" ng-model="addWorkflowData.wfcriteria[$index].operator" required>
+                					<md-option value="Equals">
+                                        <span class="icon icon-symbol-1"></span>
+                                        <span class="text">Equals</span>
+                                    </md-option>
+                					<md-option value="Not Equals">
+                                        <span class="icon icon-symbol-2"></span>
+                                        <span class="text">Not equal</span>
+                                    </md-option>
+                				</md-select>
+                			</md-input-container>
+                		</div>
+
+                		<div flex="40">
+                			<md-input-container md-no-float>
+                				<md-select md-no-asterisk aria-label="Criteria" md-container-class="crit-dd" ng-model="addWorkflowData.wfcriteria[$index].value" placeholder="Choose option" required>
+                					<md-option ng-repeat="val in critItem[$index].item" value="{{val.key}}">
+                                        <span class="truncate">
+                                            <a title="{{val.display}}">{{val.display}}</a>
+                                        </span>
+                                    </md-option>
+                				</md-select>
+                			</md-input-container>
+                		</div>
+
+                		<md-button class="delete-btn" ng-click="deleteCriteria($index);" aria-label="Close" ng-if="$last && $index > 0">
+                			<span class="icon icon-close-5"></span>
+                		</md-button>
+
+                	</div>
+
+                    <div class="add-more-new-wrap" ng-if="action== 'add' || action=='editcriteria' ||  action=='duplicate' || action== 'catchall'">
+                        <md-button class="add-more" ng-click="addMoreCriteria();">
+                            <span class="icon icon-plus"></span>
+                            <span class="text">add more</span>
+                        </md-button>
+                    </div>
+
+                </md-content>
+            </md-tab>
+            <md-tab label="Custom Fields" ng-if="customFields.length > 0 && action!=='catchall'">
+                <md-content class="md-padding">
+                    <label class="heading">Add the fields you wish to access within this workflow.</label>
+                    <div class="multi-manager-options">
+                        <div class="detail-section" style="display:inline-block">
+                            <div>
+                                <table class="table manager-list-main cf-list">
+                                    <thead>
+                                        <th>Field Name</th>
+                                        <th>Required Option</th>
+                                        <th>&nbsp;</th>
+                                    </thead>
+                                </table>
+                                <ol class="options-info">
+                                    <li ng-repeat="wfcf in cflist track by $index">
+                                        <div layout="row" class="managerlist-content">
+                                            <table class="table manager-list-main">
+                                                <tbody>
+                                                    <tr ng-repeat="cf in customFields track by $index" ng-if="wfcf.uid == cf.uid">
+                                                        <td class="td-container">
+                                                            <div>
+                                                                <span ng-if="cf.typ === 'f-longtext'" class="icon icon-f-longtext"></span>
+                                                                <span ng-if="cf.typ === 'f-shorttext'" class="icon icon-f-shorttext"></span>
+                                                                <span ng-if="cf.typ === 'f-date'" class="icon icon-f-date"></span>
+                                                                <span ng-if="cf.typ === 'f-time'" class="icon icon-f-time"></span>
+                                                                <span ng-if="cf.typ === 'f-numbers'" class="icon icon-f-numbers"></span>
+                                                                <span ng-if="cf.typ === 'f-picklist'" class="icon icon-f-choice"></span>
+                                                                <span class="text truncate">{{cf.nm}}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td  class="td-container">
+                                                            <span ng-if="cf.req === 'yes'">Required</span>
+                                                            <span ng-if="cf.req !== 'yes'">-</span>
+                                                        </td>
+
+                                                        <td class="td-container">
+                                                            <div>
+                                                                <md-button class="delete-btn" aria-label="Close" ng-click="deleteCustomField($parent.$parent.$index);">
+                                                                    <span class="icon icon-close-5"></span>
+                                                                </md-button>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </li>
+                                </ol>
+                            </div>
+                            <!-- <md-button class="add-more" ng-click="addManager();">
+                                <span class="icon icon-plus"></span>
+                                <span class="text">add more</span>
+                            </md-button> -->
+
+                            <div class="add-more-new-wrap">
+                                <md-button class="add-more" ng-click="addMoreCustomFields();">
+                                    <span class="icon icon-plus"></span>
+                                    <span class="text">add more</span>
+                                </md-button>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+            </md-tab>
+            <md-tab label="{{custlabels.Managers || 'Managers'}}" ng-if="action!=='catchall'">
+                <md-content class="md-padding">
+                    <label class="heading">Add the {{(custlabels.Managers || 'managers') | lowercase}} you wish to communicate to within this workflow.</label>
+                    <div class="multi-manager-options">
+                        <div class="detail-section" style="display:inline-block">
+                            <table class="table manager-list-main mgr-list">
+                                <thead>
+                                    <th>{{custlabels.Manager || 'Manager'}} label</th>
+                                    <th>&nbsp;&nbsp;Profile</th>
+                                    <th>Required<br>at&nbsp;start</th>
+                                    <th>&nbsp;</th>
+                                </thead>
+                            </table>
+                            <ol class="options-info">
+                                <li ng-repeat="wfmgr in managers track by $index">
+                                    <div layout="row" class="managerlist-content">
+                                        <table class="table manager-list-main">
+                                            <tbody>
+                                                <tr ng-repeat="manager in managerlist track by $index" ng-if="wfmgr.uid == manager.uid">
+                                                    <td class="td-container">
+                                                        <div>
+                                                            <span class="txt">
+                                                                <a title="{{manager.l}}">{{manager.l}}</a>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-if="manager.t === 'd'" class="td-container">
+                                                        <div class="disable-text fkchip">
+                                                            <span class="profile-na">
+                                                                <span class="txt">Na</span>
+                                                            </span>
+                                                            <span class="txt mn">
+                                                                Enter at runtime
+                                                            </span>
+                                                        </div>
+                                                    </td>
+                                                    <td ng-if="manager.t === 's'" class="td-container">
+                                                        <div class="fkchip">
+                                                            <span class="profile-pic" ng-if="manager.t === 's'">
+                                                                <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                                                <img class="prfimg" src="{{manager.photo}}{{refreshProfileToken}}" alt="">
+                                                            </span>
+                                                            <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="" ng-if="manager.t !== 's'">
+                                                            <span class="txt truncate">
+                                                                <a title="{{manager.n}}">{{manager.n}}</a>
+                                                            </span>
+                                                        </div>
+                                                    </td>
+
+                                                    <td ng-if="manager.t === 'd'" class="td-container">
+                                                        <span>
+                                                            <md-checkbox ng-model="wfmgr.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required at start">
+                                    			            </md-checkbox>
+                                                        </span>
+                                                    </td>
+                                                    <td ng-if="manager.t === 's'" class="td-container">
+                                                        <span>
+                                                            <md-checkbox ng-model="wfmgr.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required at start" ng-disabled="true" ng-init="wfmgr.req='yes'">
+                                    			            </md-checkbox>
+                                                        </span>
+                                                    </td>
+                                                    <td class="td-container">
+                                                        <div>
+                                                            <md-button class="delete-btn" aria-label="Close" ng-click="deleteManager($parent.$parent.$index);">
+                                                                <span class="icon icon-close-5"></span>
+                                                            </md-button>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </li>
+                            </ol>
+                            <!-- <md-button class="add-more" ng-click="addManager();">
+                                <span class="icon icon-plus"></span>
+                    			<span class="text">add more</span>
+                    		</md-button> -->
+
+                            <div class="add-more-new-wrap">
+                                <md-button class="add-more" ng-click="addNewManager();">
+                                    <span class="icon icon-plus"></span>
+                        			<span class="text">add more</span>
+                        		</md-button>
+                            </div>
+                        </div>
+                    </div>
+                </md-content>
+            </md-tab>
+        </md-tabs>
+
+        <div class="error" ng-show="deleteMgrErr === 'yes'">
+            <span class="icon icon-notification-alert"></span>
+            <span class="text">You can not delete a {{(custlabels.Manager || 'manager') | lowercase}} that is active in a workflow. Remove the sequence from the workflow before deleting the {{(custlabels.Manager || 'manager') | lowercase}} here.</span>
+        </div>
+        <div class="error" ng-if="serverError">
+            <span class="icon icon-notification-alert"></span>
+            <span class="text">{{serverErrorMessage}}</span>
+        </div>
+
+    	<div class="advanced-option-wrap" ng-if="action== 'add' || action== 'edit' || action=='editcriteria' ||  action=='duplicate' || showadvanced === true">
+    		<div class="show-hide">
+    			<span class="arrow-toggle icon-arrow-1"></span>
+    			<span class="text">Advanced options</span>
+    		</div>
+            <div class="detail-section bottom-checkboxes">
+                <!-- Profile progress tasks
+                <div class="checkbox-container">
+                    <span class="label">Workflow-progress for employee:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="Workflow-progress for employee" ng-model="addWorkflowData.nhwfprgrs">
+                                <md-option value="no">Do not show this</md-option>
+                                <md-option value="todt">Only show tasks to date</md-option>
+                                <md-option value="prsftr">Show present + future tasks</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                -->
+                <div class="checkbox-container" ng-if="lockedworkflows === 'yes'">
+                    <span class="label">Who can access this workflow:</span>
+                    <md-input-container flex>
+                        <md-select 
+                            md-container-class="advopt-dd" 
+                            aria-label="Access workflows"
+                            ng-model="addWorkflowData.controlaccess">
+                            <md-option value="no">All admins</md-option>
+                            <md-option value="yes">Only specific admins</md-option>
+                        </md-select>
+                    </md-input-container>
+                    <md-content 
+                        ng-if="addWorkflowData.controlaccess === 'yes' && allowedUsers"
+                        class="md-padding autocomplete adjustment-autocomplete" 
+                        layout="column">
+                        <md-contact-chips 
+                            ng-model="allowedUsers"
+                            ng-required="true"
+                            ng-change="onAllowedUsersChange(allowedUsers)"
+                            md-contacts="searchAdminUsers($query)"
+                            md-contact-name="name"
+                            md-contact-image="photoCdn_s" 
+                            md-contact-email="uname" 
+                            md-require-match="true"
+                            md-highlight-flags="i" 
+                            placeholder="Type name to add an admin as owner"
+                            secondary-placeholder="Add another admin" 
+                            input-aria-label="Admins with access">
+                        </md-contact-chips>
+                        <br>
+                    </md-content>
+                </div>
+                <div class="checkbox-container">
+        	        <span class="label">Length of start phase:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="Days" ng-model="addWorkflowData.induction">
+                            <md-option ng-if="$index == 0" ng-repeat="i in getNumber(200) track by $index" value="{{$index+1}}">{{$index+1}} Day</md-option>
+                            <md-option ng-if="$index > 0" ng-repeat="i in getNumber(200) track by $index" value="{{$index+1}}">{{$index+1}} Days</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+                <div class="checkbox-container">
+    	            <span class="label">Notification send - time:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="Days" ng-model="addWorkflowData.notifyTime">
+                            <md-option ng-repeat="i in getNumber(24) track by $index" value="{{$index+1}}">
+                                <span ng-if="$index < 9">0{{$index+1}}:00</span>
+                                <span ng-if="$index > 8">{{$index+1}}:00</span>
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+
+                <div class="checkbox-container">
+    	            <span class="label">Default Timezone:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="Timezone" ng-model="addWorkflowData.notifyTimeZone">
+                            <md-option ng-repeat="tzonedata in timezones" value="{{tzonedata.k}}">{{tzonedata.v}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div class="checkbox-container" ng-if="lang.length > 0">
+    	            <span class="label">{{custlabels.Manager || 'Manager'}} language:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="{{custlabels.Employee || 'Employee'}} Language" ng-model="addWorkflowData.mgrlang">
+                            <md-option ng-repeat="langItem in lang" value="{{langItem.tkey}}">{{langItem.lang}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div class="checkbox-container emp-lang" ng-if="lang.length > 0">
+    	            <span class="label">{{custlabels.Employee || 'Employee'}} language:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dd" aria-label="{{custlabels.Employee || 'Employee'}} Language" ng-model="addWorkflowData.emplang">
+                            <md-option ng-repeat="langItem in lang" value="{{langItem.tkey}}">{{langItem.lang}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div class="checkbox-container">
+    	            <span class="label">Mark sequence 'overdue' if not complete after:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dysaftr-dd" aria-label="Days after" ng-model="addWorkflowData.escalation">
+                            <md-option ng-if="$index == 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Day</md-option>
+                            <md-option ng-if="$index > 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Days</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+    	        <md-checkbox aria-label="Send daily notification reminders (if sequence is not complete)" ng-model="addWorkflowData.sendreminder" ng-true-value="'yes'" ng-false-value="'no'">
+    	            <span>Send daily reminders until sequence is marked 'overdue'</span>
+    	        </md-checkbox>
+                <md-checkbox class="send-admin" aria-label="Send admin escalation emails" ng-model="addWorkflowData.sendescalate">
+    	         	<span>Send admin escalation emails</span>
+    	        </md-checkbox>
+                <div class="checkbox-container" ng-if="addWorkflowData.sendescalate === true">
+    	            <span class="label">Escalation email address:</span>
+                    <md-input-container md-no-float class="md-block">
+            			<input type="email" name="email" placeholder="email-address@settings.com" ng-model="addWorkflowData.escalationemail" required>
+                        <span class="blrdv"></span>
+            		</md-input-container>
+                </div>
+                <md-checkbox aria-label="Notify participants of changes to start date" ng-model="addWorkflowData.notifyStDtChange" ng-true-value="'yes'" ng-false-value="'no'">
+    	         	<span>Notify participants of changes to start date</span>
+    	        </md-checkbox>
+                <md-checkbox aria-label="Bulk {{(custlabels.Employees || 'employees') | lowercase}} with same start date and {{(custlabels.Manager || 'manager') | lowercase}} - add 'bulk process' for {{(custlabels.Managers || 'managers') | lowercase}}" ng-model="addWorkflowData.bulkhire" ng-true-value="'yes'" ng-false-value="'no'" ng-if="bulkhireEnabled === 'yes'">
+    	         	<span>Bulk {{(custlabels.Employees || 'employees') | lowercase}} with same start date and {{(custlabels.Manager || 'manager') | lowercase}} - add 'bulk process' for {{(custlabels.Managers || 'managers') | lowercase}}</span>
+                </md-checkbox>
+    		</div>
+    	</div>
+    </div>
+
+    <div ng-if="managerListTab === 'yes'">
+
+        <table class="table tbl-mgrlist">
+            <thead>
+                <tr>
+                    <!-- <th>No.</th> -->
+                    <th>{{custlabels.Manager || 'Manager'}} label</th>
+                    <th>Profile</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="manager in displayMgrList track by $index">
+                    <td class="td-container">
+                        <div>
+                            <span class="txt">
+                                <a title="{{manager.l}}">{{manager.l}}</a>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="td-container" ng-if="manager.t === 'd'">
+                        <div class="disable-text fkchip">
+                            <span class="profile-na">
+                                <span class="txt">Na</span>
+                            </span>
+                            <span class="txt mn">
+                                Enter at runtime
+                            </span>
+                        </div>
+                    </td>
+                    <td ng-if="manager.t === 's'" class="td-container">
+                        <div class="fkchip">
+                            <span class="profile-pic" ng-if="manager.t === 's'">
+                                <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                <img class="prfimg" src="{{manager.photo}}{{refreshProfileToken}}" alt="">
+                            </span>
+                            <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="" ng-if="manager.t !== 's'">
+                            <span class="txt truncate">
+                                <a title="{{manager.n}}">{{manager.n}}</a>
+                            </span>
+                        </div>
+                    </td>
+                    <td class="td-container">
+                        <div>
+                            <md-checkbox ng-disabled="manager.disabled" ng-model="manager.selected" value="manager.uid" aria-label="Select">
+                            </md-checkbox>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <md-button class="create-mgr-btn" ng-click="showMgrDetailsInfo($parent.$index);">
+            <span class="icon icon-plus"></span>
+            <span class="text">Create a new {{(custlabels.Manager || 'manager') | lowercase}}</span>
+        </md-button>
+    </div>
+
+    <ng-include ng-if="showMgrDetails === 'yes'" src="'views/settings/div-add-new-manager.html'"></ng-include>
+
+    <div ng-if="selectcfListTab === 'yes'">
+        <table class="table">
+            <thead>
+                <tr>
+                    <!-- <th>No.</th> -->
+                    <th>Field name</th>
+                    <th>Required option</th>
+                    <th>Select</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-repeat="cf in displayCustomFields track by $index">
+                    <td class="td-container">
+                        <div>
+                            <span ng-if="cf.typ === 'f-longtext'" class="icon icon-f-longtext"></span>
+                            <span ng-if="cf.typ === 'f-shorttext'" class="icon icon-f-shorttext"></span>
+                            <span ng-if="cf.typ === 'f-date'" class="icon icon-f-date"></span>
+                            <span ng-if="cf.typ === 'f-time'" class="icon icon-f-time"></span>
+                            <span ng-if="cf.typ === 'f-numbers'" class="icon icon-f-numbers"></span>
+                            <span ng-if="cf.typ === 'f-picklist'" class="icon icon-f-choice"></span>
+                            <span class="text truncate">{{cf.nm}}</span>
+                        </div>
+                    </td>
+                    <td  class="td-container">
+                        <span class="text" ng-if="cf.req==='yes'">Required</span>
+                        <span class="text" ng-if="cf.req!=='yes'">-</span>
+                    </td>
+
+                    <td class="td-container">
+                        <div>
+                            <!-- <md-checkbox ng-disabled="manager.l ==='Direct 2'" ng-model="manager.selected" value="manager.uid" aria-label="Select">
+                            </md-checkbox> -->
+                            <md-checkbox ng-disabled="cf.disabled" ng-model="cf.selected" value="cf.uid" aria-label="Select">
+                            </md-checkbox>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <md-button class="create-mgr-btn" ng-click="showCreateNewCustomField($parent.$index);">
+            <span class="icon icon-plus"></span>
+            <span class="text">Create new custom field</span>
+        </md-button>
+    </div>
+
+    <ng-include ng-if="showaddcf === 'yes'" src="'views/settings/div-new-customfield.html'"></ng-include>
+
+  </md-dialog-content>
+
+  <md-dialog-actions layout="row">
+    <md-button ng-if="managerListTab === 'yes'" aria-label="Back" class="md-default-theme" ng-click="showWfDetailsInfo();">
+        <span class="text">Back</span>
+    </md-button>
+    <md-button ng-if="selectcfListTab === 'yes'" aria-label="Back" class="md-default-theme" ng-click="showWfDetailsInfoCF();">
+        <span class="text">Back</span>
+    </md-button>
+    <md-button ng-if="showMgrDetails === 'yes'" aria-label="Back" class="md-default-theme" ng-click="addNewManager();">
+        <span class="text">Back</span>
+    </md-button>
+    <md-button ng-if="showaddcf === 'yes'" aria-label="Back" class="md-default-theme" ng-click="addMoreCustomFields();">
+        <span class="text">Back</span>
+    </md-button>
+    <md-button ng-if="managerListTab === 'yes'" aria-label="Save" class="save save-spinner md-default-theme" ng-click="addNewManagertoWf();" ng-disabled="myForm.$invalid" md-autofocus>
+    	<span class="text">Add to workflow</span>
+		<!-- <span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span> -->
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+    <md-button ng-if="selectcfListTab === 'yes'" aria-label="Save" class="save save-spinner md-default-theme" ng-click="addCustomFieldtoWf();" ng-disabled="myForm.$invalid" md-autofocus>
+        <span class="text">Add to workflow</span>
+        <!-- <span class="text-save">Saving...</span>
+        <span class="text-saved">Saved <span class="icon-notification-ok"></span></span> -->
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        </span>
+    </md-button>
+    <md-button 
+        aria-label="Save" class="save save-spinner md-default-theme" 
+        ng-if="showWfDetails === 'yes'" 
+        ng-click="save();" 
+        ng-disabled="myForm.$invalid || 
+        (lockedworkflows === 'yes' && addWorkflowData.controlaccess === 'yes' 
+        && (!allowedUsers || allowedUsers.length < 1))" 
+        md-autofocus>
+    	<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+    <md-button ng-if="showMgrDetails === 'yes'" aria-label="Save {{custlabels.Manager || 'Manager'}}" class="save save-spinner md-default-theme" ng-click="saveNewManager();" ng-disabled="myForm.$invalid" md-autofocus>
+    	<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+    <md-button ng-if="showaddcf === 'yes'" aria-label="Save Custom Field" class="save save-spinner md-default-theme" ng-click="saveNewCustomField();" ng-disabled="myForm.$invalid" md-autofocus>
+    	<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+    </md-button>
+  </md-dialog-actions>
+
+  </form>
+</md-dialog>

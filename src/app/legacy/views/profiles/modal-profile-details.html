@@ -1,0 +1,48 @@
+<md-dialog aria-label="Change details" class="modal-dashlvl3-prefchnl md-default-theme">
+	<form name="profileForm" novalidate>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>{{label}}</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-dialog-content style="min-width:600px; max-width:600px;">
+            <ng-include src="'views/profiles/div-profile-content.html'"></ng-include>
+		</md-dialog-content>
+
+		<md-dialog-actions layout="row" class="updt-enbl" ng-if="showCropArea !== 'yes'">
+			<md-button aria-label="Save" class="md-raised md-default-theme save save-spinner" ng-disabled="profileForm.$invalid" ng-click="saveChangeDetails($event)"
+			 md-autofocus ng-if="tgtpage !== 'summary' && showCropArea !== 'yes'">
+				<span class="text">Save</span>
+				<span class="text-save">Saving...</span>
+				<span class="text-saved">Saved
+					<span class="icon-notification-ok"></span>
+				</span>
+				<span class="spinner">
+					<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+				</span>
+			</md-button>
+			<md-button aria-label="Save" class="md-raised md-default-theme save save-spinner" ng-disabled="profileForm.$invalid" ng-click="saveSummaryDetails($event)"
+			 md-autofocus ng-if="tgtpage === 'summary' && showCropArea !== 'yes' && ismgr === 'yes' && isfxdmgr !=='yes'">
+				<span class="text">Save</span>
+				<span class="text-save">Saving...</span>
+				<span class="text-saved">Saved
+					<span class="icon-notification-ok"></span>
+				</span>
+				<span class="spinner">
+					<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+				</span>
+			</md-button>
+
+            <!-- <md-dialog-actions ng-show="showCropArea === 'yes'">
+                <md-button aria-label="Back" class="backbtn md-raised md-default-theme" ng-click="backToUser($event)" md-autofocus>
+                	Back
+                </md-button>
+                <md-button class="save md-default-theme" aria-label="Save" ng-click="upload($event)" md-autofocus>Crop</md-button>
+            </md-dialog-actions> -->
+		</md-dialog-actions>
+	</form>
+</md-dialog>

@@ -1,0 +1,641 @@
+<div class="container dashboard-level3">
+
+	<div class="dashboard-level3-content" ng-cloak>
+		<form name="myForm" novalidate>
+		<h4>
+            {{level3data.wfname}}
+            <span ng-if="level3data.state_cap === 'Cancelled'">(Cancelled)</span>
+            <span ng-if="level3data.state_cap === 'Complete'">(Complete)</span>
+            <!-- <span ng-if="level3data.iststwf !=='y'" class="tstbdg live">Live</span> -->
+            <span ng-if="level3data.iststwf ==='y'" class="tstbdg">Test</span>
+            <span class="show-more">
+                <span class="more more-action icon-more-icon"></span>
+                <div class="action-popover" ng-controller="changeWfDetailsCtrl">
+					<span class="icon close-popover icon-more-icon"></span>
+					<span ng-click="gotoDashLevel3($event)">View timeline</span>
+					<span ng-click="cancelWfModal($event)"  ng-if="allowEdits=== 'yes'">Cancel this Workflow</span>
+					<span ng-click="deleteWfModal($event)"  ng-if="level3data.iststwf === 'y' && showSigninAs===true">Delete this Workflow</span>
+                </div>
+            </span>
+        </h4>
+
+
+			<div class="meta-info" layout="row" layout-wrap>
+				<div flex="10" class="img-wrap" ng-controller="changeWfDetailsCtrl" ng-click="showProfileDialog($event, level3data, 'no');">
+					<img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+					<img ng-if="!level3data.pic" class="prfimg" src="" alt="">
+					<img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.picCdn || level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+				</div>
+				<div flex="90" class="infoin">
+                    <!-- <div class="msk" ng-if="level3data.state_cap === 'Cancelled'|| level3data.state_cap === 'Complete'"></div> -->
+					<div class="table-responsive">
+						<table class="table top-table" ng-class="{hvrmsk : level3data.state_cap === 'Cancelled' || level3data.state_cap === 'Complete'}">
+							<thead>
+								<tr>
+									<th class="second-heading">Main info</th>
+									<th class="second-heading">{{custlabels.Manager || 'Manager'}}</th>
+                                    <th class="second-heading">Category</th>
+                                    <th class="second-heading">Custom Field</th>
+								</tr>
+							</thead>
+
+							<tbody>
+								<tr>
+									<td class="elps td-container value-td" ng-class="{frst : level3data.managers.length > 7}" ng-controller="changeWfDetailsCtrl">
+										<div class="txtwrap" ng-click="showProfileDialog($event, level3data, 'no');">
+											<span class="text">
+												{{custlabels.Employee || 'Employee'}}:
+											</span>
+											<span class="value fkchip" ng-class="{nohover : allowEdits!== 'yes'}">
+                                				<img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+												<img ng-if="!level3data.pic" class="prfimg" src="" alt="">
+												<img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.picCdn || level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+												<span class="txt">
+                                                    <a title="{{level3data.hirenm}}">{{level3data.hirenm}}</a>
+                                                </span>
+											</span>
+										</div>
+                                        <div class="txtwrap truncate" ng-click="showProfileDialog($event, level3data, 'no');">
+											<span class="text">
+												Preferred contact:
+											</span>
+											<span ng-if="!level3data.hirechnl || level3data.hirechnl ==='mob'" class="value" ng-class="{nohover : allowEdits!== 'yes'}">
+												<span>{{level3data.hiremob}}</span>
+                                                <span class="icon icon-edit" ng-if="allowEdits=== 'yes'"></span>
+											</span>
+											<span ng-if="level3data.hirechnl ==='eml'" class="value" ng-class="{nohover : allowEdits!== 'yes'}">
+												<span>
+                                                    <a title="{{level3data.hireeml}}">{{level3data.hireeml}}</a>
+                                                </span>
+                                                <span class="icon icon-edit" ng-if="allowEdits=== 'yes'"></span>
+											</span>
+										</div>
+										<div class="txtwrap truncate nohover">
+											<span class="text">
+												Workflow:
+											</span>
+											<span class="value" ng-class="{nohover : allowEdits!== 'yes'}">
+												<span>
+                                                    <a title="{{level3data.wfname}}">{{level3data.wfname}}</a>
+                                                </span>
+                                                <a ng-if="level3data.bh ==='yes' && level3data.iststwf !=='y'" title="Bulk process">
+                                                    <span class="icn icon-bulkhire"></span>
+                                                </a>
+											</span>
+										</div>
+										<!-- <div class="txtwrap" ng-controller="changeWfDetailsCtrl" ng-click="changeStartDateModal($event)"> -->
+                                        <div class="txtwrap nohover">
+											<span class="text">
+												Status:
+											</span>
+											<span class="value">
+                                                <span>{{level3data.state_cap}}</span>
+											</span>
+										</div>
+										<div class="txtwrap" ng-class="{nohover : allowEdits!== 'yes'}" ng-click="changeStartDateModal($event)">
+											<span class="text">
+												Start date:
+											</span>
+                                            <span class="value">
+                                                <span>{{level3data.hirestdtformatted}}</span>
+                                                <span ng-if="allowEdits=== 'yes'" class="icon icon-edit"></span>
+											</span>
+										</div>
+                                        <div ng-if="showSigninAs===true" class="txtwrap" ng-click="changeTestStatusModal($event)">
+											<span class="text">
+												Mode:
+											</span>
+                                            <span class="value">
+                                                <span ng-if="level3data.iststwf !=='y'">Live</span>
+    											<span ng-if="level3data.iststwf ==='y'">Test</span>
+                                                <span class="icon icon-edit"></span>
+											</span>
+										</div>
+                                        <div ng-if="showSigninAs!==true" class="txtwrap nohover">
+											<span class="text">
+												Mode:
+											</span>
+                                            <span class="value">
+                                                <span ng-if="level3data.iststwf !=='y'">Live</span>
+    											<span ng-if="level3data.iststwf ==='y'">Test</span>
+											</span>
+										</div>
+									</td>
+									<td class="elps td-container value-td" ng-controller="changeWfDetailsCtrl">
+                                        <div ng-class="{scrl : level3data.managers.length > 7}">
+                                            <div class="txtwrap" ng-repeat="manager in level3data.managers" ng-click="showProfileDialog($event, manager, 'yes');">
+                                                <span class="text">
+                                                    {{manager.label}}:
+                                                </span>
+                                                <span class="value fkchip" ng-class="{nohover : manager.type==='s' || allowEdits!== 'yes'}" ng-if="manager.mgrname">
+                                                    <img src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+    												<img ng-if="!manager.pic" class="prfimg" src="" alt="">
+    												<img ng-if="manager.pic" class="prfimg" ng-src="{{manager.picCdn || manager.pic}}{{level3data.refreshProfileToken}}" alt="">
+                                                    <span class="txt">
+                                                        <a title="{{manager.dispnm}}">{{manager.mgrname}}</a>
+    												</span>
+    											</span>
+    											<span ng-if="allowEdits === 'yes' && !manager.mgrname" class="value" ng-class="{nohover : false}">
+    												<span class="icon icon-edit"></span>
+    											</span>
+                                            </div>
+                                        </div>
+									</td>
+                                    <td class="elps td-container value-td" ng-controller="changeWfDetailsCtrl">
+                                        <div ng-class="{scrl : level3data.categories.length > 8}">
+                                            <div class="txtwrap" ng-class="{nohover : allowEdits!== 'yes'}" ng-repeat="category in level3data.categories track by $index" ng-click="changeCategoryModal($event, category);">
+    											<span class="text">
+                                                    <span>{{category.dnm}}:</span>
+    											</span>
+                                                <span ng-if="allowEdits === 'yes' && category.dval.length === 0" class="value" ng-class="{nohover : false}">
+                                                    <span class="icon icon-edit"></span>
+                                                </span>
+                                                <span ng-if="allowEdits === 'yes' && category.dval.length > 0" class="value" ng-class="{nohover : false}">
+                                                    <a title="{{category.dval}}">{{category.dval}}</a>
+                                                    <span class="icon icon-edit"></span>
+                                                </span>
+    											<span ng-if="allowEdits !== 'yes'" class="value">
+    												<span>{{category.dval}}</span>
+    											</span>
+    										</div>
+                                        </div>
+                                    </td>
+                                    <td class="elps td-container value-td" ng-controller="changeWfDetailsCtrl">
+                                        <div ng-class="{scrl : level3data.cflist.length > 8}">
+                                            <div class="txtwrap" ng-class="{nohover : allowEdits!== 'yes'}" ng-repeat="cf in level3data.cflist track by $index" ng-click="changeCustomFieldsModal($event, cf);">
+    											<span class="text">
+                                                    <span>{{cf.nm}}:</span>
+    											</span>
+    											<span ng-if="allowEdits === 'yes' && cf.dispval.length === 0" class="value" ng-class="{nohover : false}">
+                                                    <span class="icon icon-edit"></span>
+                                                </span>
+    											<span ng-if="allowEdits === 'yes' && cf.dispval.length > 0" class="value" ng-class="{nohover : false}">
+    												<span>{{cf.dispval}}</span>
+    											    <span class="icon icon-edit"></span>
+                                                </span>
+    											<span ng-if="allowEdits !== 'yes'" class="value">
+    												<span>{{cf.dispval}}</span>
+    											</span>
+                                            </div>
+                                        </div>
+                                    </td>
+								</tr>
+							</tbody>
+
+						</table>
+					</div>
+				</div>
+			</div>
+
+			<md-tabs md-dynamic-height md-border-bottom>
+
+				<md-tab label="Profile Details">
+			  		<md-content class="soon">
+						<h3>Coming soon...</h3>
+			  		</md-content>
+				</md-tab>
+
+				<md-tab md-active="true" label="Employee Workflow">
+					<md-content>
+
+						<div class="table-responsive">
+							<table class="table workflow-info-table" ng-cloak>
+								<thead>
+									<!-- <tr>
+										<th class="top-heading" colspan="6">
+											<span class="name">{{level3data.hirenm}}</span>
+											<span class="date">{{level3data.hirestdtformatted}}</span>
+											<span class="wfname">{{level3data.wfname}}</span>
+
+                                            <span class="show-more-wrap">
+                                                <span class="status">
+                                                    <span class="state incomplete" ng-if="level3data.state === 'incomplete'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state pending" ng-if="level3data.state === 'pending'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state cancelled" ng-if="level3data.state === 'cancelled'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state deleted" ng-if="level3data.state === 'deleted'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state error" ng-if="level3data.state === 'error'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state inprogress" ng-if="level3data.state === 'in progress'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                    <span class="state complete" ng-if="level3data.state === 'complete'">
+                                                        {{level3data.state}}
+                                                        <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(level3data.state)}}</p></md-tooltip>
+                                                    </span>
+                                                </span>
+                                                <span class="show-more">
+    												<span class="more more-action icon-more-icon"></span>
+    												<div class="action-popover" ng-controller="changeWfDetailsCtrl">
+    													<span class="icon close-popover icon-more-icon"></span>
+    													<span ng-click="changeStartDateModal($event)"  ng-if="allowEdits=== 'yes'">Change Start date</span>
+    													<span ng-click="cancelWfModal($event)"  ng-if="allowEdits=== 'yes'">Cancel this Workflow</span>
+    													<span ng-click="gotoDashLevel3($event)">View timeline</span>
+    												</div>
+    											</span>
+                                            </span>
+										</th>
+									</tr> -->
+									<tr>
+                                        <th class="second-heading">Who</th>
+										<th class="second-heading">What</th>
+                                        <th class="second-heading whn">When ({{level3data.tz}})</th>
+										<th class="second-heading status">Status</th>
+									</tr>
+								</thead>
+								<tbody class="collapse-wrap" ng-repeat="data in seqData track by $index">
+                                    <tr class="show-hide-dashboard" ng-if="data.dtype==='wf' && data.prop === 'launched'">
+                                        <td class="td-container">
+                                            <div class="icntyp-wrap">
+                                                <img alt="Profile pic" src="//static.enboarder.net/images/prfl-enb-dark.gif">
+                                            </div>
+										</td>
+                                        <td class="td-container">
+											<div>
+												<span class="icon icon-after icon-launch"></span>
+												<span class="text">Workflow launched, ID: {{data.extid}}</span>
+                                                <span class="icon-before arrow-toggle icon-arrow-2"></span>
+											</div>
+										</td>
+										<td class="td-container">
+											<div>
+												<span class="date">{{data.crdt}}</span>
+											</div>
+										</td>
+                                        <td class="td-container">
+											<div>
+                                                <span class="status launched">
+													Launched
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top">
+                                                        <p>
+                                                            Launched and ready, awaiting the first sequence to trigger.
+                                                        </p>
+                                                    </md-tooltip>
+												</span>
+											</div>
+										</td>
+									</tr>
+                                    <tr class="detail-section-dashboard spaced-row-first spaced-row-last" ng-if="data.dtype==='wf' && data.prop === 'launched'">
+                                        <td class="td-container">
+											<div>&nbsp;</div>
+										</td>
+                                        <td class="td-container">
+											<div class="lblwrap">
+											    <span class="lbl">By:</span>
+                                                <span class="text">{{level3data.crby}}</span>
+											</div>
+											<div>
+											    <span class="lbl">Method:</span>
+                                                <span class="text">{{level3data.src}}</span>
+											</div>
+										</td>
+                                        <td class="td-container">
+											<div>&nbsp;</div>
+										</td>
+                                        <td class="td-container">
+											<div>&nbsp;</div>
+										</td>
+                                    </tr>
+                                    <tr class="show-hide-dashboard" ng-if="data.dtype==='wf' && data.prop !== 'hirestdt' && data.prop !== 'launched'">
+                                        <td class="td-container" ng-if="data.updName">
+                                            <div class="icntyp-wrap">
+                                                <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+                                                <img class="prfimg" ng-src="" alt="">
+                                            </div>
+                                            <div class="nmlbl">
+                                                <span class="text">
+                                                    {{data.updName}}
+                                                </span>
+                                            </div>
+										</td>
+                                        <td class="td-container" ng-if="!data.updName">
+                                            <div class="icntyp-wrap">
+                                                <img alt="Profile pic" src="//static.enboarder.net/images/prfl-enb-dark.gif">
+                                            </div>
+										</td>
+                                        <td class="td-container">
+											<div>
+                                                <span class="icon icon-after icon-refresh"></span>
+                                                <span class="text">{{data.activity}}</span>
+                                            </div>
+										</td>
+										<td class="td-container">
+											<div>
+												<span class="date">{{data.crdt}}</span>
+											</div>
+										</td>
+                                        <td class="td-container">
+											<div>
+												<span class="status change">
+                                                    change
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top">
+                                                        <p>
+                                                            {{data.activity}}
+                                                        </p>
+                                                    </md-tooltip>
+                                                </span>
+											</div>
+										</td>
+									</tr>
+									<tr class="show-hide-dashboard" ng-if="data.dtype==='wf' && data.prop === 'hirestdt'">
+                                        <td class="td-container">
+                                            <div class="icntyp-wrap">
+                                                <img alt="Profile pic" src="//static.enboarder.net/images/prfl-enb-dark.gif">
+                                            </div>
+										</td>
+                                        <td class="td-container">
+											<div>
+												<span class="icon icon-after icon-refresh"></span>
+												<span class="text">Start date changed to: {{data.nval}}</span>
+											</div>
+										</td>
+										<td class="td-container">
+											<div>
+												<span class="date">{{data.crdt}}</span>
+											</div>
+										</td>
+                                        <td class="td-container">
+											<div>
+                                                <span class="status change">
+													Change
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{data.activity}}</p></md-tooltip>
+												</span>
+                                                <span ng-if="data.owners" class="status-logic status-change icon-notification-small change" ng-click="showChangeNotifications(data.uid, data.seqid , data.initid);"></span>
+											</div>
+										</td>
+									</tr>
+
+                                    <tr class="show-hide-dashboard" ng-if="data.dtype==='seq'" ng-class="{nohover : data.status === 'skipped' || data.status==='gdpr_viewed' || data.status==='gdpr_notsigned'}">
+                                        <td class="td-container">
+                                            <div class="icntyp-wrap">
+                                                <div ng-if="data.seqfor==='NH'">
+                                                    <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+													<img ng-if="!level3data.pic" class="prfimg" src="" alt="">
+													<img ng-if="level3data.pic" class="prfimg" ng-src="{{level3data.picCdn || level3data.pic}}{{level3data.refreshProfileToken}}" alt="">
+                                                </div>
+    											<div ng-if="data.seqfor==='M'">
+                                                    <img alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif">
+													<img ng-if="!(level3data.managerMap[data.mgrid] && level3data.managerMap[data.mgrid].pic)" class="prfimg" src="" alt="">
+													<img ng-if="level3data.managerMap[data.mgrid] && level3data.managerMap[data.mgrid].pic" class="prfimg" ng-src="{{level3data.managerMap[data.mgrid].picCdn || level3data.managerMap[data.mgrid].pic}}{{level3data.refreshProfileToken}}" alt="">
+                                                </div>
+                                            </div>
+                                            <div ng-if="data.seqfor==='NH'" class="nmlbl">
+                                                <span class="text">{{level3data.hirenm}}</span>
+                                            </div>
+                                            <div ng-if="data.seqfor==='M'" class="nmlbl">
+                                                <!-- <span class="text" ng-if="data.label">{{data.label}}: </span> -->
+                                                <span class="text">{{data.mgrnm}}</span>
+                                                <span class="text" ng-if="!data.mgrnm">{{level3data.mgrnm}}</span>
+                                            </div>
+                                        </td>
+                                        <td class="td-container">
+											<div>
+												<span class="icon icon-after icon-sequence-manager-small" ng-if="data.seqfor==='NH' && data.type!=='gdpr'"></span>
+                                                <span class="icon icon-after icon-e-signing-small" ng-if="data.seqfor==='NH' && data.type==='gdpr'"></span>
+
+                                                <span class="icon icon-after icon-sequence-newhire-small" ng-if="data.seqfor==='M'"></span>
+												<span class="text">{{data.seqname}}</span>
+                                                <span ng-if="data.status!=='skipped' && data.type!=='gdpr'" class="icon-before arrow-toggle icon-arrow-2"></span>
+											</div>
+										</td>
+										<td class="td-container">
+											<div ng-if="data.status==='in progress' || data.status==='skipped' || data.status ==='gdpr_notsigned' || data.status==='gdpr_signed' || data.status==='gdpr_viewed'">
+												<span class="date">{{data.crdt}}</span>
+											</div>
+											<div ng-if="data.status==='complete'">
+												<span class="date">{{data.compdt}}</span>
+												<span class="date" ng-if="!data.compdt">{{data.upddt}}</span>
+											</div>
+											<div ng-if="data.status==='overdue'">
+												<span class="date">{{data.overduedt}}</span>
+											</div>
+                                            <div ng-if="data.status==='dismissed'">
+												<span class="date">{{data.dismissdt}}</span>
+											</div>
+										</td>
+                                        <td class="td-container wtltp">
+											<div>
+												<span class="status complete" ng-if="data.status==='complete'">
+													{{data.status}}
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+												</span>
+												<span class="status overdue" ng-if="data.status==='overdue'">
+													{{data.status}}
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+												</span>
+												<span class="status inprogress" ng-if="data.status==='in progress'">
+													{{data.status}}
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+												</span>
+												<span class="status skipped" ng-if="data.status==='skipped'">
+													{{data.status}}
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top">
+														<p>
+															{{getTooltip(data.status)}}<br><br>
+															<strong>Why was this skipped?</strong><br> 
+															<span ng-if="data.status==='skipped'" class="ltr-txt">
+																<span ng-if="data.skipmsg === 'added_later'">Added at later date</span>
+																<span ng-if="data.skipmsg === 'seq_deleted'">Sequence removed.</span>
+																<span ng-if="data.skipmsg === 'seq_removed'">Sequence removed.</span>
+																<span ng-if="data.skipmsg === 'not_available'">Participant not available</span>
+															</span>
+														</p>
+													</md-tooltip>
+												</span>
+                                                <span class="status dismiss" ng-if="data.status==='dismissed'">
+													{{data.status}}
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+												</span>
+                                                <span class="status skipped" ng-if="data.status==='gdpr_viewed' || data.status==='gdpr_notsigned'">
+                                                    Not Signed
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+                                                </span>
+                                                <span class="status launched" ng-if="data.status==='gdpr_signed'">
+                                                    Signed
+                                                    <md-tooltip class="manager-tooltip status-tooltip" md-delay="100" md-direction="top"><p>{{getTooltip(data.status)}}</p></md-tooltip>
+                                                </span>
+                                                <span class="status-logic icon-logic-small complete" ng-if="data.logic && data.status === 'complete'" ng-click="showLogicDetails(data.seqid , data.initid , data.seqname);"></span>
+                                                <span class="status-logic icon-logic-small overdue" ng-if="data.logic && data.status === 'overdue'" ng-click="showLogicDetails(data.seqid , data.initid , data.seqname);"></span>
+                                                <span class="status-logic icon-logic-small inprogress" ng-if="data.logic && data.status === 'in progress'" ng-click="showLogicDetails(data.seqid , data.initid , data.seqname);"></span>
+                                                <span class="status-logic icon-logic-small skipped" ng-if="data.logic && data.status === 'skipped'" ng-click="showLogicDetails(data.seqid , data.initid , data.seqname);"></span>
+                                                <span class="status-logic icon-logic-small dismiss" ng-if="data.logic && data.status === 'dismissed'" ng-click="showLogicDetails(data.seqid , data.initid , data.seqname);"></span>
+											</div>
+										</td>
+									</tr>
+
+									<!-- <tr class="detail-section-dashboard" ng-repeat="data1 in getModuleData(data.seqid) | orderBy:['data1.crdt',-'data1.action','data1.modname']"> -->
+									<tr ng-class="{'spaced-row-first':$first, 'spaced-row-last':$last}" class="detail-section-dashboard" ng-if="data.dtype==='seq'" ng-repeat="data1 in getModuleData(data.seqid)">
+										<td class="td-container">
+											<div>&nbsp;</div>
+										</td>
+                                        <td class="td-container">
+											<div>
+												<!-- <span ng-if="data1.modname === 'Notification'" class="shape"></span> -->
+												<span class="icon icon-after" ng-class="getModuleIcon(data1)"></span>
+												<span ng-class="{othermodules: data1.modname !== 'Notification'}" class="text">
+                                                    {{data1.modname}}
+                                                    <span ng-if="data1.action==='resend' && data1.resendto">(<a title="{{data1.resendto}}">{{data1.resendto}}</a>)</span>
+                                                    <span ng-if="data1.action==='forward' && data1.fwdto">(<a title="{{data1.fwdto}}">{{data1.fwdto}}</a>)</span>
+                                                    <span ng-if="data1.action==='s' && data1.sendto">(<a title="{{data1.sendto}}">{{data1.sendto}}</a>)</span>
+													<span ng-if="data1.action==='reminder' && data1.remindto">(<a title="{{data1.remindto}}">{{data1.remindto}}</a>)</span>
+													<span ng-if="data1.hasmd === 'y' && hasPermission('permissions.createWF')" class="icon goto icon-go-to-small" ng-click="gotoModule(level3data.wfid, wfname, data1.modid, data1.iconname, data1.seqid);"></span>
+                                                </span>
+												<span class="text" ng-if="data1.action==='btnclk'"> (Button)</span>
+											</div>
+										</td>
+										<td class="td-container">
+											<div>
+												<span class="date">{{data1.crdt}}</span>
+											</div>
+										</td>
+										<td class="td-container">
+												<div ng-controller="showWfDetailsCtrl" ng-if="data1.modtype === 'multi-page' || (data1.modtype === 'embed-course' && data1.test_type !== 'none')"
+												ng-init="learnstatus = getLearnModuleStatus(data1); assessmentstatus = getAssessmentStatus(level3data, data1)">
+												<span class="status fkbtn form-submit" ng-class="{'viewed': learnstatus==='complete', 'inprogress': learnstatus!=='complete'}"  ng-click="showLearnDetailsModal(data1, data, level3data);" >{{learnstatus}}</span>
+												<span ng-if="data1.test_type === 'quiz' && learnstatus === 'complete' && assessmentstatus !== 'complete'" class="cir inprogress">
+													<span class="icn icon-tl-sml-progress"></span>
+												</span>
+												<span ng-if="data1.test_type === 'quiz' && assessmentstatus === 'complete'" class="cir complete">
+													<span class="icn icon-tl-sml-complet"></span>
+												</span>
+												<span ng-if="data1.test_type === 'quiz' && learnstatus !== 'complete'" class="cir inactive"></span>
+												<span ng-if="false" class="cir active"></span>
+											</div>
+											<div ng-controller="showWfDetailsCtrl" ng-if="data1.modtype !== 'multi-page' && !(data1.modtype === 'embed-course' && data1.test_type !== 'none')" >
+												<span class="status viewed" ng-if="data1.action==='v' && data1.modtype !== 'video-rec'">viewed</span>
+												<span class="status viewed" ng-if="data1.action==='s'">sent</span>
+												<span class="status viewed" ng-if="data1.action==='forward'">forward</span>
+                                                <span class="status viewed retxt" ng-if="data1.action==='resend'">resent</span>
+                                                <span class="status viewed retxt" ng-if="data1.action==='fail'">failed</span>
+												<span class="status viewed" ng-if="data1.action==='reminder'">reminder</span>
+												<span class="status viewed" ng-if="data1.action==='queue'">queued</span>
+												<span class="status viewed" ng-if="data1.action==='sms'">sms sent</span>
+												<span class="status viewed" ng-if="data1.action==='skip'">sms skip</span>
+												<span class="status viewed" ng-if="data1.action==='email'">email sent</span>
+												<span class="status viewed" ng-if="data1.action==='event'">invite sent</span>
+												<span class="status viewed" ng-if="data1.action==='stp'">stopped</span>
+												<span class="status viewed" ng-if="data1.action==='rdt'">redirected</span>
+
+                                                <span class="status viewed fkbtn inprogress" ng-if="data1.action==='logic_prog'" ng-click="showLogicStatus(data1)">
+                                                    <span class="text">in progress</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.action==='logic_comp'" ng-click="showLogicStatus(data1)">
+                                                    <span class="text">completed</span>
+                                                </span>
+                                                <span class="status viewed fkbtn inprogress" ng-if="data1.action==='sd_prog'" ng-click="showSendDataStatus(data1)">
+                                                    <span class="text">in progress</span>
+                                                </span>
+												<span class="status fkbtn viewed form-submit" ng-if="data1.action==='sd_comp' && data1.sd_action !== 'webhook'" ng-click="showSendDataStatus(data1)">
+                                                    <span class="text">completed</span>
+												</span>
+												<span ng-if="data1.sd_action==='webhook'">
+													<span class="status fkbtn viewed form-submit"  ng-if="data1.details.webhookres.status === 'ok'" ng-click="showSendDataStatus(data1)">
+														<span class="text">completed</span>
+													</span>
+													<span class="status fkbtn viewed error" ng-if="data1.details.webhookres.status !== 'ok'" ng-click="showSendDataStatus(data1)">
+														<span class="text">Error</span>
+													</span>
+												</span>
+                                                <span class="status fkbtn viewed error" ng-if="data1.action==='sd_err'" ng-click="showSendDataStatus(data1)">
+                                                    <span class="text">Error</span>
+                                                </span>
+												<span class="status viewed fkbtn inprogress" ng-if="data1.action==='ack_prog'" ng-click="showSubmittedAck(data1)">
+                                                    <span class="text">in progress</span>
+                                                </span>
+												<span class="status fkbtn viewed form-submit" ng-if="data1.action==='ack_comp'" ng-click="showSubmittedAck(data1)">
+                                                    <span class="text">completed</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.action==='sbt'" ng-click="showSubmittedForm(data1)">
+                                                    <span class="text">Submitted</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.action==='comp'" ng-click="showSubmittedForm(data1)">
+                                                    <span class="text">Completed</span>
+                                                </span>
+												<span class="status viewed" ng-if="data1.action==='btnclk'">clicked</span>
+												<span class="status viewed fkbtn inprogress" ng-if="data1.action==='esign_st'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Started</span>
+                                                </span>
+                                                <span class="status viewed fkbtn inprogress" ng-if="data1.action==='esign_prep'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Preparing</span>
+                                                </span>
+                                                <span class="status fkbtn viewed error" ng-if="data1.action==='esign_err'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Error</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.action==='esign_done'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Completed</span>
+                                                </span>
+                                                <span class="status fkbtn viewed error" ng-if="data1.action==='esign_declined'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Declined</span>
+                                                </span>
+                                                <span class="status fkbtn viewed error" ng-if="data1.action==='esign_voided'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Voided</span>
+                                                </span>
+                                                <span class="status fkbtn viewed cancelled" ng-if="data1.action==='esign_cancel'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Cancelled</span>
+                                                </span>
+                                                <span class="status fkbtn viewed deleted" ng-if="data1.action==='esign_deleted'" ng-click="showEsignStatusDialog(data1)">
+                                                    <span class="text">Deleted</span>
+                                                </span>
+
+                                                <span class="status viewed fkbtn inprogress" ng-if="data1.action==='I9_inprogress'" ng-click="showI9StatusDialog(data1)">
+                                                    <span class="text">In progress</span>
+                                                </span>
+                                                <span class="status fkbtn viewed error" ng-if="data1.action==='I9_error'" ng-click="showI9StatusDialog(data1)">
+                                                    <span class="text">Error</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.action==='I9_complete'" ng-click="showI9StatusDialog(data1)">
+                                                    <span class="text">Completed</span>
+                                                </span>
+
+                                                <span class="status viewed fkbtn inprogress" ng-if="data1.modtype === 'video-rec' && data1.action === 'v'" ng-click="showMyInterviewDialog(data1)">
+                                                    <span class="text">viewed</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.modtype === 'video-rec' && data1.action === 'recorded'" ng-click="showMyInterviewDialog(data1)">
+                                                    <span class="text">Recorded</span>
+                                                </span>
+                                                <span class="status fkbtn viewed form-submit" ng-if="data1.modtype === 'video-rec' && data1.action === 'saved'" ng-click="showMyInterviewDialog(data1)">
+                                                    <span class="text">Saved</span>
+                                                </span>
+
+												<span class="status viewed" ng-if="data1.proxy==='a'">by Admin</span>
+                                                <span class="status viewed" ng-if="data1.proxyid && data1.proxyid!=='a'">by {{data1.proxy}}</span>
+
+											</div>
+										</td>
+									</tr>
+								</tbody>
+
+							</table>
+
+                            <div ng-if="seqData.length == '0'" class="empty-data">
+                                <p class="fancy title">
+                                    <span>No data to show yet</span>
+                                </p>
+                            </div>
+
+						</div>
+
+			  		</md-content>
+				</md-tab>
+
+		  	</md-tabs>
+
+
+		</form>
+
+	</div>
+</div>

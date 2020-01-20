@@ -1,0 +1,64 @@
+<md-dialog aria-label="New Language" class="add-new-people-modal lang-modal md-default-theme">
+<form name="languageForm" novalidate>
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2 ng-if="mode === 'add'">Add New Language</h2>
+            <h2 ng-if="mode === 'update'">Update Language</h2>
+            <span flex></span>
+            <md-button class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content style="min-width:600px;max-width:600px;max-height:810px;">
+        <span class="heading custom-field-heading">
+            Follow instructions below and add new translations via the 'UPLOAD<br>.CSV TRANSLATION FILE' button.
+        </span>
+        <div class="upld-setps">
+            <ol>
+                <li>
+                    Download
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="" ng-csv="getEmptyCSVData()" filename="empty_translations.csv">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Empty-template.csv</span>
+                        </md-button>
+                    </div>
+                </li>
+                <li>Add language translations into the far right column and save CSV file.</li>
+                <li>Use thev 'Upload .csv translation file' button to upload the new translation.</li>
+            </ol>
+        </div>
+
+        <div layout="row" layout-align="space-around center" layout-wrap class="upld-wrap">
+            <md-input-container flex class="lang-ddwrap md-block" md-no-float>
+                <label>Language name</label>
+                <md-select md-no-asterisk md-container-class="fixed-dd" ng-model="langdata.langtkey" placeholder="Select Language" required ng-disabled="mode === 'update'">
+                    <md-option ng-repeat="lang in availableLang track by $index"value="{{lang.key}}">{{lang.lang}}</md-option>
+                </md-select>
+            </md-input-container>
+
+            <md-button flex aria-label="Upload" class="md-raised" ngf-max-size="50KB" ngf-select="uploadCSVFile($file)" accept="text/csv">
+                <span class="text">upload .csv translation file</span>
+            </md-button>
+            <span class="lbl" ng-if="uploaddt">
+                Updated: <span>{{uploaddt}}</span>
+            </span>
+        </div>
+        <div class="error" ng-if="error === 'yes'">
+            <span class="icon icon-notification-alert"></span>
+            <span class="text">{{errorMsg}}</span>
+        </div>
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+        <md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveTranslations();" ng-disabled="languageForm.$invalid" md-autofocus>
+            <span class="text">save</span>
+            <span class="text-save">saving...</span>
+            <span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+            <span class="spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+        </md-button>
+    </md-dialog-actions>
+</form>
+</md-dialog>

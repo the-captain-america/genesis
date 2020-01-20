@@ -1,0 +1,63 @@
+<div class="preview-overlay quizpreview qzpgprv">
+    <div class="preview-content">
+        <div class="preview-spinner">
+            <span class="spinner">
+                <md-progress-circular md-diameter="65px"></md-progress-circular>
+            </span>
+        </div>
+
+        <div
+            ng-if="contentType==='multi-page'"
+            ng-controller="MultiPageEditorCtrl"
+            ng-cloak
+            class="preview-tabs"
+        >
+            <md-content>
+                <md-tabs md-selected="assmntTabIndex">
+                    <md-tab
+                        label="ASSESSMENT"
+                        md-on-select="assessmentPreview();"
+                    ></md-tab>
+                    <md-tab
+                        label="CONTENT"
+                        md-on-select="contentPreview();"
+                    ></md-tab>
+                </md-tabs>
+            </md-content>
+        </div>
+
+        <div
+            ng-if="contentType==='embed-course'"
+            ng-controller="EmbedCourseEditorCtrl"
+            ng-cloak
+            class="preview-tabs"
+        >
+            <md-content>
+                <md-tabs md-selected="assmntTabIndex">
+                    <md-tab
+                        label="ASSESSMENT"
+                        md-on-select="assessmentPreview();"
+                    ></md-tab>
+                    <md-tab
+                        label="CONTENT"
+                        md-on-select="contentPreview();"
+                    ></md-tab>
+                </md-tabs>
+            </md-content>
+        </div>
+
+        <div class="device-wrap">
+            <div class="device-container">
+                <div class="device mobile animate-if">
+                    <div class="frmwrp mobile">
+                        <iframe
+                            title="preivew"
+                            id="previewFrame"
+                            ng-src="{{ previewurl }}"
+                        ></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,150 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+
+    <div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+        <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+        <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+        <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+    </div>
+
+    <div class="container content-editor forms-editor">
+    <form name="workflow3" novalidate>
+        <!-- Preview icon -->
+        <a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default' && iconname !== 'notification-small' && iconname !== 'I9'">
+            <span class="icon icon-preview-big"></span>
+        </a>
+
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+        <div class="cecwrp">
+            <div class="content-editor-content fkpge pg2" ng-if="pages.total > 2"></div>
+            <div class="content-editor-content fkpge pg1" ng-if="pages.total > 1"></div>
+            <div class="content-editor-content" ng-cloak>
+                <div class="maskd" ng-if="locked === 'Y'"></div>
+
+                <div class="multipagination-wrap tp">
+                    <span class="msk" ng-if="pages.total < 1"></span>
+                    <span class="icn icon-button-arrow-left" ng-click="leftClick()"></span>
+                    <md-button class="whtbtn more-action md-raised" ng-click="">
+                        <span ng-if="currpage === 0" class="btntxt">cover</span>
+                        <span ng-if="currpage > 0" class="btntxt">{{currpage}} / {{pages.total}}</span>
+                    </md-button>
+                    <div class="preivew-popover">
+                        <span class="btnwrp" ng-click="dndclicked(0);">
+                            <span class="txt">Cover</span>
+                        </span>
+                        <span dnd-list="pages" dnd-drop="dropCallbackLearnTopic(event, index, item);">
+                            <span dnd-draggable="$index" dnd-effect-allowed="move" ng-repeat="i in [].constructor(pages.total) track by $index" style="display: block">
+                                <span class="btnwrp" ng-click="dndclicked($index+1);" ng-class="{act: currpage === ($index+1)}">
+                                    <span class="txt">{{$index+1}}. {{pages['page'+($index+1)].title ? pages['page'+($index+1)].title: 'Untitled'}}</span>
+                                    <span class="drgicn icon-drag-small"></span>
+                                </span>
+                            </span>
+                        </span>
+                    </div>
+                    <span class="icn icon-button-arrow-right" ng-click="rightClick()"></span>
+                </div>
+
+                <div class="cvrtxt" ng-if="currpage === 0">
+                    Cover is auto-generated when adding pages.<br>
+                    Click ' <span class="icn icon-plus"></span> ' icon in bottom corner to create a new page.
+                </div>
+
+                <div class="heading">
+                    <md-input-container class="md-block">
+                        <label>Page title</label>
+                        <input class="heading-input" ng-if="titleFocus === 'yes'" placeholder="Write a title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ></input>
+                        <input ng-if="titleFocus === 'no'" placeholder="Write a title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();"></input>
+                        <span class="blrdv wht"></span>
+                    </md-input-container>
+                </div>
+
+                <div class="wdgincldwrp">
+                    <div ng-include="'views/workflow/div-workflow3-widgets.html'"></div>
+                    <div class="flsh" ng-class="{vsbl : flshenb === 'yes'}"></div>
+                </div>
+
+                <div class="multipagination-wrap">
+                    <span class="msk" ng-if="pages.total < 1"></span>
+                    <span class="icn icon-button-arrow-left" ng-click="leftClick()"></span>
+                    <md-button class="whtbtn more-action md-raised" ng-click="">
+                        <span ng-if="currpage === 0" class="btntxt">cover</span>
+                        <span ng-if="currpage > 0" class="btntxt">{{currpage}} / {{pages.total}}</span>
+                    </md-button>
+                    <div class="preivew-popover">
+                        <span class="btnwrp" ng-click="dndclicked(0);">
+                            <span class="txt">Cover</span>
+                        </span>
+                        <span dnd-list="pages" dnd-drop="dropCallbackLearnTopic(event, index, item);">
+                            <span dnd-draggable="$index" dnd-effect-allowed="move" ng-repeat="i in [].constructor(pages.total) track by $index" style="display: block">
+                                <span class="btnwrp" ng-click="dndclicked($index+1);" ng-class="{act: currpage === ($index+1)}">
+                                    <span class="txt">{{$index+1}}. {{pages['page'+($index+1)].title ? pages['page'+($index+1)].title: 'Untitled'}}</span>
+                                    <span class="drgicn icon-drag-small"></span>
+                                </span>
+                            </span>
+                        </span>
+                    </div>
+                    <span class="icn icon-button-arrow-right" ng-click="rightClick()"></span>
+                </div>
+
+                <md-button class="whtbtn addbtn md-raised" ng-click="addPage()">
+                    <a title="Add page">
+                        <span class="icn icon-plus"></span>
+                    </a>
+                </md-button>
+                <md-button class="whtbtn removebtn md-raised" ng-click="removePage()" ng-if="pages.total > 1 && currpage > 0">
+                    <span class="icn icon-close-5"></span>
+                </md-button>
+
+                <div class="error error-form ack-error" ng-if="reqFldErr === 'yes'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Create at least 1 flashcard to save module.</span>
+                </div>
+
+                <div class="error error-form ack-error" ng-if="noPagesError === true">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Create at least 1 page to save module.</span>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>

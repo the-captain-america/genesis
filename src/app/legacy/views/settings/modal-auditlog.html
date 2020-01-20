@@ -1,0 +1,140 @@
+<md-dialog aria-label="Audit log details" class="auditlog-modal md-default-theme">
+    <md-toolbar>
+        <div class="md-toolbar-tools">
+            <h2>Audit log details</h2>
+            <span flex></span>
+            <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                <span class="icon icon-close-2"></span>
+            </md-button>
+        </div>
+    </md-toolbar>
+    <md-dialog-content aria-label="Audit log details" style="min-width:570px;max-width:570px;max-height:810px;">
+        <div class="txtwrp" ng-if="detailpgerror">
+            <div class="lbl">{{detailpgerror}}</div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Date ({{tz}})
+            </div>
+            <div class="dtl">
+                {{auditlog.dispdt}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Employee
+            </div>
+            <div class="dtl">
+                {{auditlog.hirenm}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                External Id
+            </div>
+            <div class="dtl">
+                {{auditlog.externalid}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                System
+            </div>
+            <div class="dtl">
+                {{auditlog.system}}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="txtwrp">
+            <div class="lbl">
+                URL
+            </div>
+            <div class="dtl">
+                {{auditlog.url}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Method
+            </div>
+            <div class="dtl">
+                {{auditlog.method}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Http code
+            </div>
+            <div class="dtl">
+                {{auditlog.status}}
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Trace ID
+            </div>
+            <div class="dtl">
+                {{auditlog.id}}
+            </div>
+        </div>
+        <!-- <div class="txtwrp">
+            <div class="lbl">
+                Context
+            </div>
+            <div class="dtl">
+                {{auditlog.context}}
+            </div>
+        </div> -->
+        <div class="txtwrp">
+            <div class="lbl">
+                Response message
+            </div>
+            <div class="dtl pld">
+                <pre class="prettyprint"><span>{{auditlog.msg | json}}</span></pre>
+            </div>
+        </div>
+        <div class="txtwrp">
+            <div class="lbl">
+                Payload
+            </div>
+            <div class="dtl pld">
+                <pre class="prettyprint"><span>{{auditlog.payload | json}}</span></pre>
+            </div>
+        </div>
+
+        <div class="txtwrp" ng-if="showretrymsg==='yes'">
+            <div class="lbl">
+                Retry webhook response
+            </div>
+            <div class="dtl pld">
+                <pre class="prettyprint"><span>{{ retrylog | json}}</span></pre>
+            </div>
+        </div>
+
+    </md-dialog-content>
+    <md-dialog-actions layout="row">
+
+        <md-button
+            ng-if="(auditlog.auditWFStatus.webhookstatus==='error' || auditlog.auditWFStatus.webhookstatus==='retry') && auditlog.auditWFStatus.workflowstatus==='INIT' && showretrymsg==='no'"
+            aria-label="Retry" class="save save-spinner as-loading md-default-theme" ng-click="retry()" md-autofocus>
+
+            <span ng-if="retryprocess !== 'started' || retryprocess !== 'completed'" class="text-name">Retry</span>
+            <span ng-if="retryprocess === 'started'" class="item-spinner">
+                <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            </span>
+            <span ng-if="retryprocess === 'completed'" class="text-result">Success</span>
+            <span ng-if="retryprocess === 'completed'" class="text-icon"><span
+                    class="icon-notification-ok"></span></span>
+        </md-button>
+
+
+        <md-button ng-if="retryprocess === 'error'" aria-label="Retry"
+            class="save save-spinner as-loading md-default-theme" md-autofocus>
+            <span class="text-name">Error</span>
+            <span class="text-icon"><span class="icon icon-close-5"></span></span>
+        </md-button>
+
+    </md-dialog-actions>
+</md-dialog>

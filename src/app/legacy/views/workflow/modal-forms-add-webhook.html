@@ -1,0 +1,183 @@
+<md-dialog aria-label="Add webhook" class="form-webhook-modal md-default-theme">
+    <form name="AddWebhookForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="webhookDialog.showDeleteWebhookDialog !== 'yes'">add webhook</h2>
+                <h2 ng-if="webhookDialog.showDeleteWebhookDialog === 'yes'">delete webhook</h2>
+                <span flex></span>
+                <md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content ng-class="{delw : webhookDialog.showDeleteWebhookDialog === 'yes'}"
+            style="min-width:715px;max-width:715px">
+
+            <div layout="row" layout-align="space-around start" layout-wrap
+                ng-if="webhookDialog.showAddWebhookDialog === 'yes'">
+                <div flex="75">
+                    <label class="heading heading-inside">
+                        A webhook allows you to send data to other applications. Enter the webhook details below as
+                        specified in your other application. For more details see our <a
+                            href="https://help.enboarder.com" target="_blank">help center.</a>
+                    </label>
+                </div>
+                <div flex="100">
+                    <md-input-container class="required">
+                        <label>Enter URL</label>
+                        <input md-no-asterisk name="webhookurl" ng-model="localWebhook.url" type="url" required>
+                        <!-- <input md-no-asterisk name="webhookurl" ng-model="localWebhook.url" required> -->
+                    </md-input-container>
+
+                    <!-- align inputs horizontally in a row id:5757 name: modal-forms-add-webhook-->
+                    <div class="grid">
+                        <div flex="50" layout="column" layout-align="start" class="column method-dd push-right">
+
+                            <md-input-container>
+                                <label>Authentication</label>
+                                <md-select md-no-asterisk ng-model="localWebhook.auth" required>
+                                    <md-option value="{{authOption.val}}" ng-disabled="{{authOption.disabled}}"
+                                        ng-repeat="authOption in authOptions track by $index">{{authOption.name}}
+                                    </md-option>
+                                </md-select>
+                            </md-input-container>
+                        </div>
+                        <div flex="50" layout="column" layout-align="start" class="method-dd">
+                            <md-input-container>
+                                <label>Method</label>
+                                <md-select md-no-asterisk ng-model="localWebhook.method" required>
+                                    <md-option value="get">Get (data from URL)</md-option>
+                                    <md-option value="post">Post (data to URL)</md-option>
+                                    <md-option value="put">Put (data to URL)</md-option>
+                                </md-select>
+                            </md-input-container>
+
+                        </div>
+                    </div>
+                    <!-- <md-checkbox aria-label="Do not store data on Enboarder servers" ng-model="localWebhook.storedata" ng-true-value="'yes'" ng-false-value="'no'">
+                <span>Do not store data on Enboarder servers</span>
+            </md-checkbox> -->
+
+                    <hr>
+
+                    <div layout="row" class="header-label">
+                        <div flex>
+                            <label>Header, key</label>
+                        </div>
+                        <div flex>
+                            <label>Header, value</label>
+                        </div>
+                    </div>
+
+                    <div ng-if="parentType === 'forms'" layout="row" class="header-inputs"
+                        ng-repeat="header in localWebhook.headers track by $index">
+                        <div flex>
+                            <md-input-container>
+                                <input name="webhookurl" ng-model="header.key">
+                            </md-input-container>
+                        </div>
+                        <div flex>
+                            <md-input-container>
+                                <input name="webhookurl" ng-model="header.value">
+                            </md-input-container>
+                        </div>
+                        <md-button class="delete-btn" ng-click="deleteHeaders($index);" aria-label="Delete"
+                            ng-if="$index > 0" md-ink-ripple="false">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                        <div class="delete-btn-cover" ng-if="$index > 0"></div>
+                    </div>
+
+                    <div ng-if="parentType === 'senddata'" layout="row" class="grid header-inputs"
+                        ng-repeat="header in localWebhook.headers track by $index">
+                        <div flex class="column push-right">
+                            <md-input-container>
+                                <input class="hook-adjustment" name="webhookurl" ng-model="header.key">
+                            </md-input-container>
+                        </div>
+                        <div flex>
+                            <md-input-container>
+                                <input name="webhookurl" ng-model="header.value">
+                            </md-input-container>
+                        </div>
+                        <md-button class="delete-btn" ng-click="deleteHeaders($index);" aria-label="Delete"
+                            md-ink-ripple="false">
+                            <span class="icon icon-close-5"></span>
+                        </md-button>
+                        <div class="delete-btn-cover"></div>
+                    </div>
+
+                    <div class="add-more-new-wrap">
+                        <md-button class="add-more" ng-click="addMoreHeaders();">
+                            <span class="icon icon-plus"></span>
+                            <span class="text">add more</span>
+                        </md-button>
+                    </div>
+
+                    <div layout="row" ng-if="localWebhook.method !== 'get'">
+                        <div flex="100" class="textarea-wrap">
+                            <label>Body (re-interpret JSON)</label>
+                            <md-input-container>
+                                <textarea ng-if="parentType === 'forms'" ng-model="localWebhook.payload"></textarea>
+                                <div class="editor wbedtr focus" ng-if="parentType === 'senddata'">
+                                    <textarea ui-tinymce="tinymceWebhook" ng-model="localWebhook.payload"></textarea>
+                                </div>
+                            </md-input-container>
+                        </div>
+                    </div>
+
+                    <div class="error" ng-if="webhookError === 'yes'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">{{webhookErrorMessage}}</span>
+                    </div>
+
+
+                    <md-checkbox aria-label="Export JSON as XML" ng-model="localWebhook.contenttype"
+                        ng-true-value="'application/xml'" ng-false-value="'application/json'">
+                        <span>Export JSON as XML</span>
+                    </md-checkbox>
+
+                    <div layout="row" ng-if="localWebhook.contenttype === 'application/xml'" class="xmlouter">
+                        <div flex="100" class="textarea-wrap xml-wrap">
+                            <span class="text">
+                                <pre>{{jsonXML}}</pre>
+                            </span>
+                        </div>
+                        <md-button class="btn md-raised save save-spinners gnkey" ng-click="refreshXml();">
+                            <span class="text">
+                                refresh XML
+                                <span class="btn-icon icon-refresh"></span>
+                            </span>
+                            <span class="text-saved">
+                                refreshed
+                                <span class="btn-icon icon-criteria"></span>
+                            </span>
+                        </md-button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="delete-btn-copy" ng-if="webhookDialog.showDeleteWebhookDialog === 'yes'">
+                Are you sure you want to delete webhook ?
+            </div>
+
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row" ng-if="webhookDialog.showAddWebhookDialog === 'yes'">
+            <md-button aria-label="Delete" class="md-default-theme" ng-click="showDeleteWebhookMsg();"
+                ng-if="showWebhookDeleteButton === 'yes'">Delete</md-button>
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="saveWebhook();"
+                ng-disabled="AddWebhookForm.$invalid" md-autofocus>Save</md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions layout="row" ng-if="webhookDialog.showDeleteWebhookDialog === 'yes'">
+            <md-button aria-label="Delete" class="md-default-theme" ng-click="showAddWebhookDialog();" md-autofocus
+                ng-if="showWebhookDeleteButton === 'yes'">Back</md-button>
+            <md-button aria-label="OK" class="save md-default-theme" ng-click="removeWebhookData();" md-autofocus>OK
+            </md-button>
+        </md-dialog-actions>
+
+    </form>
+</md-dialog>

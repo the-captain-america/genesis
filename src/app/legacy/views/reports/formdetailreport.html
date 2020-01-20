@@ -1,0 +1,207 @@
+<div class="bread-crumb">
+    <span><a ng-href="#/reports/forms">Form</a></span>
+    <span>/</span>
+    <span><a href="javascript:void(0)" class="active">Form detail</a></span>
+</div>
+
+<div class="reports-wrap formdetails lngtbl fmdtlrpt">
+    <div class="reports-wrap-inner">
+
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <form name="reportForm" novalidate>
+            <div class="heading-panel">
+                <h4>{{wfdefn.name}}</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download table data (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+
+            <div class="search-panel detail-section" style="display:block">
+
+                <div layout="row" layout-align="center center">
+                    <div flex>
+                        <md-input-container>
+                            <label>Completed by</label>
+                            <input ng-model="reportSearch.nm">
+                            <span class="blrdv rpt"></span>
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Submitted, From</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_from" md-placeholder="Select date"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Submitted, To</label>
+                    	<md-datepicker ng-model="reportSearch.dt_cr_to" md-placeholder="Select date"></md-datepicker>
+                    </div>
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div style="position:relative">
+            <div class="scroll-btn-wrap">
+                <span class="scroll-btn icon-arrow-1"></span>
+            </div>
+            <div class="scroll-btn-wrap-rt">
+                <span class="scroll-btn icon-button-arrow-left"></span>
+            </div>
+
+            <div class="table-wrapper">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>Completed by</th>
+                            <th>Submitted</th>
+                            <th>Workflow</th>
+                            <th ng-repeat="col in cols track by $index">
+                                <span class="icon icon-attachement" ng-if="col.type ==='fileupload'"></span>
+                                <span class="text">
+                                    <a title="{{col.lbl}}">{{col.lbl}}</a>
+                                </span>
+                                <span class="rttxt" ng-if="col.type ==='rating' && col.avg">(Average: {{col.avg}})</span>
+                                <span class="rttxt" ng-if="col.type ==='rating' && col.nps">(ENPS: {{col.nps}})</span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in displayedCollection track by $index">
+                            <td class="td-container" ng-click="showFormDataDialog(row);">
+                                {{row.crby155}}
+                                <div ng-if="row['iststwf'] ==='y'" class="tstbdg">Test</div>
+                            </td>
+                            <td class="td-container" ng-click="showFormDataDialog(row);">
+                                <div>{{row.crdt155fmt}}</div>
+                            </td>
+                            <td class="td-container" ng-click="showFormDataDialog(row);">
+                                <div>{{row.wfname}}</div>
+                            </td>
+                            <td class="td-container" ng-repeat="col in cols track by $index">
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type !== 'fileupload' && col.type !== 'multiple-choice' && col.type !== 'fileuploadszip' && col.type !== 'special-text'">{{row[col.uid]}}</div>
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type !== 'fileupload' && col.type !== 'multiple-choice' && col.type !== 'fileuploadszip' && (col.type === 'special-text' && row[col.uid].constructor !== {}.constructor)">{{row[col.uid]}}</div>
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type === 'fileupload'">
+                                    <a href="{{row[col.uid].s3path}}" target="_blank">{{row[col.uid].origname}}</a>
+                                </div>
+                                <!-- <div ng-if="col.type === 'fileuploadszip'">
+                                    <span ng-click="downloadZip(row[col.uid]);">Download zip</span>{{row[col.uid]}}
+                                </div> -->
+                                <div ng-if="col.type === 'fileuploadszip'">
+                                    <form name="dnldatchmntfrm" novalidate>
+                                        <md-input-container class="dnlddd" md-no-float>
+                                            <md-select aria-label="Select" md-no-asterisk required placeholder="Select" md-container-class="crit-cont dnldatchdd"
+                                                ng-model="fileitems" multiple>
+                                                <md-option ng-repeat="item in row[col.uid]" value="{{item.uid}}">
+                                                    {{item.lbl}}
+                                                </md-option>
+                                            </md-select>
+                                        </md-input-container>
+                                        <md-button class="dnldbtn md-raised" ng-click="downloadZip(row, fileitems);" ng-disabled="dnldatchmntfrm.$invalid" md-autofocus>
+                                            <span class="icn icon-download"></span>
+                                            <span class="text">Download attachments</span>
+                                        </md-button>
+                                    </form>
+                                </div>
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type === 'multiple-choice' && row[col.uid].constructor === [].constructor">
+                                    <ul class="clist">
+                                        <li ng-repeat="opt in row[col.uid]">
+                                            <span class="txt">{{opt}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type === 'special-text' && row[col.uid].constructor === {}.constructor">
+                                    <span ng-if="row[col.uid].nm">{{row[col.uid].nm}}</span>
+                                    <span ng-if="row[col.uid].mob"><span ng-if="row[col.uid].nm">, {{row[col.uid].mob}}</span><span ng-if="!row[col.uid].nm">{{row[col.uid].mob}}</span></span>
+                                    <span ng-if="row[col.uid].eml"><span ng-if="row[col.uid].nm || row[col.uid].mob">, {{row[col.uid].eml}}</span><span ng-if="!(row[col.uid].nm || row[col.uid].mob)">{{row[col.uid].eml}}</span></span>
+                                    <span class="txt" ng-repeat="(key, val) in row[col.uid]">
+                                        <span ng-if="!$last && !(key === 'nm' || key === 'mob' || key === 'eml' || key === 'pref' || key === 'prflid')">{{val}}, </span>
+                                        <span ng-if="$last && !(key === 'nm' || key === 'mob' || key === 'eml' || key === 'pref' || key === 'prflid')">{{val}}</span>
+                                    </span>
+                                </div>
+                                <div ng-click="showFormDataDialog(row);" ng-if="col.type === 'multiple-choice' && row[col.uid].constructor !== [].constructor">
+                                    <ul class="clist">
+                                        <li ng-repeat="opt in row[col.uid].split(',')">
+                                            <span class="txt">{{opt}}</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr class="nohover" ng-if="displayedCollection.length == 0">
+                            <td colspan="6">
+                                <div>
+                                    <p>
+                                        There is no relevant data to display
+                                    </p>
+                                    <div class="img-wrap">
+                                        <img src="//static.enboarder.net/images/error-bouble.gif" alt="Error" />
+                                    </div>
+                                    <!-- <md-button class="md-raised refresh" ng-disabled="reportForm.$invalid" ng-click="clearFilterRefresh();">
+                                        <span class="icon"></span>
+                                        <span class="text">refresh reports list</span>
+                                    </md-button> -->
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                    <tfoot>
+                        <tr ng-if="displayedCollection.length > 0">
+                            <td colspan="6" class="text-center">
+                                <div class="pagination-wrap">
+
+                                    <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                        <span class="icon icon-arrow-1"></span>
+                                        <span class="text">Back</span>
+                                    </button>
+
+                                    <div class="pagination-number-wrap">
+                                        <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                        <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                        <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                    </div>
+
+                                    <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                        <span class="text">Next</span>
+                                        <span class="icon icon-arrow-1"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+
+        </div>
+    </div>
+</div>

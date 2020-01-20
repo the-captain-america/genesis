@@ -1,0 +1,30 @@
+<md-dialog aria-label="Create New Custom Field" class="custom-field-modal md-default-theme">
+    <form name="customFieldForm" ng-submit="saveNewCustomfield();" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="updCustomfield === 'no'">Add New Custom Field</h2>
+                <h2 ng-if="updCustomfield === 'yes'">Update Custom Field</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+        <md-dialog-content aria-label="Add Custom Field Dialog" style="min-width:570px;max-width:570px;max-height:810px;">
+            <ng-include src="'views/settings/div-new-customfield.html'"></ng-include>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row">
+            <md-button type="submit" aria-label="Save CustomField" class="save save-spinner md-default-theme" ng-disabled="customFieldForm.$invalid" md-autofocus>
+                <span class="text">Save</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved
+                    <span class="icon-notification-ok"></span>
+                </span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

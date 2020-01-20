@@ -1,0 +1,350 @@
+<div ng-controller="profileDetailsCtrl">
+    <div ng-if="tgtpage === 'summary'">
+        <div layout="row" flex="100" layout-wrap class="chiprwrp">
+            <div
+                class="msk"
+                ng-if="( (ismgr !== 'yes'|| isfxdmgr ==='yes' || prflsave !=='yes') ? true : false)"
+            ></div>
+            <div flex class="manager-mobile-wrap adppl-chips">
+                <md-chips md-max-chips="2" ng-model="profilelist" md-autocomplete-snap="" md-require-match="true" md-removable="( (ismgr === 'yes' &&  isfxdmgr !=='yes') ? true : false)" md-on-remove="clearChip()">
+                    <md-autocomplete ng-hide="profilelist.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="newdata.chipselnm"
+                        md-search-text="autocom.searchManager" md-items="mgritem in getProfileList(autocom.searchManager)"
+                        md-item-text="mgritem.name" md-min-length="0" placeholder="Name"
+                        md-delay='50' md-selected-item-change="selectedMgrChange(mgritem)" md-autoselect="true"
+                        md-floating-label="Name" ng-class="{required : dmgr.req !== 'no'}">
+                        <span>
+                            <img alt="profile" ng-if="mgritem.attr && mgritem.attr.photo" ng-src="{{mgritem.attr.photo}}{{refreshProfileToken}}" class="md-avatar"></img>
+                            <img alt="profile" ng-if="!(mgritem.attr && mgritem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" class="md-avatar"/>
+                            <span class="txtwrp">
+                                <span class="nmtxt" md-highlight-text="searchText">{{mgritem.name}}</span>
+                                <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in mgritem.commlist">
+                                    <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                    <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                    <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                </span>
+                            </span>
+                        </span>
+                    </md-autocomplete>
+                    <md-chip-template>
+                      <span>
+                          <img alt="profile" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}{{refreshProfileToken}}" class="md-avatar"></img>
+                          <img alt="profile" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                          <span md-highlight-text="searchText">{{$chip.name}}</span>
+                      </span>
+                    </md-chip-template>
+                </md-chips>
+            </div>
+            <div flex>
+                <md-input-container class="employee-mobile-wrap required">
+                    <label>Preferred contact (mobile or email)</label>
+                    <div class="msk" ng-if="newdata.uid"></div>
+                    <input
+                        md-no-asterisk
+                        name="mobeml"
+                        ng-model="newdata.mobeml"
+                        ng-readonly="newdata.uid"
+                        required
+                    />
+                    <span class="blrdv"></span>
+                </md-input-container>
+            </div>
+        </div>
+        <div ng-if="newdata.uid" layout="row" flex="100" layout-wrap>
+            <div flex="100">
+                <md-button class="add-more gtprfl" ng-click="editProfile();">
+                    <span class="icon icon-go-to-small"></span>
+                    <span class="text">edit profile</span>
+                </md-button>
+            </div>
+        </div>
+    </div>
+    <div
+        layout="row"
+        layout-align="center"
+        layout-wrap
+        ng-if="tgtpage !== 'summary'"
+    >
+        <div flex ng-show="showCropArea === 'no'">
+            <div flex="100" class="img-wrap">
+                <div
+                    class="imginn"
+                    ngf-select="fileSelected($file)"
+                    ngf-drop="fileSelected($file)"
+                    ngf-max-size="5MB"
+                    name="file"
+                    ng-model="picFile"
+                    accept="image/*"
+                >
+                    <!-- <img ng-if="!(newdata.attr && newdata.attr.photo)" alt="Profile pic" alt="Profile pic" src="//static.enboarder.net/images/profile-placeholder.gif"/> -->
+                    <img
+                        ng-if="!(newdata.attr && newdata.attr.photo)"
+                        alt="Profile pic"
+                        alt="Profile pic"
+                        src="{{ dfphotopathCdn || dfphotopath }}_l"
+                    />
+                    <span
+                        ng-if="!(newdata.attr && newdata.attr.photo)"
+                        class="adimglbl"
+                        >Add image</span
+                    >
+                    <img
+                        ng-if="newdata.attr && newdata.attr.photo"
+                        alt="Profile pic"
+                        alt="Profile pic"
+                        ng-src="{{
+                            newdata.attr.photoCdn || newdata.attr.photo
+                        }}_l{{ refreshProfileToken }}"
+                    />
+                </div>
+                <span class="name">{{ newdata.nm }}</span>
+                <span class="loc">{{ newdata.topfield }}</span>
+            </div>
+            <md-tabs md-dynamic-height class="advanced-option-wrap" flex="100">
+                <md-tab label="contact">
+                    <md-content class="md-padding">
+                        <div layout="row" layout-wrap>
+                            <md-input-container class="fnme required" flex>
+                                <label>Full name</label>
+                                <input
+                                    md-no-asterisk
+                                    ng-model="newdata.nm"
+                                    required
+                                    focus="true"
+                                />
+                            </md-input-container>
+                        </div>
+                        <div layout="row" layout-wrap>
+                            <div flex="10" class="radio-wrap">
+                                <label>Preferred contact channel</label>
+                                <md-radio-group ng-model="newdata.chnl">
+                                    <md-radio-button value="mob">
+                                    </md-radio-button>
+                                    <md-radio-button value="eml">
+                                    </md-radio-button>
+                                </md-radio-group>
+                            </div>
+                            <div flex="90" class="cnt-inpt-wrap">
+                                <md-input-container
+                                    md-no-float
+                                    class="intmbl md-block"
+                                >
+                                    <span class="label">Mobile</span>
+                                    <intl-tel
+                                        placeholder="Enter mobile number"
+                                        ng-model="newdata.mob"
+                                        ng-change="checkToSwitchRadio()"
+                                    ></intl-tel>
+                                </md-input-container>
+                                <md-input-container>
+                                    <label>Email</label>
+                                    <input
+                                        ng-model="newdata.eml"
+                                        name="uemail"
+                                        type="email"
+                                        ng-change="checkToSwitchRadio()"
+                                        ng-pattern="/^.+@.+\..+$/"
+                                    />
+                                    <div
+                                        ng-messages="detailsForm.uemail.$error"
+                                        role="alert"
+                                    >
+                                        <div
+                                            ng-message-exp="['required', 'pattern']"
+                                        >
+                                            Invalid e-mail address.
+                                        </div>
+                                    </div>
+                                </md-input-container>
+                            </div>
+                        </div>
+                    </md-content>
+                </md-tab>
+                <md-tab label="about">
+                    <md-content
+                        class="md-padding"
+                        ng-repeat="pf in newdata.pflist"
+                    >
+                        <div
+                            class="datepicker-wrap date__adjustment"
+                            ng-if="pf.typ === 'f-date'"
+                        >
+                            <div
+                                ng-class="{'basic__mask is-active' : pf.lnk2ds === 'y'}"
+                            ></div>
+                            <label class="md-caption">{{ pf.nm }}</label>
+                            <span
+                                ng-class="{'icon__item icon__dynamic icon__datepicker is-active icon-link' : pf.lnk2ds === 'y'}"
+                            ></span>
+                            <md-datepicker
+                                flex="100"
+                                ng-model="pf.val"
+                                md-placeholder="Select"
+                                ng-disabled="pf.lnk2ds === 'y'"
+                            ></md-datepicker>
+                        </div>
+                        <md-input-container
+                            ng-if="pf.typ === 'f-longtext'"
+                            ng-class="{dsbl : pf.lnk2ds === 'y'}"
+                        >
+                            <div
+                                ng-class="{'basic__mask is-upper is-active' : pf.lnk2ds === 'y'}"
+                            ></div>
+                            <label class="label__adjustment">{{ pf.nm }}</label>
+                            <textarea
+                                class="text-field"
+                                ng-model="pf.val"
+                            ></textarea>
+                            <span
+                                class="icon__adjustment icon__row icon__position"
+                            >
+                                <span class="icon__item icon-f-longtext"></span>
+                                <span
+                                    ng-class="{'icon__item icon__dynamic is-active icon-link' : pf.lnk2ds === 'y'}"
+                                ></span>
+                            </span>
+                        </md-input-container>
+                        <md-input-container
+                            ng-if="pf.typ === 'f-shorttext'"
+                            ng-class="{dsbl : pf.lnk2ds === 'y'}"
+                        >
+                            <div
+                                ng-class="{'basic__mask is-active' : pf.lnk2ds === 'y'}"
+                            ></div>
+                            <label>{{ pf.nm }}</label>
+                            <input
+                                md-no-asterisk
+                                ng-model="pf.val"
+                                type="text"
+                            />
+                            <span
+                                class="icon__adjustment icon__row icon__position"
+                            >
+                                <span
+                                    class="icon__item icon-f-shorttext"
+                                ></span>
+                                <span
+                                    ng-class="{'icon__item icon__dynamic is-active icon-link' : pf.lnk2ds === 'y'}"
+                                ></span>
+                            </span>
+                        </md-input-container>
+                    </md-content>
+                </md-tab>
+                <md-tab
+                    ng-if="learnapp==='yes'"
+                    label="LEARN"
+                    md-on-select="getProfileLearnItems();"
+                >
+                    <md-content class="md-padding lrntb">
+                        <label class="heading"
+                            >Review all Learn-modules and assessments assigned
+                            to this profile</label
+                        >
+                        <span class="infowrap-main">
+                            <div
+                                layout="row"
+                                layout-align="space-between"
+                                class="dtawrp tl"
+                            >
+                                <div flex="50">Module</div>
+                                <div flex="15">Test</div>
+                                <div flex="35">Time</div>
+                            </div>
+                            <hr />
+                            <div
+                                ng-repeat="learn in learnitems"
+                                layout="row"
+                                layout-align="space-between"
+                                class="dtawrp tltx"
+                            >
+                                <div flex="50">
+                                    <span
+                                        class="icn"
+                                        ng-class="{'icon-tl-sml-complet': learn.status ==='complete', 'icon-tl-sml-progress': learn.status ==='inprogress'}"
+                                    ></span>
+                                    <span
+                                        class="icn"
+                                        ng-class="{'icon-multi-page-small':learn.type==='multi-page', 'icon-embed-course-small':learn.type==='embed-course'}"
+                                    ></span>
+                                    <span class="txt">{{ learn.modname }}</span>
+                                </div>
+                                <div
+                                    flex="15"
+                                    ng-class="{'pass': learn.assmtstatus==='Pass', 'fail': learn.assmtstatus==='Fail', 'pending': learn.assmtstatus ==='Pending'}"
+                                >
+                                    {{ learn.assmtstatus }}
+                                </div>
+                                <div flex="35">{{ learn.dt }}</div>
+                            </div>
+                        </span>
+                    </md-content>
+                </md-tab>
+                <md-tab label="STATISTICS">
+                    <md-content class="md-padding">
+                        <label class="heading"
+                            >This page is not seen by participants.</label
+                        >
+                        <span class="infowrap-main">
+                            <span class="infowrap-in">
+                                <span class="lbl">Number of workflows:</span>
+                                <span class="info">{{ wfcount }}</span>
+                            </span>
+                        </span>
+                    </md-content>
+                </md-tab>
+            </md-tabs>
+        </div>
+        <div
+            flex
+            layout="row"
+            layout-align="center"
+            layout-wrap
+            ng-show="showCropArea === 'yes'"
+        >
+            <div flex="100" class="img-wrap">
+                <div
+                    ngf-drop
+                    ng-model="picFile"
+                    ngf-pattern="image/*"
+                    class="cropArea"
+                >
+                    <ui-cropper
+                        image="picFile | ngfDataUrl"
+                        result-image="croppedDataUrl"
+                        ng-init="croppedDataUrl='{{
+                            newdata.attr.photoCdn || newdata.attr.photo
+                        }}'"
+                        cropject="cropper"
+                    ></ui-cropper>
+                    <md-progress-circular
+                        md-diameter="55px"
+                    ></md-progress-circular>
+                </div>
+            </div>
+            <md-dialog-actions
+                class="cropbtn-wrap"
+                flex
+                ng-show="showCropArea === 'yes'"
+            >
+                <md-button
+                    aria-label="Back"
+                    class="backbtn md-raised md-default-theme"
+                    ng-click="backToUser($event)"
+                    md-autofocus
+                >
+                    Back
+                </md-button>
+                <md-button
+                    class="save md-default-theme"
+                    aria-label="Save"
+                    ng-click="upload(picFile, cropper)"
+                    md-autofocus
+                    >Crop</md-button
+                >
+            </md-dialog-actions>
+        </div>
+    </div>
+    <div class="error" ng-if="detailSaveError === 'yes'">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">{{ detailSaveErrorMsg }}</span>
+    </div>
+</div>

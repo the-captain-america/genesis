@@ -1,0 +1,256 @@
+<md-dialog aria-label="{{action}} Logic Branch" class="logic-modal md-default-theme">
+<form name="LogicBranchModalForm" novalidate>
+
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>{{action}} logic branch</h2>
+		<span flex></span>
+		<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:650px;max-width:650px;">
+    <div class="activity-wrap nocond" layout="row" layout-align="center start" ng-if="branchtype==='default'">
+        <span>If no conditions are met...</span>
+    </div>
+    <!--
+        ng-init is removed as with deletion in criteria it was updating $index but not ng-init variable. So both were
+        priniting different values causing issues.
+    -->
+    <div class="activity-wrap" layout="row" layout-align="center start" ng-if="branchtype==='activity'" ng-repeat="critdata in criteria track by $index">
+        <span class="lbl" ng-if="$index === 0">IF:</span>
+        <span class="lbl" ng-if="$index !== 0">AND:</span>
+        <div flex="35" class="sub-input field-update">
+        <md-menu-bar>
+            <md-menu>
+                <button ng-click="$mdOpenMenu()">
+                    <span class="mm-dropdown" ng-class="{inptval : critdata.operand.dispnm.length > 0}">
+                        <span class="text plhldr" ng-if="!critdata.operand.dispnm">Select condition</span>
+                        <span class="text truncate plinfo" ng-if="critdata.operand.dispnm.length > 0 && $index === 0">Condition</span>
+                        <span class="text truncate" ng-if="critdata.operand.dispnm"><a title="{{critdata.operand.dispnm}}">{{critdata.operand.dispnm}}</a></span>
+                        <span class="icon icon-dropdown icon-arrow-7"></span>
+                    </span>
+                </button>
+                <md-menu-content class="fltrmm">
+                     <md-menu-item ng-if="setupdata.category.length > 0">
+                        <md-menu>
+                            <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                            <md-menu-content>
+                                <md-menu-item ng-repeat="cat in setupdata.category">
+                                    <md-button ng-click="selectCategory(cat, $parent.$index);">
+                                        <span class="icon-dtype icon-f-choice"></span>
+                                        <span class="text">{{cat.dispnm}}</span>
+                                    </md-button>
+                                </md-menu-item>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-item>
+                    <md-menu-item ng-if="setupdata.cflist.length > 0">
+                        <md-menu>
+                            <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                            <md-menu-content>
+                                <md-menu-item ng-repeat="cf in setupdata.cflist">
+                                    <md-button ng-click="selectCustomfield(cf, $parent.$index);">
+                                        <span class="icon-dtype icon-{{cf.typ}}"></span>
+                                        <span class="text">{{cf.nm}}</span>
+                                    </md-button>
+                                </md-menu-item>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-item>
+                    <md-menu-item ng-if="setupdata.forms.length > 0">
+                       <md-menu>
+                            <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                            <md-menu-content>
+                                <md-menu ng-repeat="formitem in setupdata.forms">
+                                    <md-button ng-click="$mdOpenMenu()">{{formitem.formname}}</md-button>
+                                    <md-menu-content>
+                                        <md-menu-item ng-repeat="formfield in formitem.fields">
+                                            <!-- used 4 $parent here because we want to access the top index of ng-repeat (for criteria) and it
+                                                was 4th parent scope here (two ng-repeat and one ng-if child scope)
+                                             -->
+                                            <md-button ng-click="selectForm(formitem, formfield, $parent.$parent.$parent.$index);">
+                                                <span class="icon-dtype icon-f-numbers" ng-if="formfield.type==='special-text'"></span>
+                                                <span class="icon-dtype icon-f-numbers" ng-if="formfield.type==='rating'"></span>
+                                                <span class="icon-dtype icon-f-choice" ng-if="formfield.type==='dropdown'"></span>
+                                                <span class="icon-dtype icon-f-choice" ng-if="formfield.type==='multiple-choice'"></span>
+                                                <span class="text">{{formfield.fnm}}</span>
+                                            </md-button>
+                                        </md-menu-item>
+                                    </md-menu-content>
+                                </md-menu>
+                            </md-menu-content>
+                       </md-menu>
+                   </md-menu-item>
+                   <md-menu-item ng-if="setupdata.seq.length > 0">
+                       <md-menu>
+                           <md-button ng-click="$mdOpenMenu()">Sequence</md-button>
+                           <md-menu-content>
+                               <md-menu-item ng-repeat="seq in setupdata.seq">
+                                   <md-button ng-click="selectSequence(seq, $parent.$index);">
+                                       <span class="icon-dtype icon-sequence-{{seq.icon}}-small"></span>
+                                       <span class="text">{{seq.name}}</span>
+                                   </md-button>
+                               </md-menu-item>
+                           </md-menu-content>
+                       </md-menu>
+                   </md-menu-item>
+                   <md-menu-item>
+                       <md-button ng-click="selectStartDate($index);">
+                           <span class="icon-dtype icon-sd icon-f-date"></span>
+                           <span class="text">Start Date</span>
+                       </md-button>
+                   </md-menu-item>
+                </md-menu-content>
+            </md-menu>
+        </md-menu-bar>
+        </div>
+
+        <md-input-container flex="25" md-no-float class="equal-sep">
+            <md-select md-container-class="equal-cont" ng-disabled="!critdata.operand.dispnm" md-no-asterisk aria-label="Operators" placeholder="=" ng-model="critdata.operator.key" required  ng-change="changeOperator($index);">
+                <md-option value="{{op.key}}" ng-repeat="op in operators[$index] track by op.key">
+                    <span ng-if="op.key === 'equal'">
+                        <span class="icon icon-symbol-1"></span>
+                        <span class="text">Equal</span>
+                    </span>
+                    <span ng-if="op.key === 'notequal'">
+                        <span class="icon icon-symbol-2"></span>
+                        <span class="text">Not equal</span>
+                    </span>
+                    <span ng-if="op.key === 'lessthan'">
+                        <span class="icon icon-symbol-3"></span>
+                        <span class="text">Smaller than</span>
+                    </span>
+                    <span ng-if="op.key === 'greaterthan'">
+                        <span class="icon icon-symbol-4"></span>
+                        <span class="text">Bigger than</span>
+                    </span>
+                    <span ng-if="op.key === 'in'">
+                        <span class="icon icon-symbol-5"></span>
+                        <span class="text">Contain any</span>
+                    </span>
+                </md-option>
+            </md-select>
+        </md-input-container>
+
+        <md-input-container class="num-inpt" flex="35" ng-disabled="!critdata.operand.dispnm" ng-if="inputType[$index] === 'number'">
+              <input md-no-asterisk ng-model="critdata.value[0]" type="number">
+        </md-input-container>
+        <md-input-container class="num-inpt" flex="35" ng-disabled="!critdata.operand.dispnm" ng-if="inputType[$index] === 'text'">
+              <input md-no-asterisk ng-model="critdata.value[0]">
+        </md-input-container>
+        <md-input-container class="num-inpt" flex="35" ng-disabled="!critdata.operand.dispnm" ng-if="inputType[$index] === 'date'">
+              <input md-no-asterisk ng-model="critdata.value[0].unt" type="number">
+        </md-input-container>
+        <md-input-container flex="35" md-no-float ng-if="inputType[$index] === 'singleselect'">
+            <md-select ng-disabled="!critdata.operand.dispnm" md-no-asterisk aria-label="Values" placeholder="Select option" ng-model="critdata.value[0]" required>
+                <md-option value="{{valChoice.key}}" ng-repeat="valChoice in valuechoices[$index] track by valChoice.key">{{valChoice.val}}</md-option>
+            </md-select>
+        </md-input-container>
+        <span ng-if="inputType[$index] === 'date'" class="dlbl">Days</span>
+        <md-button class="delete-btn" ng-click="deleteLogicCriteria($index);" aria-label="Delete" ng-if="$index !== 0">
+            <span class="icon icon-close-5"></span>
+        </md-button>
+
+        <div class="multi-sel-wrap" flex="35" ng-if="inputType[$index] === 'multiselect'">
+            <label>Value</label>
+            <md-input-container md-no-float ng-repeat="critval in critdata.value track by $index">
+                <md-select md-no-asterisk aria-label="Values" placeholder="Select option" ng-model="critdata.value[$index]" required>
+                    <md-option value="{{valChoice.key}}" ng-repeat="valChoice in valuechoices[$parent.$index] track by valChoice.key">{{valChoice.val}}</md-option>
+                </md-select>
+                <md-button class="delete-btn" ng-click="deleteCriteriaValues($index, $parent.$parent.$index);" aria-label="Delete" ng-if="$index > 0">
+                    <span class="icon icon-close-5"></span>
+                </md-button>
+            </md-input-container>
+            <div class="add-more-new-wrap">
+                <md-button class="add-more" ng-click="addMoreCriteriaValues($index);">
+                    <span class="icon icon-plus"></span>
+                    <span class="text">add more</span>
+                </md-button>
+            </div>
+        </div>
+    </div>
+	<div class="activity-wrap" layout="row" layout-align="start start" ng-if="branchtype !== 'default'">
+        <div class="add-more-new-wrap andbtn">
+			<md-button class="add-more" ng-click="addLogicCriteria();">
+				<span class="icon icon-plus"></span>
+				<span class="text">and</span>
+			</md-button>
+		</div>
+	</div>
+
+    <div class="then-outer-wrap" ng-class="{maskon : branchtype==='activity' && (!criteria[0].operator.key || !criteria[0].operand.key || !criteria[0].value[0])}">
+        <span class="lbl">THEN:</span>
+        <span class="mask"></span>
+
+        <div class="select-group-wrap" dnd-list="list" dnd-drop="dropCallbackMove(event, index, item, external, type, 'itemType')">
+            <div layout="row" dnd-draggable="item" dnd-effect-allowed="move" class="select-group close-enabled updateval-rpt then-wrap" layout-align="center center" ng-class="{'focus':$last}" ng-repeat="item in activity track by $index" ng-init="outerIndex=$index">
+                <span ng-if="activity.length > 1" class="icon-remove icon-close-4" ng-click="deleteActivity(outerIndex);"></span>
+
+                <div flex="45" class="sub-input field-update">
+                    <div class="custom-dropdown-wrap">
+                        <span class="mm-dropdown">
+                            <span class="text truncate placeholder" ng-if="!activity[outerIndex].dispnm">Select activity</span>
+                            <span class="text truncate" ng-if="activity[outerIndex].dispnm">
+                                <a title="{{activity[outerIndex].dispnm}}">
+                                    <span class="icon-dtype {{activity[outerIndex].actualicon}}"></span>
+                                    {{activity[outerIndex].dispnm}}
+                                </a>
+                            </span>
+                            <span class="icon-dropdown icon-arrow-7"></span>
+                        </span>
+                        <ul class="list-wrap multi">
+                            <li ng-if="branchtype==='default'" ng-click="selectDoNothing(outerIndex);">
+                                <span>Do nothing</span>
+                            </li>
+                            <li>
+                                <span class="truncate">Insert module</span>
+                                <span class="more-arrow icon-arrow-6"></span>
+                                <ul class="list-wrap-inner">
+                                    <li ng-repeat="moditem in modlist track by $index" ng-click="selectModuleActivity(moditem, outerIndex);">
+                                        <span class="truncate">
+                                            <span class="icon-dtype {{moditem.actualicon}}"></span>
+                                            {{moditem.nm}}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="equal-sep" ng-class="{disabled : activity[outerIndex].type !== 'module'}" flex="5">=</div>
+
+                <md-input-container flex="40"  md-no-float class="recipients-dropdown">
+                    <md-select md-container-class="thn-optns" ng-disabled="activity[$index].type !== 'module'" md-no-asterisk aria-label="Module" placeholder="Select option" ng-model="activity[outerIndex].modid" ng-required="activity[$index].type === 'module' || !activity[$index].type">
+                        <md-option value="{{module.uid}}" ng-repeat="module in  modlist[item.actualicon].modules track by module.uid" ng-click="selectSpecificModule(module, outerIndex);" ng-if="item.actualicon !== 'icon-form-benchmark-small'">{{module.name}}</md-option>
+                        <md-option value="{{module.uid}}" ng-repeat="module in  modlist['icon-form-small'].modules track by module.uid" ng-click="selectSpecificModule(module, outerIndex);" ng-if="item.actualicon === 'icon-form-benchmark-small'">{{module.name}}</md-option>
+                    </md-select>
+
+                </md-input-container>
+
+                <div class="prev" flex="5" ng-class="{dsbl : activity[outerIndex].type !== 'module' || activity[outerIndex].actualicon === 'icon-e-signing-small' || activity[outerIndex].actualicon === 'icon-senddata-small' || activity[outerIndex].actualicon === 'icon-I9-small'}" ng-click="previewLayout(activity[outerIndex].modid, activity[outerIndex].type, activity[outerIndex].actualicon)">
+                    <span class="icon-preview-small"> {{module.name}}</span>
+                </div>
+
+                <span class="hline" ng-if="$first"></span>
+            </div>
+        </div>
+        <div class="add-more-new-wrap">
+            <md-button class="add-new-val" ng-click="addMoreActivity();">
+                <span class="icon icon-plus"></span>
+                <span class="text">add more</span>
+            </md-button>
+        </div>
+        <span class="vline"></span>
+    </div>
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button class="save md-default-theme" aria-label="Save" ng-click="saveLogicBranch();" ng-disabled="LogicBranchModalForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

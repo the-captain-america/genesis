@@ -1,0 +1,141 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Workflows launched</a>
+    </span>
+</div>
+
+<div class="reports-wrap formdetails wfstrtd-tbl">
+    <div class="reports-wrap-inner">
+        <div class="spinner-overlay">
+            <span class="spinner">
+                <md-progress-circular md-diameter="55px"></md-progress-circular>
+            </span>
+        </div>
+
+        <form name="reportForm" novalidate>
+            <div class="heading-panel">
+                <h4>Workflows launched</h4>
+                <span class="show-more">
+                    <span class="more more-action icon-more-icon"></span>
+                    <div class="action-popover">
+                        <span class="icon close-popover icon-more-icon"></span>
+                        <span ng-csv="getCSVData()" filename="{{exportCSVFileName}}">
+                            <span class="icon icon-download"></span>
+                            <span class="text">Download (CSV)</span>
+                        </span>
+                    </div>
+                </span>
+            </div>
+            <div class="show-hide">
+                <span class="arrow-toggle icon-arrow-2"></span>
+                <span class="text">Advanced search / filter</span>
+            </div>
+
+            <div class="search-panel detail-section" style="display:block">
+
+                <div layout="row" layout-align="start center">
+                    <div flex="35">
+                        <!--md-input-container>
+                            <label>Workflow name</label>
+                            <md-select md-container-class="reports-dd" aria-label="Workflow name" ng-model="reportSearch.wfid">
+                                <md-option value="">Select Workflow</md-option>
+                                <md-option ng-repeat="wf in wflist | orderBy:['name']" value="{{wf.uid}}">{{wf.name}}</md-option>
+                            </md-select>
+                        </md-input-container-->
+                        <md-input-container>
+                            <label>Time frame</label>
+                            <md-select md-container-class="reports-dd" aria-label="Select" ng-model="reportSearch.timeframe" ng-change="changeTimeframe();">
+                                <md-option value="LAST7D">Last 7 days</md-option>
+                                <md-option value="LAST12">Last 12 months</md-option>
+                                <md-option value="CY">Current year</md-option>
+                                <md-option value="PY">Previous year</md-option>
+                                <md-option value="CM">Current month</md-option>
+                                <md-option value="PM">Previous month</md-option>
+                                <md-option value="CUSTOM">Custom</md-option>
+                            </md-select>
+                        </md-input-container>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, From</label>
+                    	<md-datepicker ng-change="changeDate();" ng-model="reportSearch.dt_cr_from" md-placeholder="Select"></md-datepicker>
+                    </div>
+                    <div class="datepicker-wrap" flex>
+                        <label class="md-caption">Launch date, To</label>
+                    	<md-datepicker ng-change="changeDate();" ng-model="reportSearch.dt_cr_to" md-placeholder="Select"></md-datepicker>
+                    </div>
+                </div>
+
+                <div layout="row" layout-align="center center">
+                    <div flex="100" class="search-button">
+                        <md-button class="md-raised clear" ng-disabled="reportForm.$invalid" ng-click="clearFilter();">
+                            <span class="icon"></span>
+                            <span class="text">Clear</span>
+                        </md-button>
+                        <md-button class="md-raised search" ng-disabled="reportForm.$invalid" ng-click="filterReport();">
+                            <span class="icon"></span>
+                            <span class="text">Search</span>
+                        </md-button>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+        <div style="position:relative">
+            <div class="scroll-btn-wrap">
+                <span class="scroll-btn icon-arrow-1"></span>
+            </div>
+            <div class="scroll-btn-wrap-rt">
+                <span class="scroll-btn icon-button-arrow-left"></span>
+            </div>
+            {{dateErr}}
+            <div class="table-wrapper">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th ng-repeat="hdr in headers">
+                                {{hdr.header}}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="row in wfstartedrows track by $index">
+                            <td class="td-container" ng-repeat="hdr in headers">
+                                <div ng-if="row.uid !== 'total'">{{row[hdr.colkey]}}</div>
+                                <div ng-if="row.uid === 'total'">{{row[hdr.colkey]}}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr ng-if="displayedCollection.length > 0">
+                            <td colspan="6" class="text-center">
+                                <div class="pagination-wrap">
+
+                                    <button class="back" ng-click="prevClick();" ng-disabled="showPrevBtn != 'yes'">
+                                        <span class="icon icon-arrow-1"></span>
+                                        <span class="text">Back</span>
+                                    </button>
+
+                                    <div class="pagination-number-wrap">
+                                        <span class="dots" ng-show="showPrevDots === 'yes'">...</span>
+                                        <span ng-class="{ 'active-page' : page == currentSelPage}" ng-repeat="page in displayedPages" ng-click="pageClick(page);">&nbsp;{{page}}&nbsp;</span>
+                                        <span class="dots" ng-show="showNextDots === 'yes'">...</span>
+                                    </div>
+
+                                    <button class="next" ng-click="nextClick();" ng-disabled="showNextBtn != 'yes'">
+                                        <span class="text">Next</span>
+                                        <span class="icon icon-arrow-1"></span>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- ################# -->
+
+<!-- <md-button class="md-raised save" ng-csv="getCSVData()" filename="{{exportCSVFileName}}" ng-if="wfstartedrows.length > 0">Export to CSV</md-button> -->

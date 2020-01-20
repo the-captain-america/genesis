@@ -1,0 +1,42 @@
+.container{
+
+	&.help {
+    	width: 100%;
+   		margin: 0;
+        display: table;
+
+		.help-content{
+			padding: 33px 45px 0 125px;
+		    position: relative;
+		    text-align: center;
+            display: table-cell;
+            vertical-align: middle;
+
+            .spinner-overlay{
+                width: calc(~'100% - 80px');
+                height: 100%;
+                position: fixed;
+                left: 80px;
+                top: 0;
+                text-align: center;
+                z-index: 5;
+
+                .spinner{
+                    display: inline-block;
+                    width: 70px;
+                    height: 70px;
+                    top: 50%;
+                }
+            }
+
+            .fresh-desk{
+            	width: 100%;
+            	min-height: 1400px;
+            	border: none;
+                border-radius: 3px;
+                position: relative;
+                z-index: 10;
+            }
+        }
+	}
+}

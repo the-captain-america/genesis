@@ -1,0 +1,139 @@
+<ul ng-controller="NavCtrl">
+	<li class="logo">
+		<a class="more-action"><img src="{{getadminappbubble().logo}}" alt=""></a>
+        <div class="profile-popover action-popover">
+            <span class="arrow"></span>
+            <md-list>
+                <div class="sbox-wrap">
+                    <span class="show-more" ng-if="getUserDetails().linked_comp">
+                        <span class="more more-action-dbl-prfl icon-more-icon"></span>
+                        <div class="action-dblpop-prfl">
+                            <span class="icon close-popover icon-more-icon"></span>
+                            <!--span ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp" ng-click="">
+                                <span class="icond icon-close-5"></span>
+                                <span class="text">Stop promoting Sandbox</span>
+                            </span-->
+                            <span ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp" ng-click="refreshSandbox();">
+                                <span class="icond icon-refresh"></span>
+                                <span class="text">Refresh Sandbox (from Live)</span>
+                            </span>
+                            <span ng-if="getUserDetails().has_sb ==='Y' && getUserDetails().prevjobrunid" ng-click="revertLiveToPrevious(getUserDetails().prevjobrunid,getUserDetails().prevjobruntime);">
+                                <span class="icond icon-refresh"></span>
+                                <span class="text">Revert Live to previous</span>
+                            </span>
+                        </div>
+                    </span>
+                    <h4 ng-if="getUserDetails().has_sb ==='Y' && compname">{{compname}} - live</h4>
+                    <h4 ng-if="getUserDetails().has_sb ==='Y' && !compname">{{getUserDetails().loggedinComp}} - live</h4>
+                    <h4 ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp && compname">{{compname}}</h4>
+                    <h4 ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp && !compname">{{getUserDetails().loggedinComp}}</h4>
+                    <md-button class="btn md-raised drk-btn" ng-if="getUserDetails().has_sb ==='Y'" ng-click="switchTo(getUserDetails().linked_comp)" ng-disabled="task().running ==='Y'">
+                        switch to sandbox
+                    </md-button>
+                    <md-button class="btn md-raised drk-btn" ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp" ng-click="switchTo(getUserDetails().linked_comp)" ng-disabled="task().running ==='Y'">
+                        switch to live
+                    </md-button>
+                    <md-button class="prmt-btn" ng-if="getUserDetails().is_sb ==='Y' && getUserDetails().linked_comp" ng-click="promoteSandboxToLive();" ng-disabled="task().running ==='Y'">
+                        <span class="text">PROMOTE SANDBOX TO LIVE</span>
+                    </md-button>
+                </div>
+                <hr ng-if="getUserDetails().linked_comp && task().running ==='Y'">
+                <div class="promo-wrap" ng-if="getUserDetails().linked_comp && task().running ==='Y'">
+                    <div class="linewrap ng-class: task().stage;">
+                        <div class="line"></div>
+                        <div class="dtwrp" layout="row" layout-align="space-between center">
+                            <div class="dot ne"></div>
+                            <div class="dot tw"></div>
+                            <div class="dot thr"></div>
+                            <div class="dot fr"></div>
+                            <div class="dot fv"></div>
+                        </div>
+                        <div class="lineg"></div>
+                    </div>
+                    <div class="info">
+                        {{task().name}}: Tansfering files<div class="dtn">.</div> <div class="dtn">.</div> <div class="dtn">.</div>
+                    </div>
+                </div>
+                <hr ng-if="getUserDetails().linked_comp && task().running ==='Y'">
+                <md-list-item class="md-3-line" ng-controller="userDetailsCtrl">
+                    <img ng-if="!getUserDetails().photo_l" ng-src="//static.enboarder.net/images/profile-placeholder.gif" ng-click="showCurrentUserModal($event,'update',getUserDetails());" class="md-avatar" alt="" />
+                    <img ng-if="getUserDetails().photo_l" ng-src="{{getUserDetails().photo_l}}" ng-click="showCurrentUserModal($event,'update',getUserDetails());" class="md-avatar" alt="Profile Pic" />
+                    <div class="md-list-item-text" layout="column" ng-click="showCurrentUserModal($event,'update',getUserDetails());">
+                        <h3 class="truncate" ng-if="getUserDetails().loggedinDispName">{{getUserDetails().loggedinDispName}}</h3>
+                        <h4 class="truncate" ng-if="getUserDetails().loggedinComp">{{getUserDetails().loggedinComp}}</h4>
+                        <p class="truncate">{{getUserDetails().loggedinUser}}</p>
+                    </div>
+                </md-list-item>
+                <md-button class="close-profilepopover" ng-click="gotoLogin();" ng-if="showSigninAs!==true">
+                    <span class="text">Log out</span>
+                    <span class="icon icon-exit"></span>
+                </md-button>
+                <md-button class="close-profilepopover" ng-click="returnToCSR();" ng-if="showSigninAs===true">
+                    <span class="text">Log out</span>
+                    <span class="icon icon-exit"></span>
+                </md-button>
+                <span class="vlbl" ng-if="getUserDetails().appversion">Version: {{getUserDetails().appversion}}</span>
+            </md-list>
+        </div>
+	</li>
+	<li ng-class="{ active: isActive('/dashboard')}" ng-if="canAccess('dashboard')">
+		<a href="/#dashboard">
+			<span class="icon icon-dashboard"></span>
+			<span class="desc">Dashboard</span>
+		</a>
+		<a class="back-btn" ng-if="showBackButton(['dashboard-level2','dashboard-level3'])" ng-click="GlobalbackButton()">
+			<span class="icon icon-back-arrow"></span>
+			<span class="desc">Back</span>
+		</a>
+	</li>
+	<li ng-class="{ active: isActive('/workflow')}" ng-if="canAccess('workflow')">
+		<a href="/#workflow">
+			<span class="icon icon-workflow"></span>
+			<span class="desc">Workflow</span>
+		</a>
+        <a class="back-btn" ng-if="showBackButton(['workflow-editor','workflow-logic-editor','workflow-logic-editor-seq',
+        'workflow-content-editor-seq','workflow-content-editor','workflow-esign-editor','workflow-forms-editor-seq','workflow-forms-editor',
+        'workflow-senddata-editor','workflow-multi-page-editor-seq','workflow-multi-page-editor','workflow-embed-course-editor-seq',
+        'workflow-embed-course-editor'])" ng-click="GlobalbackButton()">
+            <span class="icon icon-back-arrow"></span>
+            <span class="desc">Back</span>
+        </a>
+	</li>
+	<li ng-class="{ active: isActive('/reports')}" ng-if="canAccess('reports')">
+		<a href="/#reports">
+			<span class="icon icon-reports"></span>
+			<span class="desc">Reports</span>
+		</a>
+        <a class="back-btn" ng-if="showBackButton(['reports-level2','formsdetail'])" ng-click="GlobalbackButton()">
+			<span class="icon icon-back-arrow"></span>
+			<span class="desc">Back</span>
+		</a>
+	</li>
+    <li ng-class="{ active: isActive('/childaccts')}" ng-if="isparent && canAccess('accounts')">
+		<a href="/#/csr/childaccts" class="accountsbtn">
+			<span class="icon icon-accounts"></span>
+			<span class="desc">Accounts</span>
+		</a>
+	</li>
+	<li ng-class="{ active: isActive('/help')}" ng-if="hasPermission('permissions.viewHelp')"  ng-init="intercomHelpCenterUrl = getIntercomHelpCenterUrl()">
+		<a href="{{intercomHelpCenterUrl}}" class="helpbtn" target="_blank">
+			<span class="icon icon-helpcentre"></span>
+			<span class="desc">Help</span>
+		</a>
+	</li>
+	<li  ng-class="{ active: isActive('/csr')}" ng-if="csr && canAccess('csrsettings')">
+		<a href="/#/csr/complist">
+			<span class="icon icon-god-mode"></span>
+			<span class="desc">CSR Settings</span>
+		</a>
+	</li>
+	<!-- <li ng-class="{settings: csr === false}" ng-class="{active :  csr === true}" ng-class="{ active: isActive('/settings', '/settings/config')}"> -->
+	<li class="settings" ng-class="{ active: isActive('/settings')}" ng-if="canAccess('settings')">
+		<a href="/#settings">
+			<span class="icon icon-settings"></span>
+			<span class="desc">Settings</span>
+		</a>
+	</li>
+
+
+</ul>

@@ -1,0 +1,234 @@
+<div class="bread-crumb">
+    <span>
+        <a href="javascript:void(0)" class="active">Security &amp; Privacy</a>
+    </span>
+</div>
+
+<div class="settings-wrap" ng-if="!canAccess('settings','configurations')">
+	<h4>You do not have access to this page.</h4>
+</div>
+
+<div class="settings-wrap" ng-if="canAccess('settings','configurations')">
+	<h4>Setup data security and privacy.</h4>
+    <div class="spinner-overlay">
+        <span class="spinner">
+            <md-progress-circular class="wht" md-diameter="55px"></md-progress-circular>
+        </span>
+    </div>
+	<form name="configForm" novalidate>
+	<div class="settings-wrap-inner config sec">
+
+		<div class="config-top">
+            <div class="info-block">
+				<span class="label long">
+					Account security:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <md-input-container class="dtype-inpt">
+                            <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Account security" ng-model="configData.secmode" required>
+                                <md-option value="high">High</md-option>
+                                <md-option value="medium">Medium</md-option>
+                                <md-option value="low" selected>Low</md-option>
+                            </md-select>
+    					</md-input-container>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="left">
+                            <span class="copy">
+                                <h4 class="title">HIGH</h4>
+                                <p>
+                                    Logs out from platform every 24 hours, or if browser remains inactive for 30 minutes. Requires all Admins to use complex passwords and change them every 90 days.
+                                </p>
+                                <br>
+                                <h4 class="title">MEDIUM</h4>
+                                <p>
+                                    Logs out from platfrom every 3 days, or if browser remains inactive for 4 hours. Requires all Admins to use complex passwords, and change them every 180 days.
+                                </p>
+                                <br>
+                                <h4 class="title">LOW</h4>
+                                <p>
+                                    Logs out from platform every 365 days, No other restrictions.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block security-block config-links wthtxt gdpr">
+				<span class="label long">
+					Require user consent:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+    					<md-checkbox ng-model="configData.gdpr" aria-label="User consent (GDPR)" ng-true-value="'yes'" ng-false-value="'no'" ng-change="showGdprModal()"></md-checkbox>
+                        <span class="link" ng-click="goTopage()" ng-if="configData.gdpr === 'yes'">
+    						User consent form
+    					</span>
+    				</span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">USER CONSENT FORM</h4>
+                                <p>
+                                    An automated one-time consent form is appended to all employee communications. Once signed, the workflow communications will function as normal. The content form can be used as a custom agreement or to comply with GDPR (General Data Protection Regulations).
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block config-links" ng-if="configData.advsec === 'yes' && hasPermission('permissions.canSetupSSO')">
+				<span class="label long">
+					Single sign on 'SSO':
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <span class="link" ng-click="showSsoSettingsModal($event)">
+    						Set up SSO security
+    					</span>
+    				</span>
+                    <span class="label small status" ng-if="configData.sso !=='yes'">
+                        <span>
+                            <span class="icon icon-security-0"></span>
+                            <span class="text">Inactive</span>
+                        </span>
+                    </span>
+                    <span class="label small status act" ng-if="configData.sso ==='yes'">
+                        <span>
+                            <span class="icon icon-security-2"></span>
+                            <span class="text">Active</span>
+                        </span>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block security-block config-links wthtxt gdpr wthsso" ng-if="configData.advsec === 'yes' && hasPermission('permissions.canSetupSSO')">
+				<span class="label long">
+					Only allow login through SSO:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <md-checkbox ng-model="configData.ssoonlylogin" aria-label="Only allow login through SSO" ng-true-value="'yes'" ng-false-value="'no'"></md-checkbox>
+                    </span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip
+                            class="manager-tooltip"
+                            md-direction="bottom"
+                        >
+                            <span class="copy">
+                                <h4 class="title">ONLY ALLOW SSO LOGIN</h4>
+                                <p>
+                                    All Admin logins in have to go through the authorised SSO application. All direct-logins to Enboarder will be disabled as well as 'Forget password'.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+
+                </span>
+
+ 			</div>
+            <div class="info-block security-block config-links wthtxt gdpr">
+				<span class="label long">
+					Allow look-up profile registry for:
+				</span>
+                <span class="content-wrap">
+    				<span class="content">
+                        <md-checkbox ng-model="configData.canMgrLookPrfl" aria-label="Allow look-up profile registry for {{custlabels.managers || 'managers'}}" ng-true-value="'yes'" ng-false-value="'no'">
+                        {{custlabels.Managers || 'Managers'}}
+                        </md-checkbox>
+                        <md-checkbox ng-model="configData.canEmpLookPrfl" aria-label="Allow look-up profile registry for {{custlabels.employees || 'employees'}}" ng-true-value="'yes'" ng-false-value="'no'">
+                        {{custlabels.Employees || 'Employees'}}
+                        </md-checkbox>
+                    </span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">LOOK-UP PROFILE REGISTRY</h4>
+                                <p>
+                                    Participants can use the profile registry by typing their name in fields like: <i>Contact channel widget</i>.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+    			</span>
+ 			</div>
+            <div class="info-block security-block wthtxt">
+                <span class="label long">
+                    Delete all inactive workflow data:
+                </span>
+                <span class="content-wrap">
+                    <span class="content">
+                        <md-checkbox ng-model="configData.delwfdata" aria-label="Delete all inactive workflow data" ng-true-value="'yes'" ng-false-value="'no'"></md-checkbox>
+                        <md-input-container class="nmday-inpt">
+    						<input ng-model="configData.delwfdays" type="number" min="1" max="1095" value="1095" required>
+                            <span class="blrdv"></span>
+    					</md-input-container>
+                        <span class="text da-txt">Days after completed</span>
+                    </span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">DELETE  INACTIVE WORKFLOW DATA</h4>
+                                <p>
+                                    Permanently deletes all data related to Completed, Cancelled, or Deleted workflows. Deleted data include all participant activity, forms submitted, plus profiles. (A profile is not deleted if actively used within another workflow or as a static manager)
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </span>
+            </div>
+            <div class="info-block">
+                <span class="label long">
+                    Expire sequence links:
+                </span>
+                <span class="content-wrap">
+                    <span class="content">
+                        <md-input-container class="nmday-inpt">
+    						<input ng-model="configData.expDays" type="number" min="1" max="1095" value="1095" required>
+                            <span class="blrdv"></span>
+    					</md-input-container>
+                        <span class="text da-txt">Days after</span>
+                        <md-input-container class="dtype-inpt">
+    						<md-select aria-label="date type" ng-model="configData.expDtType">
+    							<md-option value="sd" selected>Start date</md-option>
+    							<md-option value="td">Trigger date</md-option>
+    						</md-select>
+    					 </md-input-container>
+                    </span>
+                    <span class="label small">
+                        <span class="icon icon-tooltip"></span>
+                        <md-tooltip class="manager-tooltip" md-direction="top">
+                            <span class="copy">
+                                <h4 class="title">EXPIRE SEQUENCE LINKS</h4>
+                                <p>
+                                    After the set date, all links within the workflow will expire. The workflow data will still be saved but the participants will not be able to view any contentrelating to the workflow.
+                                </p>
+                            </span>
+                        </md-tooltip>
+                    </span>
+                </span>
+            </div>
+		</div>
+
+		<div class="config-bottom">
+
+			<div class="btnDiv">
+				<md-button class="save save-spinner-cnfg md-raised" ng-click="saveData();" ng-disabled="configForm.$invalid">
+					<span class="text">Save</span>
+					<span class="text-save">Saving...</span>
+					<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+					<span class="spinner">
+						<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+					</span>
+				</md-button>
+			</div>
+
+		</div>
+	</div>
+	</form>
+</div>

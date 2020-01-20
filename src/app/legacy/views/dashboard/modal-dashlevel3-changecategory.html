@@ -1,0 +1,30 @@
+<md-dialog aria-label="Change Action" class="dashlevel3-more">
+	<form name="myForm" novalidate>
+		<md-toolbar>
+			<div class="md-toolbar-tools">
+				<h2>Category</h2>
+				<span flex></span>
+				<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+					<span class="icon icon-close-2"></span>
+				</md-button>
+			</div>
+		</md-toolbar>
+		<md-dialog-content style="min-width:500px;max-width:500px;max-height:810px;">
+            <div layout="row" layout-wrap>
+                <div flex>
+                    <md-input-container md-no-float class="md-block">
+                        <label class="placeholder">{{localdata.category.dnm}}</label>
+                        <md-select ng-model="localdata.category.val" md-container-class="mdl-dd" placeholder="Select {{localdata.category.dnm}}">
+                            <md-option ng-repeat="selitem in localdata.category.vals" value="{{selitem.key}}">{{selitem.value}}</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+		</md-dialog-content>
+		<md-dialog-actions layout="row">
+			<md-button aria-label="Save" class="md-raised save" ng-click="saveCategory($event)" md-autofocus>
+				Save
+			</md-button>
+		</md-dialog-actions>
+	</form>
+</md-dialog>

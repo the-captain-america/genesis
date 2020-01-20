@@ -1,0 +1,36 @@
+<md-dialog aria-label="Edit Confirmation Message" class="modal-edit-confirmation md-default-theme">
+<form name="EditConfirmationMsgForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>edit confirmation message</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+	<div layout="row" layout-align="space-around start" layout-wrap>
+        <div class="editor focus" flex>
+            <textarea placeholder="Type your text into the box..." ui-tinymce="tinymceOptionsAck" ng-model="confmsg"></textarea>
+
+            <div class="button-wrap">
+                <div class="btn">
+                    No
+                </div>
+                <div class="btn">
+                    Yes
+                </div>
+            </div>
+        </div>
+	</div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button aria-label="Save" class="save md-default-theme" ng-click="saveMessage();" ng-disabled="EditConfirmationMsgForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

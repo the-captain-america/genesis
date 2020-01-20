@@ -1,0 +1,220 @@
+<!--  Temp div to invoke new esign modal using differnt controller-->
+<div ng-controller="addSignConnCtrl">
+	<span class='esginClick' ng-click="esignClicked(esignParam);"> </span>
+</div>
+<!--  Temp div to invoke new senddata modal using differnt controller-->
+<div ng-controller="addSendDataCtrl">
+	<span class='senddataClick' ng-click="senddataClicked(senddataParam);"> </span>
+</div>
+<!--  Temp div to invoke new embed course modal using differnt controller-->
+<div ng-controller="addEmbedCourseCtrl">
+	<span class='embedCourseClick' ng-click="embedCourseClicked(embedCourseParam);"> </span>
+</div>
+
+<div class="workflow level2dynamicht" ng-cloak>
+
+	<div class="workflow-editor-content" id="scroll">
+		<div class="main-table">
+
+			<!-- style="display: none;" -->
+			<!-- Bread Crumb | Area Icons | V-Line-->
+			<div class="bread-crumb wfl2">
+				<span><a ng-href="#/workflow">Workflow</a></span>
+				<span>/</span>
+				<span><a href="javascript:void(0)" class="active">{{wfname}}</a></span>
+				<span class="capture-item " ng-click="workflowScreenshot();">
+					<span class="item__camera">
+						<span ng-if="showLoadingSpinner !== 'yes'" class="icon icon-camera-export">
+						</span>
+					</span>
+					<span class="item__animation is-loading" ng-if="showLoadingSpinner === 'yes'">
+						<md-progress-circular md-diameter="20px"></md-progress-circular>
+					</span>
+				</span>
+			</div>
+			<div class="area-icon-wrap manager">
+				<div class="content-manager">
+					<span class="icon icon-manager"></span>
+					<span class="text">{{custlabels.Manager || 'Manager'}} area</span>
+				</div>
+			</div>
+			<div class="area-icon-wrap new-hire">
+				<div class="content-new-hire">
+					<span class="icon icon-newhire"></span>
+					<span class="text">{{custlabels.Employee || 'Employee'}} area</span>
+
+				</div>
+			</div>
+			<div class="line"></div>
+
+			<div class="main-manager" ng-if="managers.length > 0">
+				<div dnd-list="list" class="drag-holder" dnd-drop="dropCallbackManager(event, index,item,type);">
+					<!-- <span class="text">{{models.dropzone.sequence}}</span> -->
+					<span class="text">Drag {{(custlabels.Manager || 'manager') | lowercase}} sequence here</span>
+				</div>
+			</div>
+			<div class="main-manager">
+				<div class="drag-holder-comm"></div>
+			</div>
+
+			<div class="main-newhire" ng-class="{nomanager: managers.length == '0'}">
+				<div dnd-list="list" class="drag-holder" dnd-drop="dropCallbackNewHire(event, index,item,type);">
+					<!-- <span class="text">{{models.dropzone.sequence}}</span> -->
+					<span class="text">Drag {{(custlabels.Employee || 'employee') | lowercase}} sequence here</span>
+				</div>
+			</div>
+			<div class="main-newhire">
+				<div class="drag-holder-comm"></div>
+			</div>
+
+			<!-- Main Cell -->
+			<div class="main-cell {{key}}" ng-repeat="(key,phase) in seqcard">
+				<span class="pipe pipe-start" ng-class="{  show : showiffNoStartSeq() }"></span>
+				<div class="text-info text-start">Start phase</div>
+
+				<div class="inner-table {{getGroupBoundary(key,$index)}}"
+					ng-class="{  stacked : showStackedTableClass(key,$index), chainedtable : showChainedTableClass(key,$index), double : showDoubleTableClass(key,$index), single : showSingleTableClass(key,$index)}"
+					ng-repeat="data in phase track by $index">
+
+					<div class="inner-cell">
+						<div class="wrap-height">
+
+							<div class="{{seq.type}}" ng-class="{ 'on-start' : seq.critdays == '0'}"
+								ng-repeat="seq in data.seq track by $index" ng-cloak>
+								<div class="box-wrap"
+									ng-class="{ connected : showConnectedClass(seq, 'connected',key,$index), chain : seq.critsubtype === 'chain', multimanager : showConnectedClass(seq,'mm',key,$index)}">
+									<div class="box" ng-class="{stackedemp : seq.crittype==='seqtrigger'}">
+										<div class="editseq-wrap">
+											<span class="icon more-action extra icon-more-icon"></span>
+											<div class="action-popover">
+												<span class="icon close-popover icon-more-icon"></span>
+												<span ng-click="showPreviewModal(seq);">
+													<span class="icn icon-demo-mbl"></span>
+													Send preview
+												</span>
+												<span ng-if="locked !== 'Y'"
+													ng-click="showNewSequenceModal(null, seq, 'update');">
+													<span class="icn icon-edit"></span>
+													Edit
+												</span>
+												<span ng-if="locked !== 'Y'"
+													ng-click="removeSeq($parent.$index,$index,seq.uid, key, seq);">
+													<span class="icn icon-close-5"></span>
+													Remove
+												</span>
+												<span class="dsbl" ng-if="locked === 'Y'">
+													<span class="icn icon-edit"></span>
+													Edit
+												</span>
+												<span class="dsbl" ng-if="locked === 'Y'">
+													<span class="icn icon-close-5"></span>
+													Remove
+												</span>
+											</div>
+										</div>
+										<div class="header">
+											<span ng-cloak class="text">
+												<a ng-attr-title="{{seq.name}}">
+													{{seq.name}}
+												</a>
+											</span>
+											<span class="icon othicn lockwrap">
+												<a ng-if="seq.seqtype && seq.seqtype === 'logic'"
+													ng-attr-title="Logic: {{seq.logiccritstring}}">
+													<span class="icon lgc-icn icon-logic-small"></span>
+												</a>
+												<!-- <span class="icon lgc-icn icon-mail-small"></span> -->
+												<!-- <span class="icon lgc-icn icon-mobile-small2"></span> -->
+												<a ng-if="seq.stop_esc_alerts === 'Y'"
+													ng-attr-title="Suppress all alerts">
+													<span class="icon lgc-icn icon-alert-dismiss"></span>
+												</a>
+												<span ng-if="advsec === 'yes'">
+													<a ng-if="seq.seqprot === 'pp'" ng-attr-title="Password protection">
+														<span class="lock icon-security-1"></span>
+													</a>
+													<a ng-if="seq.seqprot === 'sso'" ng-attr-title="SSO protection">
+														<span class="lock icon-security-2"></span>
+													</a>
+												</span>
+											</span>
+										</div>
+										<div ng-if="mm === 'yes' && seq.type === 'manager-area' && managers.length > 0"
+											class="header title"
+											ng-style="{'border-left-color': getManagerLabelColor(seq.mgrid)}">
+											{{getManagerLabel(seq.mgrid)}}
+										</div>
+										<div ng-if="mm === 'yes' && seq.type === 'manager-area' && (!managers || managers.length == 0)"
+											class="header title">
+											{{getManagerLabel(seq.mgrid)}}
+										</div>
+										<ul dnd-list="seq.modules"
+											dnd-drop="dropCallbackModuleAdded(event, index,item,seq);">
+											<li ng-repeat="module in seq.modules track by $index"
+												ng-click="clickModuleTile(module,seq.uid);"
+												ng-class="{'disable-link' : (seq.notifylink ==='no' && !(module.iconname === 'senddata' || module.iconname === 'logic'))}"
+												dnd-draggable="module" dnd-effect-allowed="move">
+												<span class="icon" ng-class="getModuleIcon(module)"></span>
+												<span class="text truncate">{{module.modulename}}</span>
+												<span class="icon extra icon-close-5"
+													ng-click="removeModule($index, module, seq); $event.stopPropagation();"></span>
+												<span class="icon extra drag icon-handles-small"></span>
+											</li>
+										</ul>
+									</div>
+									<div class="shape-wrap shape-full-wrap">
+										<span class="shape" ng-class="{dot : seq.crittype==='seqtrigger'}"></span>
+										<div class="blurb"></div>
+									</div>
+
+									<div class="info-text truncate" ng-if="seq.crittype==='time'">
+										<span ng-if="seq.critdays < -1">
+											{{seq.critdays *-1 }} Days before
+										</span>
+										<span ng-if="seq.critdays === -1">
+											{{seq.critdays *-1 }} Day before
+										</span>
+										<span ng-if="seq.critdays === 0">
+											Start date
+										</span>
+										<span ng-if="seq.critdays === 1">
+											{{seq.critdays }} Day after
+										</span>
+										<span ng-if="seq.critdays > 1">
+											{{seq.critdays }} Days after
+										</span>
+									</div>
+
+									<div class="info-text truncate"
+										ng-if="seq.crittype==='sequence' || seq.crittype==='seqtrigger'">
+										<span ng-if="$index ==1 && seq.crittype==='sequence'">
+											After: {{data.seq[$index-1].name}}
+										</span>
+										<span ng-if="$index ==1 && seq.crittype==='seqtrigger'">
+											<span>With: {{data.seq[$index].grpparent}}</span>
+										</span>
+
+										<!-- Manager sequence chain Name is taken from Employee or manager Sequence -->
+										<span ng-if="$index ==0  && seq.crittype==='sequence'">
+											After:
+											<span>{{getChainSequenceName(phase[$parent.$parent.$parent.$index-1].seq[1].name, phase[$parent.$parent.$parent.$index-1].seq[0].name)}}</span>
+										</span>
+										<span ng-if="$index ==0  && seq.crittype==='seqtrigger'">
+											<!-- When: <span>{{getChainSequenceName(phase[$parent.$parent.$parent.$index-1].seq[1].name, phase[$parent.$parent.$parent.$index-1].seq[0].name)}}</span> -->
+											<span ng-if="seq.seqfor==='NH'">With: {{data.seq[$index].grpparent}}</span>
+										</span>
+									</div>
+
+								</div>
+							</div>
+
+						</div>
+					</div>
+				</div>
+
+				<div class="text-info text-post">Post phase</div>
+			</div>
+
+		</div>
+	</div>
+</div>

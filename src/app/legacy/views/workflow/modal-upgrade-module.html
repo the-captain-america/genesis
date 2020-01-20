@@ -1,0 +1,48 @@
+<md-dialog aria-label="Disable Link" class="disablelink-modal vdorcdinfo-modal md-default-theme">
+    <!-- <form name="myForm" novalidate> -->
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-class="{errmsg : pgstatus === 'error' || pgstatus === 'submitted'}">{{pgtitle}}</h2>
+                <span flex></span>
+                <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="hide()">
+                    <span class="icon icon-close-2"></span>
+    			</md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="max-height:460px;max-width:690px">
+            <div ng-if="pgstatus === 'pending'">
+                <div layout="column" layout-align="space-around center" layout-wrap>
+                    <div class="imgwrp">
+                        <img src="//static.enboarder.net/images/vrdinfo.jpg" alt="" />
+                    </div>
+                    <div class="info-text">
+                        <p>
+                            Create simple ways for participants to record engaging and fun videos within their experience. Video content is easily shared throughout the workflow or pushed to your other social channels.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="errinfo" ng-if="pgstatus === 'error'">
+                <p>
+                    If you email us your details<br>we'll get in touch with you ASAP!
+                    <a href="mailto:support@enboarder.com">support@enboarder.com</a>
+                </p>
+            </div>
+            <div class="errinfo" ng-if="pgstatus === 'submitted'">
+                <p>Great, we'll get in touch soon...</p>
+            </div>
+
+        </md-dialog-content>
+        <md-dialog-actions layout="row" ng-if="pgstatus === 'pending'">
+            <md-button aria-label="I WOULD LIKE TO KNOW MORE!" class="save save-spinner md-default-theme" ng-click="sendUpgradeRequest()" md-autofocus>
+                <span class="text">HEY SALES - I WOULD LIKE TO KNOW MORE!</span>
+                <span class="text-save">HEY SALES - I WOULD LIKE TO KNOW MORE!</span>
+                <span class="text-saved">HEY SALES - I WOULD LIKE TO KNOW MORE!<span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+    <!-- </form> -->
+</md-dialog>

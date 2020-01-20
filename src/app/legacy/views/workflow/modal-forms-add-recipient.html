@@ -1,0 +1,58 @@
+<md-dialog aria-label="Add recipient" class="new-seq-modal form-recpient-modal md-default-theme">
+<form name="AddRecipientForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2>add email recipients</h2>
+		<span flex></span>
+		<md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+
+	<div layout="column" class="select-group">
+		<!-- <label class="heading heading-inside">Select data format and recipients below.</label> -->
+		<label class="heading heading-inside">Select recipients below.</label>
+
+		<!-- <md-radio-group ng-model="emailFormat" required>
+			<md-radio-button value="html">HTML</md-radio-button>
+			<md-radio-button value="csv">CSV <span class="icon icon-attachment2"></span></md-radio-button>
+		</md-radio-group> -->
+
+        <div layout="row" class="select-group-wrap">
+            <div flex>
+                <label>Email recipients</label>
+                <md-input-container md-no-float class="recipients-dropdown" ng-repeat="selRecp in selectedRecpList track by $index">
+                    <md-select md-no-asterisk md-container-class="fixed-dd" aria-label="Email recipients" placeholder="Select" ng-model="selRecp.recp" required>
+                        <md-option value="{{recp.uid}}" ng-repeat="recp in recpList track by $index">{{recp.l}}</md-option>
+                    </md-select>
+                    <!-- <md-button class="delete-btn" ng-if="!$first" ng-click="deleteRecipients($index);" aria-label="Close">
+                        <span class="icon icon-close-5"></span>
+                    </md-button> -->
+                    <md-button class="delete-btn" ng-click="deleteRecipients($index);" aria-label="Close">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                </md-input-container>
+            </div>
+
+        </div>
+
+        <div class="add-more-new-wrap">
+            <md-button class="add-more" ng-click="addMoreRecipients();">
+                <span class="icon icon-plus"></span>
+                <span class="text">add more</span>
+            </md-button>
+        </div>
+
+	</div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button aria-label="Save" class="save md-default-theme" ng-click="saveRecipient();" ng-disabled="AddRecipientForm.$invalid" md-autofocus>Save</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

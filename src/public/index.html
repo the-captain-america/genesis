@@ -1,0 +1,32 @@
+<!doctype html>
+
+<html lang="en" ng-strict-di>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Enboarder</title>
+  <link rel="icon" type="image/x-icon" href="/img/favicon.ico">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="description" content="Enboarder">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+  <!-- Angular Material CSS  -->
+  <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/angular-material/1.1.18/angular-material.min.css"
+    integrity="sha256-GOiHM1s7jkFNwWdvyi3e3YLRrEoWQp31KF7Dj90f2dQ=" crossorigin="anonymous" />
+  <!-- Opensans Font-->
+  <link href="//static.enboarder.net/css/opensansfont.css" rel="stylesheet" type="text/css" />
+
+  <base href="/">
+</head>
+
+<body ng-app="EnboarderApp" ng-controller="AppCtrl" layout="column" class="{{ bodylayout }} {{ drag }} {{ backdrop }}" ng-cloak>
+  <div id="legacy-app" >
+    <enboarder-view></enboarder-view>
+    <react-loader-two></react-loader-two>
+  </div>
+</body>
+
+</html>

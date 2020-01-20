@@ -1,0 +1,304 @@
+<md-dialog aria-label="Add New Sequence" class="new-seq-modal md-default-theme">
+<form name="NewSequenceModalForm" novalidate>
+<md-toolbar>
+	<div class="md-toolbar-tools">
+		<h2 ng-if="operation ==='add'">New <span ng-if="localdata.seqfor === 'NH'">{{custlabels.Employee || 'Employee'}}</span><span ng-if="localdata.seqfor === 'M'">{{custlabels.Manager || 'Manager'}}</span> Sequence</h2>
+		<h2 ng-if="operation ==='edit' || operation === 'update' || operation ==='readd-chained'">Edit <span ng-if="localdata.seqfor === 'NH'">{{custlabels.Employee || 'Employee'}}</span><span ng-if="localdata.seqfor === 'M'">{{custlabels.Manager || 'Manager'}}</span> Sequence</h2>
+		<!-- <h2 ng-if="operation ==='update'">Edit Sequence</h2> -->
+		<span flex></span>
+		<md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+			<span class="icon icon-close-2"></span>
+		</md-button>
+	</div>
+</md-toolbar>
+
+<md-dialog-content style="min-width:570px;max-width:570px">
+
+	<div layout="row" layout-align="space-around center" layout-wrap ng-class="{ namewrap : mm === 'yes' && localdata.seqfor === 'M'}">
+        <div flex>
+            <md-input-container class="required">
+    			<label>
+    				<span ng-if="localdata.seqfor === 'NH'">{{custlabels.Employee || 'Employee'}}</span><span ng-if="localdata.seqfor === 'M'">{{custlabels.Manager || 'Manager'}}</span> sequence name
+    			</label>
+    			<input md-no-asterisk ng-model="localdata.name" required focus="true">
+                <span class="blrdv"></span>
+    		</md-input-container>
+        </div>
+        <div flex ng-if="localdata.seqfor === 'M'">
+            <md-input-container class="multimanager-dropdown" md-no-float>
+                <label>{{custlabels.Manager || 'Manager'}} label</label>
+                <md-select md-no-asterisk md-container-class="newseqmanager-list fixed-dd" ng-model="localdata.mgrid" placeholder="Select Manager" ng-change="getAvailableSeqValues('M',localdata.mgrid);" required>
+                    <md-option ng-repeat="item in managers track by $index" value="{{item.uid}}">{{item.label}}</md-option>
+                </md-select>
+            </md-input-container>
+        </div>
+    </div>
+
+    <hr>
+
+	<div layout="column" class="select-group">
+		<label class="heading heading-inside">When does this sequence begin?</label>
+		<md-radio-group ng-model="localdata.crittype" required>
+			<md-radio-button value="time" selected><em>At</em> a specific time</md-radio-button>
+			<md-radio-button value="seqtrigger"><em>With</em> another sequence</md-radio-button>
+			<md-radio-button value="sequence"><em>After</em> another sequence is complete</md-radio-button>
+		</md-radio-group>
+         <div layout="row" ng-if="localdata.crittype === 'time'" layout-align="center center" layout-wrap class="startday-wrap">
+            <span class="lbl">Start Date</span>
+            <span class="sdte-pl"></span>
+            <span class="sdte-br"></span>
+            <md-slider-container flex="100">
+                <md-slider min="-183" max="183" ng-model="localdata.critdays" aria-label="days"></md-slider>
+            </md-slider-container>
+            <md-input-container flex="10" class="sdte-dy">
+                <input name="numofdays" type="number" ng-model="localdata.critdays" aria-label="days" required ng-pattern="/^[^.]*$/">
+                <div ng-messages="NewSequenceModalForm.numofdays.$error" role="alert" multiple>
+                    <div ng-message="pattern" class="err-msg">
+                        No decimal value allowed
+                    </div>
+                </div>
+                <span class="lbl">Days</span>
+            </md-input-container>
+        </div>
+		<div flex ng-if="localdata.crittype === 'sequence' || localdata.crittype === 'seqtrigger'">
+			<md-input-container md-no-float>
+				<md-select md-container-class="seq-dd" md-no-asterisk ng-model="localdata.critseq" placeholder="Select Sequence..." required>
+					<md-option ng-repeat="item in availableSeq" value="{{item.seqid}}" ng-disabled=item.disabled>{{item.seqname}}</md-option>
+				</md-select>
+			</md-input-container>
+		</div>
+
+        <hr class="sendseq-hr">
+
+        <div class="sendseq-wrap">
+            <!-- <div class="checkbox-container">
+                <span class="label">Send sequence using:</span>
+                <md-input-container flex>
+                    <md-select md-container-class="advopt-dd" aria-label="Send sequence using" ng-model="tempdata.sndseq">
+                        <md-option value="one" selected>Preferred contact channel</md-option>
+                        <md-option value="two">Two</md-option>
+                        <md-option value="three">Three</md-option>
+                    </md-select>
+                </md-input-container>
+            </div> -->
+            <md-checkbox class="seq-lgc" aria-label="Suppress all admin escalation emails and dashboard alerts if overdue" ng-model="tempdata.stop_esc_alerts" ng-true-value="'Y'" ng-false-value="'N'">
+                <span>Suppress all admin escalation emails and dashboard alerts if overdue</span>
+            </md-checkbox>
+        </div>
+	</div>
+
+    <div class="advanced-option-wrap">
+        <div class="show-hide">
+            <span class="arrow-toggle icon-arrow-1"></span>
+            <span class="text">Advanced options</span>
+        </div>
+        <div class="detail-section">
+            <md-radio-group class="ppr-wrap" ng-model="tempdata.seqprot" ng-if="advsec==='yes'">
+                <span class="rd-lbl">sequence security</span>
+                <md-radio-button value="b">
+                    <span class="text">Basic protection</span>
+                </md-radio-button>
+                <md-radio-button value="pp">
+                    <span class="text">Password protection</span>
+                    <span class="lock icon-security-1"></span>
+                </md-radio-button>
+                <md-radio-button value="sso">
+                    <span class="text">SSO protection</span>
+                    <span class="lock icon-security-2"></span>
+                </md-radio-button>
+            </md-radio-group>
+            <md-radio-group class="ppr-wrap grprd" ng-if="bulkhire === 'yes' && localdata.seqfor === 'M'" ng-model="tempdata.bulkprocess">
+                <span class="rd-lbl">bulk {{custlabels.employees || 'employees'}}/ bulk process</span>
+                <md-radio-button value="daily">
+                    <span class="text">Trigger sequence once/day (Try to bulk {{custlabels.employees || 'employees'}})</span>
+                </md-radio-button>
+                <md-radio-button value="now">
+                    <span class="text">Trigger sequence immediately (Do not wait to bulk {{custlabels.employees || 'employees'}})</span>
+                </md-radio-button>
+            </md-radio-group>
+            <div class="sendseq-wrap">
+                <div class="checkbox-container">
+                    <span class="label">Mark sequence 'overdue' if not complete after:</span>
+                    <md-input-container flex>
+                        <md-select md-container-class="advopt-dysaftr-dd" aria-label="Days after" ng-model="tempdata.escalation">
+                            <md-option ng-if="$index == 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Day</md-option>
+                            <md-option ng-if="$index > 0" ng-repeat="i in getNumber(10) track by $index" value="{{$index+1}}">{{$index+1}} Days</md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+            </div>
+            <md-checkbox class="seq-lgc" aria-label="Send daily reminder until sequence is marked 'overdue'" ng-model="tempdata.sendreminder" ng-true-value="'yes'" ng-false-value="'no'">
+                <span>Send daily reminder until sequence is marked 'overdue'</span>
+            </md-checkbox>
+            <md-checkbox class="seq-lgc" aria-label="Bundle all e-signing modules into one envelope" ng-if="docusign === 'yes'" ng-model="tempdata.esigbund" ng-true-value="'y'" ng-false-value="'n'">
+                <span>Bundle all e-signing modules into one envelope</span>
+            </md-checkbox>
+            <md-checkbox class="seq-lgc" aria-label="Only trigger this sequence if a condition is met" ng-model="tempdata.seqlogic" ng-true-value="'yes'" ng-false-value="'no'">
+                <span>Only trigger this sequence if a condition is met</span>
+            </md-checkbox>
+            <div layout="row" class="cndn-wrap" ng-if="tempdata.seqlogic === 'yes'">
+                <div flex="40">
+                    <md-menu-bar>
+                        <md-menu>
+                            <button ng-click="$mdOpenMenu()">
+                                <span class="text" ng-if="criteria.operand.dispnm && criteria.operand.dispnm.length > 0 && criteria.operand.dispnm.length < 36">{{criteria.operand.dispnm}}</span>
+                                <span class="text" ng-if="criteria.operand.dispnm && criteria.operand.dispnm.length > 35">...<a title="{{criteria.operand.dispnm}}">{{criteria.operand.dispnm.substring(criteria.operand.dispnm.length-35,criteria.operand.dispnm.length)}}</a></span>
+                                <span class="text plhldr" ng-if="!criteria.operand.dispnm">Select</span>
+                                <span class="icon icon-arrow-7"></span>
+                            </button>
+                            <md-menu-content class="fltrmm">
+                                <md-menu-item ng-if="setupdata.category.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Categories</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cat in setupdata.category">
+                                                <md-button ng-click="selectCategory(cat);">
+                                                    <span class="icon-dtype icon-f-choice"></span>
+                                                    <span class="text">{{cat.dispnm}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="setupdata.cflist.length > 0">
+                                    <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Custom Fields</md-button>
+                                        <md-menu-content>
+                                            <md-menu-item ng-repeat="cf in setupdata.cflist">
+                                                <md-button ng-click="selectCustomField(cf);">
+                                                    <span class="icon-dtype icon-{{cf.typ}}"></span>
+                                                    <span class="text">{{cf.nm}}</span>
+                                                </md-button>
+                                            </md-menu-item>
+                                        </md-menu-content>
+                                    </md-menu>
+                                </md-menu-item>
+                                <md-menu-item ng-if="setupdata.forms.length > 0">
+                                   <md-menu>
+                                        <md-button ng-click="$mdOpenMenu()">Forms</md-button>
+                                        <md-menu-content>
+                                            <md-menu ng-repeat="formitem in setupdata.forms">
+                                                <md-button ng-click="$mdOpenMenu()">{{formitem.formname}}</md-button>
+                                                <md-menu-content>
+                                                    <md-menu-item ng-repeat="formfield in formitem.fields">
+                                                        <md-button ng-click="selectForm(formitem, formfield);">
+                                                            <span class="icon-dtype icon-{{formfield.icon}}"></span>
+                                                            <span class="text">{{formfield.fnm}}</span>
+                                                        </md-button>
+                                                    </md-menu-item>
+                                                </md-menu-content>
+                                            </md-menu>
+                                        </md-menu-content>
+                                   </md-menu>
+                               </md-menu-item>
+                               <md-menu-item ng-if="setupdata.seq.length > 0">
+                                   <md-menu>
+                                       <md-button ng-click="$mdOpenMenu()">Sequence</md-button>
+                                       <md-menu-content>
+                                           <md-menu-item ng-repeat="seq in setupdata.seq">
+                                               <md-button ng-click="selectSequence(seq);">
+                                                   <span class="icon-dtype icon-sequence-{{seq.icon}}-small"></span>
+                                                   <span class="text">{{seq.name}}</span>
+                                               </md-button>
+                                           </md-menu-item>
+                                       </md-menu-content>
+                                   </md-menu>
+                               </md-menu-item>
+                               <md-menu-item>
+                                   <md-button ng-click="selectStartDate();">
+                                       <span class="icon-dtype icon-sd icon-f-date"></span>
+                                       <span class="text">Start Date</span>
+                                   </md-button>
+                               </md-menu-item>
+                            </md-menu-content>
+                        </md-menu>
+                    </md-menu-bar>
+                </div>
+                <div flex="20">
+                    <md-input-container md-no-float class="equal-sep">
+                        <md-select md-no-asterisk aria-label="Criteria" md-container-class="equal-cont" ng-model="criteria.operator.key" placeholder="Select" ng-change="changeOperator();" required>
+                            <!-- ng-disabled="!criteria.operand.dispnm" -->
+                            <md-option value="{{op.key}}" ng-repeat="op in operators track by op.key">
+                                <span ng-if="op.key === 'equal'">
+                                    <span class="icon icon-symbol-1"></span>
+                                    <span class="text">Equal</span>
+                                </span>
+                                <span ng-if="op.key === 'notequal'">
+                                    <span class="icon icon-symbol-2"></span>
+                                    <span class="text">Not equal</span>
+                                </span>
+                                <span ng-if="op.key === 'lessthan'">
+                                    <span class="icon icon-symbol-3"></span>
+                                    <span class="text">Smaller than</span>
+                                </span>
+                                <span ng-if="op.key === 'greaterthan'">
+                                    <span class="icon icon-symbol-4"></span>
+                                    <span class="text">Bigger than</span>
+                                </span>
+                                <span ng-if="op.key === 'in'">
+                                    <span class="icon icon-symbol-5"></span>
+                                    <span class="text">Contain any</span>
+                                </span>
+                            </md-option>
+                        </md-select>
+                    </md-input-container>
+                </div>
+                <div flex="40">
+                    <md-input-container md-no-float ng-if="inputType === 'number'">
+                          <input md-no-asterisk ng-model="criteria.value[0]" type="number" placeholder="Type number" ng-disabled="!criteria.operand.dispnm">
+                          <div class="mask" ng-if="!criteria.operand.dispnm"></div>
+                    </md-input-container>
+                    <md-input-container md-no-float ng-if="inputType === 'text'">
+                          <input md-no-asterisk ng-model="criteria.value[0]" type="text" placeholder="Write text" ng-disabled="!criteria.operand.dispnm">
+                          <div class="mask" ng-if="!criteria.operand.dispnm"></div>
+                    </md-input-container>
+                    <md-input-container md-no-float ng-if="inputType === 'date'">
+                          <input md-no-asterisk ng-model="criteria.value[0].unt" type="number" placeholder="Type number" ng-disabled="!criteria.operand.dispnm">
+                          <div class="mask" ng-if="!criteria.operand.dispnm"></div>
+                    </md-input-container>
+                    <md-input-container md-no-float class="cat-dd" ng-if="inputType === 'multiselect' || inputType === 'singleselect'">
+                        <md-select md-no-asterisk aria-label="Criteria" md-container-class="crit-cont" ng-model="criteria.value" md-selected-html="displayOrValues(criteria.value)" placeholder="Select" multiple required>
+                            <md-option value="{{valChoice.key}}" ng-repeat="valChoice in valuechoices track by valChoice.key">{{valChoice.val}}</md-option>
+                        </md-select>
+                        <div class="mask" ng-if="!criteria.operand.dispnm"></div>
+                    </md-input-container>
+                </div>
+                <span ng-if="inputType === 'date'" class="dlbl">Days</span>
+                <!-- <md-button class="delete-btn" ng-click="deleteCriteria($index)" aria-label="Close" ng-if="$index > 0">
+                    <span class="icon icon-close-5"></span>
+                </md-button> -->
+            </div>
+            <!-- <div class="add-more-new-wrap">
+                <md-button class="add-more" ng-click="addCriteria();">
+                    <span class="icon icon-plus"></span>
+                    <span class="text">add more</span>
+                </md-button>
+            </div> -->
+        </div>
+    </div>
+
+    <div class="error" ng-if="showSameDayError === true">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">Sequence with same Date criteria already exists</span>
+    </div>
+
+    <div class="error" ng-if="showSameSequenceError === true">
+        <span class="icon icon-notification-alert"></span>
+        <span class="text">Sequence cannot be associated to itself</span>
+    </div>
+
+</md-dialog-content>
+
+<md-dialog-actions layout="row">
+	<md-button aria-label="Save" class="save save-spinner md-default-theme" ng-click="saveNewSequence();" ng-disabled="NewSequenceModalForm.$invalid" md-autofocus>
+		<span class="text">Save</span>
+		<span class="text-save">Saving...</span>
+		<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+		<span class="spinner">
+			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+		</span>
+	</md-button>
+</md-dialog-actions>
+
+</form>
+</md-dialog>

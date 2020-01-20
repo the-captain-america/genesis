@@ -1,0 +1,65 @@
+<div class="clstwrap" ng-class="{pgnchlact : isparent === 'yes'}">
+    <span ng-repeat="schar in searchChars track by $index" ng-click="filterList(schar);" ng-class="{selfilter : schar === filter.selected}">
+        {{schar}}
+    </span>
+</div>
+<div class="table-responsive">
+    <table class="table company-list-table childacct">
+        <thead>
+            <tr>
+                <th>Account Name</th>
+                <th class="smsbtn">&nbsp;</th>
+                <th class="signin" ng-class="{lstbtn : isparent === 'yes'}">&nbsp;</th>
+                <th ng-if="isparent !== 'yes'" class="signin">&nbsp;</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr ng-repeat="row in activeList track by $index" ng-class="{dsbl : (!allowLoginAs || row.inprocess === 'yes')}">
+                <td class="td-container actnm">
+                    <div ng-click="allowLoginAs && row.inprocess !== 'yes' && loginActiveAs($index);">
+                        {{row.name}}
+                        <a title="Parent account"><span ng-if="isparent !== 'yes' && row.isparent === 'yes'" class="icn icon-multimanager"></span></a>
+                        <span ng-if="isparent !== 'yes' && row.parentname" class="txt"><a title="{{row.parentname}}">Parent: {{row.parentname}}</a></span>
+                    </div>
+                </td>
+
+                <td class="td-container smsbtntd">
+                    <div ng-if="isparent !== 'yes' && row.inprocess !== 'yes'">
+                        <md-button class="smsbtn md-raised" ng-click="showSMSModal(row);" ng-if="!(row.smsdisp)">
+                            <span class="text">Provision SMS account</span>
+                        </md-button>
+                        <span class="dnme" ng-click="showSMSModal(row);" ng-if="row.smsdisp">
+                            <span class="txt truncate">{{row.smsdisp}}</span>
+                            <span class="icon icon-edit"></span>
+                        </span>
+                    </div>
+                </td>
+                <!-- <td class="td-container center">
+                    <div class="img-wrap">
+                        <img src="//static.enboarder.net/images/logo.gif" alt="Logo">
+                    </div>
+                </td> -->
+                <td class="td-container center">
+                    <div ng-if="row.inprocess !== 'yes'">
+                        <md-button class="signinas md-raised" ng-click="showActiveCompanyModal($event,'update', $index);">
+                            <span class="text">edit</span>
+                        </md-button>
+                    </div>
+                </td>
+                <td ng-if="isparent !== 'yes'" class="td-container center">
+                    <div ng-if="!row.sfacctid">
+                        <span>&nbsp;</span>
+                    </div>
+                    <div ng-if="row.sfacctid">
+                        <span ng-click="logintoSalesforce(row.sfacctid);" class="sficn icon-salesforce"></span>
+                    </div>
+                </td>
+            </tr>
+            <tr ng-if="activeList.length == '0'" class="nodata">
+                <td colspan="4">
+                    <hr>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

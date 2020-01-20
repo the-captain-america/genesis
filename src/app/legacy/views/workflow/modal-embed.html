@@ -1,0 +1,20 @@
+<md-dialog aria-label="embed content" class="modal-embed md-default-theme">
+	<md-toolbar>
+		<div class="md-toolbar-tools">
+			<span flex></span>
+			<md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+                <span class="text">Close</span>
+                <span class="icon icon-close-3"></span>
+			</md-button>
+		</div>
+	</md-toolbar>
+
+	<md-dialog-content style="min-width:1030px;max-width:1030px">
+        <div class="video-iframe-wrap" ng-style="{ height: windowHeight }" resizeframe>
+    		<div layout="row" layout-align="center center">
+                <iframe title="EmbedFrame" class="video-iframe" ng-src="{{safeEmbedUrl}}"></iframe>
+    		</div>
+        </div>
+	</md-dialog-content>
+
+</md-dialog>

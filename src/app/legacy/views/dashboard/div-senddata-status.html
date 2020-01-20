@@ -1,0 +1,140 @@
+<div class="collapse-wrap" ng-if="sd_action==='email'">
+  <div class="show-hide-dashboard">
+    <span class="text">Email (HTML)</span>
+    <span class="arrow-toggle icon-arrow-3"></span>
+  </div>
+  <div class="detail-section-dashboard show-row" ng-repeat="recp in emailRecpList">
+    <span class="info">{{ recp.n }} <span ng-if="recp.n">,</span> {{ recp.e }}</span>
+    <span class="status wait" ng-if="!recp.e">
+      <span class="icon icon-close-5"></span>
+      <span class="text" ng-if="recp.sent !=='notavailable'">Awaiting email capture</span>
+      <span class="text" ng-if="recp.sent ==='notavailable'">Recipient not available</span>
+    </span>
+    <span class="status received" ng-if="recp.e">
+      <span class="icon icon-notification-ok"></span>
+      <span class="text">Forwarded</span>
+    </span>
+  </div>
+</div>
+<div ng-if="sd_action==='updateval'">
+  <div class="collapse-wrap" ng-repeat="msg in sd_msglist track by $index">
+    <div class="show-hide-dashboard">
+      <span class="text">Value #{{ $index + 1 }}</span>
+      <span class="arrow-toggle icon-arrow-3"></span>
+    </div>
+    <div class="detail-section-dashboard show-row">
+      <div class="info" layout="row" layout-margin layout-align="center">
+        <div class="info-inner">
+          <span class="label">Field to update:</span>
+          <span>{{ msg.target }}</span>
+        </div>
+        <div class="info-inner">
+          <span class="label">Field with new value:</span>
+          <span>{{ msg.src }}</span>
+        </div>
+        <div class="info-inner new-value">
+          <span class="label">New value</span>
+
+          <md-chip-template ng-if="msg.val.nm">
+            <span class="fkchip nohover">
+              <img alt="profile" ng-src="{{ msg.val.picCdn || msg.val.pic }}" class="md-avatar" />
+              <span class="txt">{{ msg.val.nm }}</span>
+            </span>
+          </md-chip-template>
+          <span ng-if="!msg.val.nm" class="txt">{{ msg.val }}</span>
+        </div>
+      </div>
+      <span class="status received" ng-if="msg.status==='ok'">
+        <span class="icon icon-notification-ok"></span>
+        <span class="text">Updated succesfully!</span>
+      </span>
+      <span class="status wait" ng-if="msg.status==='error'">
+        <span class="icon icon-close-5"></span>
+        <span class="text">{{ msg.msg }}</span>
+      </span>
+    </div>
+  </div>
+</div>
+<div class="collapse-wrap" ng-if="sd_action==='webhook'">
+  <div class="show-hide-dashboard">
+    <span class="text">Webhook</span>
+    <span class="arrow-toggle icon-arrow-2"></span>
+  </div>
+  <div class="detail-section-dashboard show-row">
+    <span class="info">{{ webhookurl }}</span>
+    <span class="status received" ng-if="webhookstatus==='ok'">
+      <span class="icon icon-notification-ok"></span>
+      <span class="text">Delivered succesfully!</span>
+    </span>
+    <span class="status webhook" ng-if="webhookstatus==='ok'">
+      <span class="text">{{ webhookres.res }}</span>
+    </span>
+
+    <span class="status button-adjustment"
+      ng-class="webhookstatus==='error' || webhookstatus==='retry' ? 'as-error' : 'as-success'"
+      ng-if="webhookstatus==='error' || webhookstatus==='retry' && workflowstatus === 'In progress'"
+      ng-click="retry();">
+      <span class="button-close"><span class="icon icon-close-5"></span></span>
+      <span ng-if="retryprocess === 'error'" class="content-text">Error</span>
+      <span ng-if="webhookstatus === 'complete' || retryprocess === 'complete'" class="content-text">Retry Error</span>
+
+      <div class="dev-helper send-data is-hidden">
+        <span ng-if="retryprocess"><span>retryprocess</span>{{ retryprocess }}</span>
+        <span ng-if="webhookstatus"><span>webhookstatus</span>{{ webhookstatus }}</span>
+      </div>
+
+      <span ng-if="retryprocess !== 'started'" class="button-retry as-default">
+        <span class="text-icon"><span class="icon icon-refresh"></span></span>
+        <span class="content-text">Retry</span>
+      </span>
+
+      <span ng-if="retryprocess === 'started'" class="button-retry as-complete">
+        <span class="item-spinner">
+          <md-progress-circular class="blk" md-diameter="16px"></md-progress-circular>
+        </span>
+        <span class="content-text">Retry</span>
+      </span>
+
+
+      <span ng-if="retryprocess === 'complete'" class="button-retry as-complete">
+        <!-- <span class="text-icon success"><span class="icon-notification-ok"></span></span> -->
+        <span class="text-icon is-error"><span class="icon icon-close-5"></span></span>
+        <span class="content-text">Retry</span>
+      </span>
+
+      <span ng-if="retryprocess === 'error'" class="button-retry as-complete">
+        <span class="text-icon is-error"><span class="icon icon-close-5"></span></span>
+        <span class="content-text">Retry</span>
+      </span>
+    </span>
+
+    <div>
+      <span style="margin-top: 20px;" class="status webhook" ng-if="webhookstatus==='error'">
+        <span class=" text"><strong>RESPONSE:</strong>
+        </span>
+        <span class="text">{{ webhookres.res }}</span>
+      </span>
+    </div>
+
+
+    <div class="status webhook" ng-if="webhookstatus==='finalError'">
+      <span class="text"></br><strong>RETRY WEBHOOK:</strong> </span>
+      <span class="text">({{ webhookres.attempt ? webhookres.attempt : 0 }} / {{ webhookres.max ? webhookres.max : 0 }})
+        <strong>Webhook failed permannantly</strong> </span>
+    </div>
+
+    <div class="status webhook" ng-if="webhookstatus==='retry' || webhookstatus==='error'">
+      <span class="text"><strong>RESPONSE:</strong>
+      </span>
+      <span class="text">Server not responding</span>
+    </div>
+    <div class="status webhook" ng-if="webhookstatus==='retry' || webhookstatus==='error'">
+      <span class="text"><strong>RETRY WEBHOOK:</strong> </span>
+      <span class="text">{{ attemptdt }} </span>
+      <span class="text">
+        {{ webhookres.attempt ? webhookres.attempt : 0 }} of {{ webhookres.max ? webhookres.max : 0 }}
+        attempts
+      </span>
+    </div>
+  </div>
+</div>

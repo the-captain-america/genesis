@@ -1,0 +1,518 @@
+<md-dialog aria-label="Add New People" class="add-new-people-modal md-default-theme">
+    <form name="myForm" novalidate>
+        <md-toolbar>
+            <div class="md-toolbar-tools">
+                <h2 ng-if="employeeDetails === true">Add New People</h2>
+                <h2 ng-if="managerDetails === true">{{custlabels.Managers || 'Managers'}}</h2>
+                <h2 ng-if="customfieldDetails === true">Custom Fields</h2>
+                <h2 ng-if="showbulkupload === true">Bulk upload</h2>
+                <h2 ng-if="confirmation === 'yes'">&nbsp;</h2>
+                <span flex></span>
+                <md-button aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content style="min-width:600px;max-width:600px;max-height:810px;">
+            <div ng-if="employeeDetails === true">
+                <div layout="row" layout-align="space-around center" layout-wrap class="name-wrap">
+                    <div flex class="adppl-chips" ng-if="bulkupload.mode !== 'yes'">
+                        <label class="fklbl" ng-if="profilelist.length > 0">{{custlabels.Employee || 'Employee'}} Full Name</label>
+                        <!--
+                            md-max-chips needs to be 2 instead of 1, see the below link for details:
+                            https://github.com/angular/material/issues/8476
+                        -->
+                        <md-chips md-max-chips="2" ng-model="profilelist" md-autocomplete-snap="" md-require-match="true" md-on-remove="chipRemoved()">
+                            <md-autocomplete ng-hide="profilelist.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="addPeopleData.chipselnm"
+                        		md-search-text="autocom.searchTextNH" md-items="nhitem in getProfileList(autocom.searchTextNH)"
+                        		md-item-text="nhitem.name" md-min-length="0" placeholder="{{custlabels.Employee || 'Employee'}} Full Name"
+                        		md-delay='50' md-selected-item-change="selectedNHChange(nhitem)" md-autoselect="true"
+                        		md-floating-label="{{custlabels.Employee || 'Employee'}} Full Name" md-autofocus="true" class="required" ng-required="!addPeopleData.hireselnm" >
+                                <span>
+                                    <img alt="" ng-if="nhitem.attr && nhitem.attr.photo" ng-src="{{nhitem.attr.photo}}" class="md-avatar"></img>
+                                    <img alt="" ng-if="!(nhitem.attr && nhitem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" class="md-avatar"/>
+                                    <span class="txtwrp">
+                                        <span class="nmtxt" md-highlight-text="searchText">{{nhitem.name}}</span>
+                                        <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in nhitem.commlist">
+                                            <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                            <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                            <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                        </span>
+                                    </span>
+                                </span>
+                            </md-autocomplete>
+                            <md-chip-template>
+                                <span>
+                                    <img alt="" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}" class="md-avatar"></img>
+                                    <img alt="" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                                    <span md-highlight-text="searchText">{{$chip.name}}</span>
+                                </span>
+                            </md-chip-template>
+                        </md-chips>
+                    </div>
+
+                    <div flex ng-if="bulkupload.mode!=='yes'" class="mbemlwrp">
+                        <div class="msk" ng-if="addPeopleData.nhprflid"></div>
+                        <md-input-container class="employee-mobile-wrap required">
+                    		<label>Mobile or Email</label>
+                    		<input md-no-asterisk name="hireemail" ng-model="addPeopleData.hireemlMobile" required ng-readonly="addPeopleData.nhprflid">
+                            <span class="blrdv"></span>
+                    	</md-input-container>
+                    </div>
+
+                    <div flex ng-if="bulkupload.mode ==='yes'">
+                        <md-input-container class="employee-mobile-wrap required">
+                    		<label>{{custlabels.Employee || 'Employee'}} Full Name</label>
+                    		<input md-no-asterisk name="hireemail" value="Bulk Upload" disabled>
+                            <span class="blrdv"></span>
+                    	</md-input-container>
+                    </div>
+                    <div flex ng-if="bulkupload.mode ==='yes'">
+                        <md-input-container class="employee-mobile-wrap required">
+                    		<label>Mobile or Email</label>
+                    		<input md-no-asterisk name="hireemail" value="Bulk Upload" disabled>
+                            <span class="blrdv"></span>
+                    	</md-input-container>
+                    </div>
+
+                    <div class="datepicker-wrap select-start adjustment" flex>
+                        <label class="md-caption">Start date</label>
+                    	<md-datepicker ng-model="addPeopleData.hirestdt" md-placeholder="Select date" required></md-datepicker>
+                    </div>
+                </div>
+                <div flex="100" class="btn-bulkupload-wrap" ng-click="showBulkUpload()">
+                    <span ng-class="{wtxt : bulkupload.mode==='yes'}" class="btn-bulkupload icon-bulkupload"></span>
+                    <span class="text" ng-if="bulkupload.mode==='yes'">{{bulkhires.length}} <span ng-if="bulkhires.length > '1'">Entries</span><span ng-if="bulkhires.length == '1'">Entry</span> added</span>
+                </div>
+                <hr>
+                <label class="heading">Category related details</label>
+
+            	<div class="select-group">
+            		<div layout="row" layout-wrap>
+            			<div flex>
+            				<md-input-container md-no-float class="md-block">
+                                <label class="placeholder">Brand</label>
+            					<md-select ng-model="addPeopleData.critkeys.brand" md-container-class="wfcat-dd" placeholder="Select Brand" ng-change="updateAutoSelectedWorkflow()">
+            						<md-option ng-repeat="item in jobDetail | filter:{purpose: 'Brand'} track by $index" value="{{item.tkey}}">{{item.name}}</md-option>
+            					</md-select>
+            				</md-input-container>
+            				<md-input-container md-no-float class="md-block" ng-repeat="item in jobDetail | filter:{purpose: 'Optional'} track by $index" ng-if="$even" >
+                                <label class="placeholder">{{item.name}}</label>
+            					<md-select ng-model="addPeopleData.critkeys.optional[item.tkey]" md-container-class="wfcat-dd" placeholder="Select {{item.name}}" ng-change="updateAutoSelectedWorkflow()">
+            						<md-option ng-repeat="selitem in item.attr" value="{{selitem.key}}">{{selitem.value}}</md-option>
+            					</md-select>
+            				</md-input-container>
+            			</div>
+
+            			<div flex>
+            				<md-input-container md-no-float class="md-block">
+                                <label class="placeholder">Location</label>
+            					<md-select ng-model="addPeopleData.critkeys.location" md-container-class="wfcat-dd" placeholder="Select Location" ng-change="updateAutoSelectedWorkflow()">
+            						<md-option ng-repeat="item in jobDetail | filter:{purpose: 'Location'} track by $index" value="{{item.tkey}}">{{item.name}}</md-option>
+            					</md-select>
+            				</md-input-container>
+
+            				<md-input-container md-no-float class="md-block" ng-repeat="item in jobDetail | filter:{purpose: 'Optional'} track by $index" ng-if="$odd">
+                                <label class="placeholder">{{item.name}}</label>
+            					<md-select ng-model="addPeopleData.critkeys.optional[item.tkey]" md-container-class="wfcat-dd" placeholder="Select {{item.name}}" ng-change="updateAutoSelectedWorkflow()">
+            						<md-option ng-repeat="selitem in item.attr" value="{{selitem.key}}">{{selitem.value}}</md-option>
+            					</md-select>
+            				</md-input-container>
+            			</div>
+            		</div>
+                    <div layout="row" layout-wrap>
+                        <div flex="100" class="selected-wf-wrap">
+                            <span class="selected-wf" ng-bind-html="currentSelWorkflowName"></span>
+                            <md-input-container>
+            					<md-select md-container-class="wf-dd fixed-dd" ng-model="wfdata.selwf" ng-change="changeWorkflowSelection()" aria-label="Select Workflow">
+                                    <md-option value="autoselected">(Auto select) {{autoselwf.name}}</md-option>
+                                    <md-option ng-repeat="wfitem in actWfList" value="{{wfitem.uid}}">{{wfitem.name}}</md-option>
+            					</md-select>
+            				</md-input-container>
+                        </div>
+                    </div>
+            	</div>
+                <md-checkbox class="tstcbox" aria-label="Test workflow" ng-model="addPeopleData.iststwf" ng-true-value="'y'" ng-false-value="'n'" ng-if="bulkupload.mode !=='yes'">
+    	            <span>Test workflow</span>
+    	        </md-checkbox>
+                <div class="error" ng-if="emlmobErr === 'mobileError'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Please use a correct mobile number format, plus country code (i.e. +1xxxxxxxxx)</span>
+                </div>
+                <div class="error" ng-if="emlmobErr === 'mobileDigitError'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Please use a correct mobile number format, plus country code (i.e. +1xxxxxxxxx)</span>
+                </div>
+                <div class="error" ng-if="emlmobErr === 'emailError'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">please enter a valid email address.</span>
+                </div>
+                <div class="error" ng-if="serverError">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{serverErrorMessage}}</span>
+                </div>
+            </div>
+
+            <div class="bulkupload-wrap" ng-if="showbulkupload === true">
+                <span class="heading custom-field-heading">
+                    You can upload a max of 1000 people at one time.<br>Simply enter the details below or use a CSV upload.
+                </span>
+                <div class="collapse-wrap">
+                    <div class="show-hide-wfl2">
+                        <span class="text">How to upload a CSV file</span>
+                        <span class="arrow-toggle icon-arrow-2"></span>
+                    </div>
+                    <div class="detail-section">
+                        <ul>
+                            <li>Download 'Bulk-template.csv' from the button below.</li>
+                            <li>Add all {{(custlabels.Employee || 'employee') | lowercase}} details into the two column table within the template and save.</li>
+                            <li>Use "CSV UPLOAD" button to upload your new csv template.</li>
+                        </ul>
+                        <div class="add-more-new-wrap">
+                            <md-button class="add-more" ng-click="downloadSampleCsv();">
+                                <span class="icon icon-download"></span>
+                                <span class="text">Bulk-template.csv</span>
+                            </md-button>
+                        </div>
+                    </div>
+                </div>
+                <div layout="row" layout-align="space-around center" layout-wrap class="name-wrap">
+                    <div flex>
+                        <label>{{custlabels.Employee || 'Employee'}} full name</label>
+                    </div>
+                    <div flex>
+                        <label>Mobile or Email</label>
+                    </div>
+                </div>
+                <div layout="row" layout-align="space-around center" layout-wrap class="name-wrap" ng-repeat="hire in localBulkHires track by $index" ng-init="bulkhireIndex = $index" ng-if="!hire.del">
+                    <div flex>
+                        <div flex class="adppl-chips">
+                            <md-chips md-max-chips="2" ng-model="hire.chip"  md-require-match="true" md-on-remove="clearBulkHireChip(bulkhireIndex)">
+                                <md-autocomplete ng-hide="hire.chip.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="hire.hireselname"
+                            		md-search-text="hire.hiresearch" md-items="hireitem in getProfileList(hire.hiresearch)"
+                            		md-item-text="hireitem.name" md-min-length="0"
+                            		md-delay='50' md-selected-item-change="selectedBulkHireChange(hireitem,bulkhireIndex)" md-autoselect="true"
+                            		md-autofocus="true" ng-class="{required : dmgr.req !== 'no'}">
+                                    <span>
+                                        <img alt="" ng-if="hireitem.attr && hireitem.attr.photo" ng-src="{{hireitem.attr.photo}}" class="md-avatar"></img>
+                                        <img alt="" ng-if="!(hireitem.attr && hireitem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" class="md-avatar"/>
+                                        <span class="txtwrp">
+                                            <span class="nmtxt" md-highlight-text="hire.hiresearch">{{hireitem.name}}</span>
+                                            <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in hireitem.commlist">
+                                                <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                                <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                                <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                            </span>
+                                        </span>
+                                    </span>
+                                </md-autocomplete>
+                                <md-chip-template>
+                                    <span>
+                                        <img alt="" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}" class="md-avatar"></img>
+                                        <img alt="" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                                        <span md-highlight-text="searchText">{{$chip.name}}</span>
+                                    </span>
+                                </md-chip-template>
+                            </md-chips>
+                        </div>
+                    </div>
+                    <div flex class="mbemlwrp">
+                        <div class="msk" ng-if="localBulkHires[bulkhireIndex].nhprflid"></div>
+                        <md-input-container ng-if="localBulkHires[bulkhireIndex].nhprflid">
+                            <input md-no-asterisk name="manageremail" ng-readonly="localBulkHires[bulkhireIndex].nhprflid" ng-model="hire.emlmob" aria-label="Mobile or Email">
+                        </md-input-container>
+                        <md-input-container class="required" ng-if="!localBulkHires[bulkhireIndex].nhprflid">
+                            <input md-no-asterisk name="manageremail" ng-model="hire.emlmob" aria-label="Mobile or Email" required>
+                        </md-input-container>
+                    </div>
+                    <md-button class="delete-btn" ng-click="deleteBulkHire($index);" aria-label="Close">
+                        <span class="icon icon-close-5"></span>
+                    </md-button>
+                    <div class="delete-btn-cover"></div>
+                </div>
+                <div class="add-more-btn-wrap">
+                    <md-button class="add-more" ng-click="addBulkHire();" ng-disabled="localBulkHires.length >= 1000">
+                        <span class="icon icon-plus"></span>
+                        <span class="text">add more</span>
+                    </md-button>
+                    <span class="seprator">/</span>
+                    <md-button aria-label="Upload" class="add-more" ngf-max-size="50KB" ngf-select="uploadCSVFile($file)" accept="text/csv" ng-disabled="localBulkHires.length >= 1000">
+                        <span class="text">csv upload</span>
+                    </md-button>
+                </div>
+
+                <div class="error" ng-if="bulkError === 'yes'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">{{bulkErrorMessage}}</span>
+                </div>
+            </div>
+
+            <div ng-if="customfieldDetails === true">
+                <label class="heading custom-field-heading">Enter custom field details for "{{currentselwf.name}}"</label>
+
+            	<div class="customfield-group">
+                    <div layout="row" layout-wrap ng-repeat="rowcf in displaycf track by $index">
+
+                        <!-- <div flex="{{cf.flex}}" ng-repeat="cf in rowcf track by $index"> -->
+                        <div flex="{{cf.flex}}" ng-class="{'select-wrap' : cf.typ==='f-time', 'full-width' : cf.typ==='f-longtext', 'datepicker-wrap' : cf.typ ==='f-date'}" ng-repeat="cf in rowcf track by $index">
+                            <span class="icon icon-before icon-{{cf.typ}}" ng-if="cf.typ !== 'f-picklist'"></span>
+                            <span class="icon icon-before icon-f-choice" ng-if="cf.typ === 'f-picklist'"></span>
+
+                            <md-input-container md-no-float class="employee-mobile-wrap {{cf.req}}" ng-if="cf.typ ==='f-shorttext'">
+                        		<label>{{cf.nm}}</label>
+                        		<input md-no-asterisk name="empid" ng-model="cf.val" required ng-if="cf.req==='required'">
+                        		<input md-no-asterisk name="empid" ng-model="cf.val" ng-if="cf.req!=='required'">
+                                <span class="blrdv"></span>
+                        	</md-input-container>
+
+                            <md-input-container md-no-float class="employee-mobile-wrap {{cf.req}}" ng-if="cf.typ ==='f-numbers'">
+                                <label>{{cf.nm}}</label>
+                                <input md-no-asterisk name="empid" ng-model="cf.val" type="number" required ng-if="cf.req==='required'">
+                                <input md-no-asterisk name="empid" ng-model="cf.val" type="number" ng-if="cf.req!=='required'">
+                                <span class="blrdv"></span>
+                            </md-input-container>
+
+                            <div class="datepicker" md-no-float ng-if="cf.typ ==='f-date'">
+                                <label class="md-caption">{{cf.nm}}</label>
+                                <md-datepicker ng-model="cf.val" md-placeholder="Select date" ng-if="cf.req!=='required'"></md-datepicker>
+                                <md-datepicker ng-model="cf.val" md-placeholder="Select date" required ng-if="cf.req==='required'"></md-datepicker>
+                            </div>
+
+                            <md-input-container md-no-float class="md-block" ng-if="cf.typ ==='f-time'">
+                                <label class="placeholder">{{cf.nm}}</label>
+            					<md-select md-no-float md-no-asterisk ng-model="cf.val" placeholder="{{cf.nm}}" required ng-if="cf.req==='required'">
+                                    <md-option ng-repeat="timedata in timeArr track by $index" value="{{timedata.value}}">
+                                        <span>{{timedata.value}}</span>
+                                    </md-option>
+            					</md-select>
+                                <md-select md-no-float ng-model="cf.val" placeholder="{{cf.nm}}" ng-if="cf.req!=='required'">
+                                    <md-option ng-repeat="timedata in timeArr track by $index" value="{{timedata.value}}">
+                                        <span>{{timedata.value}}</span>
+                                    </md-option>
+            					</md-select>
+            				</md-input-container>
+
+                            <md-input-container md-no-float class="{{cf.req}}" ng-if="cf.typ ==='f-longtext'">
+                                <label class="placeholder">{{cf.nm}}</label>
+            					<textarea md-no-asterisk name="{{cf.nm}}" ng-model="cf.val" required ng-if="cf.req==='required'"></textarea>
+            					<textarea md-no-asterisk name="{{cf.nm}}" ng-model="cf.val" ng-if="cf.req!=='required'"></textarea>
+            				</md-input-container>
+
+                            <md-input-container md-no-float class="{{cf.req}}" ng-if="cf.typ ==='f-picklist'">
+                                <label class="placeholder">{{cf.nm}}</label>
+                                <md-select md-no-float md-no-asterisk md-container-class="fixed-dd" ng-model="cf.val" required ng-if="cf.req==='required'">
+                                    <md-option ng-repeat="item in cf.vals" value="{{item.key}}">{{item.val}}</md-option>
+                                </md-select>
+                                <md-select md-no-float md-no-asterisk md-container-class="fixed-dd" ng-model="cf.val" ng-if="cf.req!=='required'">
+                                    <md-option ng-repeat="item in cf.vals" value="{{item.key}}">{{item.val}}</md-option>
+                                </md-select>
+            				</md-input-container>
+
+                        </div>
+                    </div>
+            	</div>
+            </div>
+
+            <div ng-if="managerDetails === true">
+                <label class="heading-inside heading">
+                    Enter {{(custlabels.Manager || 'manager') | lowercase}} details for "{{currentselwf.name}}"
+                </label>
+
+                <div class="managerdetails-wrap" ng-repeat="dmgr in dynamicMgrList track by $index" ng-init="mgrindex = $index">
+                    <span class="number">{{$index + 1}}.</span>
+                    <div layout="row" layout-align="space-around center" layout-wrap class="name-wrap">
+                        <div flex>
+                            <div flex class="adppl-chips">
+                                <md-chips md-max-chips="2" ng-model="dmgr.chip" md-autocomplete-snap="" md-require-match="true" md-on-remove="clearMgrChip(mgrindex)">
+                                    <md-autocomplete ng-hide="dmgr.chip.length > 0" md-no-asterisk ng-disabled="false" md-no-cache="false" md-selected-item="dmgr.mgrselname" placeholder="{{custlabels.Manager || 'Manager'}} Full Name"
+                                        md-search-text="dmgr.mgrsearch" md-items="mgritem in getProfileList(dmgr.mgrsearch)"
+                                        md-item-text="mgritem.name" md-min-length="0" md-floating-label="{{dmgr.l}}" ng-required="(dmgr.chip.length == 0 && dmgr.req !== 'no')"
+                                        md-delay='50' md-selected-item-change="selectedMgrChange(mgritem,mgrindex)" md-autoselect="true"
+                                        md-autofocus="true" ng-class="{required : dmgr.req !== 'no'}">
+                                        <span>
+                                            <img alt="" ng-if="mgritem.attr && mgritem.attr.photo" ng-src="{{mgritem.attr.photo}}" class="md-avatar"></img>
+                                            <img alt="" ng-if="!(mgritem.attr && mgritem.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" class="md-avatar"/>
+                                            <span class="txtwrp">
+                                                <span class="nmtxt" md-highlight-text="hire.hiresearch">{{mgritem.name}}</span>
+                                                <span class="txtwrp-in {{commItem.typ}}" ng-class="{scnd : commItem.pref!=='yes'}" ng-repeat="commItem in mgritem.commlist">
+                                                    <span ng-if="commItem.typ === 'eml'" class="icn icon-mail-small"></span>
+                                                    <span ng-if="commItem.typ === 'mob'" class="icn icon-chip-phone mbicn"></span>
+                                                    <span class="cntxt truncate" md-highlight-text="searchText">{{commItem.dispval || commItem.val}}</span>
+                                                </span>
+                                            </span>
+                                        </span>
+                                    </md-autocomplete>
+                                    <md-chip-template>
+                                      <span>
+                                          <img alt="" ng-if="$chip.attr && $chip.attr.photo" ng-src="{{$chip.attr.photo}}" class="md-avatar"></img>
+                                          <img alt="" ng-if="!($chip.attr && $chip.attr.photo)" ng-src="//static.enboarder.net/images/profile-placeholder.gif" width="10" class="md-avatar"></img>
+                                          <span md-highlight-text="dmgr.mgrsearch">{{$chip.name}}</span>
+                                      </span>
+                                    </md-chip-template>
+                                </md-chips>
+                            </div>
+                        </div>
+                        <div flex class="mbemlwrp">
+                            <div class="msk" ng-if="dmgr.chip.length>0"></div>
+                            <md-input-container ng-class="{required : dmgr.req !== 'no'}">
+                                <label>Mobile or Email</label>
+                                <input md-no-asterisk name="manageremail" ng-model="dmgr.emlmob" ng-readonly="dmgr.chip.length>0" ng-required="dmgr.req !== 'no'">
+                                <span class="blrdv"></span>
+                            </md-input-container>
+                        </div>
+                    </div>
+
+                    <hr ng-if="dmgr.label">
+                </div>
+
+                <div class="advanced-option-wrap" ng-if="staticMgrList.length > 0">
+            		<div class="show-hide">
+            			<span class="arrow-toggle icon-arrow-1"></span>
+            			<span class="text">Fixed {{(custlabels.Manager || 'manager') | lowercase}} type</span>
+            		</div>
+            		<div class="detail-section">
+                        <span class="text" ng-repeat="smgr in staticMgrList track by $index">
+                            <span class="name">{{smgr.l}}:</span>
+                            <span class="name">{{smgr.n}},</span>
+                            <span class="contact-details" ng-if="smgr.e && smgr.m && smgr.pref">
+                                <span ng-if="smgr.pref === 'eml'">{{smgr.e}}</span>
+                                <span ng-if="smgr.pref === 'mob'">{{smgr.m}}</span>
+                            </span>
+							<span class="contact-details" ng-if="!(smgr.e && smgr.m && smgr.pref)">{{smgr.e}}{{smgr.m}}</span>
+                        </span>
+            		</div>
+            	</div>
+                    <div class="error" ng-if="emlmobErr === 'mobileError'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Please use a correct mobile number format, plus country code (i.e. +1xxxxxxxxx)</span>
+                    </div>
+                    <div class="error" ng-if="emlmobErr === 'mobileDigitError'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">Please use a correct mobile number format, plus country code (i.e. +1xxxxxxxxx)</span>
+                    </div>
+                    <div class="error" ng-if="emlmobErr === 'emailError'">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">please enter a valid email address.</span>
+                    </div>
+                    <div class="error" ng-if="serverError">
+                        <span class="icon icon-notification-alert"></span>
+                        <span class="text">{{serverErrorMessage}}</span>
+                    </div>
+            </div>
+
+            <div class="confirmation-wrap" ng-if="confirmation === 'yes'">
+                <span class="tick-wrap">
+                    <img src="//static.enboarder.net/images/tick-animated.gif" alt="confirmation">
+                </span>
+                <div class="detail-section" style="display: block;" ng-if="initRes.status === 'BULK'">
+                    <span class="text">Workflows are being launched in the background, reports will show updates on completion</span>
+                </div>
+                <div class="advanced-option-wrap" ng-if="initRes.status === 'INIT' && initRes.sentlist.length > 0">
+            		<div class="show-hide">
+            			<span class="arrow-toggle icon-arrow-1"></span>
+            			<span class="text">{{initRes.sentlist.length}} Notifications sent</span>
+            		</div>
+            		<div class="detail-section">
+                        <span class="text">
+                            <span class="name" ng-repeat="sentItem in initRes.sentlist track by $index">{{sentItem.n}}: {{sentItem.c}}</span>
+                            <!-- <span class="contact-details">Anuj: @anuj (Slack)</span> -->
+                        </span>
+            		</div>
+            	</div>
+                <div class="advanced-option-wrap" ng-if="initRes.status === 'INIT' && initRes.queuelist.length > 0">
+            		<div class="show-hide">
+            			<span class="arrow-toggle icon-arrow-1"></span>
+            			<span class="text">{{initRes.queuelist.length}} Notifications queued</span>
+            		</div>
+            		<div class="detail-section">
+                        <span class="text">
+                            <span class="name" ng-repeat="queueItem in initRes.queuelist track by $index">{{queueItem.n}}: {{queueItem.c}}</span>
+                        </span>
+            		</div>
+            	</div>
+                <div class="advanced-option-wrap" ng-if="initRes.status === 'INIT' && initRes.skippedlist.length > 0">
+                    <div class="show-hide">
+                        <span class="arrow-toggle icon-arrow-1"></span>
+                        <span class="text">{{initRes.skippedlist.length}} Notifications skipped</span>
+                    </div>
+                </div>
+                <div class="advanced-option-wrap" ng-if="initRes.status === 'NEW'">
+            		<div class="show-hide nohover">
+            			<span class="text">{{initRes.wfcount}} Workflow pending</span><span class="text" ng-if="initRes.dnd === 'yes'"> - 'Do not disturb' is active</span>
+            		</div>
+            	</div>
+                <div class="advanced-option-wrap" ng-if="initRes.status === 'DONE'">
+            		<div class="show-hide">
+            			<span class="text">{{initRes.wfcount}} Workflow complete</span>
+            		</div>
+            	</div>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row" ng-if="employeeDetails === true">
+            <md-button ng-if="hideNextbtn ==='no'" ng-click="next();" class="save md-default-theme" aria-label="Next" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Next</span>
+            </md-button>
+            <md-button ng-if="hideNextbtn ==='yes'" ng-click="save();" class="save save-spinner md-default-theme" aria-label="Save" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Add to workflow</span>
+            	<span class="text-save">Adding...</span>
+            	<span class="text-saved">Added <span class="icon-notification-ok"></span></span>
+            	<span class="spinner">
+            		<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            	</span>
+            </md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions class="blkupld" layout="row" ng-if="showbulkupload === true">
+            <md-button ng-click="closeBulkUpload('back');" aria-label="Back" class="md-raised md-default-theme">
+            	<span class="text">Back</span>
+            </md-button>
+            <md-button ng-click="closeBulkUpload('save');" class="save save-spinner md-default-theme" aria-label="Save" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Save</span>
+            	<span class="text-save">Saving...</span>
+            	<span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+            	<span class="spinner">
+            		<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            	</span>
+            </md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions class="blkupld" layout="row" ng-if="confirmation === 'yes'">
+            <md-button ng-click="cancel()" class="save md-default-theme" aria-label="Done" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Done</span>
+            </md-button>
+        </md-dialog-actions>
+
+
+        <md-dialog-actions layout="row" ng-if="customfieldDetails === true">
+            <md-button aria-label="Back" class="md-raised md-default-theme" ng-click="backToEmp()" md-autofocus>
+            	Back
+            </md-button>
+            <md-button ng-if="mgrFound ==='yes'" ng-click="nextToMgr();" class="save md-default-theme" aria-label="Next" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Next</span>
+            </md-button>
+            <md-button ng-if="mgrFound ==='no'" ng-click="save();" class="save save-spinner md-default-theme" aria-label="Save" md-autofocus ng-disabled="myForm.$invalid">
+                <span class="text">Add to workflow</span>
+                <span class="text-save">Adding...</span>
+                <span class="text-saved">Added <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="managerDetails === true">
+            <md-button aria-label="Back" class="md-raised md-default-theme" ng-click="back()" md-autofocus>
+            	Back
+            </md-button>
+            <md-button ng-click="save();" class="save save-spinner md-default-theme" aria-label="Save" md-autofocus ng-disabled="myForm.$invalid">
+            	<span class="text">Add to workflow</span>
+            	<span class="text-save">Adding...</span>
+            	<span class="text-saved">Added <span class="icon-notification-ok"></span></span>
+            	<span class="spinner">
+            		<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+            	</span>
+            </md-button>
+        </md-dialog-actions>
+    </form>
+</md-dialog>

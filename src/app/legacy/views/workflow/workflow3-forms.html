@@ -1,0 +1,1117 @@
+<!-- Bread Crumb | Area Icons | V-Line-->
+<div class="bread-crumb" ng-controller="saveModuleCtrl">
+    <span ng-if="!seqmoddata">
+        <a ng-href="#/workflow">Workflow</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level1');"><a
+            href="javascript:void(0)">Workflow</a></span>
+    <span>/</span>
+    <span ng-if="!seqmoddata">
+        <a href="#/workflow-editor/wf/{{wfid}}/yes?wfname={{wfname}}">{{wfname}}</a>
+    </span>
+    <span ng-if="seqmoddata" ng-click="showSaveConfirmationModal(mod, 'level2');"><a
+            href="javascript:void(0)">{{wfname}}</a></span>
+    <span>/</span>
+    <span ng-if="seqid">
+        <a href="javascript:void(0)" class="active">{{seqmoddata.name}} - {{docname}}</a>
+    </span>
+    <span ng-if="!seqid">
+        <a href="javascript:void(0)" class="active">{{docname}}</a>
+    </span>
+</div>
+<div class="bread-crumb" ng-if="wfid == 'default'">
+	<span><a ng-href="#/settings">Configuration</a></span>
+</div>
+<div ng-if="seqmoddata" ng-controller="saveModuleCtrl" class="bread-crumb pagi">
+    <span class="btnar-lft icon-button-arrow-left" ng-click="showSaveConfirmationModal(mod, 'l');"></span>
+    <span class="nmbr" ng-class="{'active-page' : modid === mod.moduleid}" ng-repeat="mod in seqmoddata.modules" ng-click="showSaveConfirmationModal(mod);">{{$index+1}}</span>
+    <span class="btnar-rt icon-button-arrow-right" ng-click="showSaveConfirmationModal(mod, 'r');"></span>
+</div>
+
+
+<div class="container content-editor forms-editor">
+	<!-- Preview icon -->
+	<a href="javascript:void(0);" ng-click="previewLayout();" class="preview" ng-if="wfid!= 'default'">
+		<span class="icon icon-preview-big"></span>
+	</a>
+
+    <form name="formWidgeteForm" novalidate>
+    	<div class="content-editor-content" ng-cloak>
+            <div class="maskd" ng-if="locked ==='Y'"></div>
+    		<div class="heading">
+    			<md-input-container class="md-block">
+    				<label>Page title</label>
+    				<input class="heading-input" ng-if="titleFocus === 'yes'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid ==='default'"></input>
+    				<input ng-if="titleFocus === 'no'" placeholder="Write a page title" ng-model="module.pagetitle" ng-model-options="{ updateOn: 'blur' }" ng-change="updateDocName();" ng-disabled="wfid==='default'"></input>
+                    <span class="blrdv wht"></span>
+    			</md-input-container>
+    		</div>
+
+    		<div dnd-list="widgetList" ng-class="{nowgt : !widgetList.length}" class="content" dnd-drop="dropCallback(event, index, item, external, type, 'itemType')">
+
+    			<span class="placeholder-text" ng-if="!widgetList.length">
+    				Drag a widget to begin
+    			</span>
+
+    			<div ng-repeat="widget in widgetList track by $index" class="widget" dnd-draggable="widget" dnd-effect-allowed="move" dnd-disable-if="(widget.uid.indexOf('473benchmark155_')===0)">
+
+    				<!-- Text editor -->
+    				<div class="editor close-enabled-editor" ng-if="widget.type === 'text'">
+    					<span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="clrtlbr">
+                            <span class="clrbtnwrp" dnd-nodrag>
+                                <span class="text">Background:</span>
+                                <input class="dot" md-no-asterisk minicolors ng-model="widget.bgcolor" type="text">
+                            </span>
+                        </span>
+                        <span class="bgclr" ng-style="{ background: widget.bgcolor || '' }"></span>
+
+                        <textarea placeholder="Type your text into the box..." ui-tinymce="tinymceOptions" ng-model="widget.data"></textarea>
+    				</div>
+
+    				<!-- Image -->
+                    <div  class="image close-enabled" ng-if="widget.type === 'image'">
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget, widget);"></span>
+                        <div class="main-btn-wrap">
+                            <div class="button-wrap">
+                                <md-button ng-class="{active : widget.smallimage === 'yes'}" ng-click="smallimage(widget)" class="md-raised">Small</md-button>
+                                <md-button ng-class="{active : widget.mediumimage === 'yes'}" ng-click="mediumimage(widget)" class="md-raised">Medium</md-button>
+                                <md-button ng-class="{active : widget.fullimage === 'yes'}" ng-click="fullimage(widget)" class="md-raised">Large</md-button>
+                            </div>
+
+                            <div class="button-wrap upload-img-btn">
+                                <md-button ng-click="keepfocus($index)" ngf-select="showImageWidgetCropModal($file, $index, picFileBtn, 'fileDnd')"
+                                    ngf-max-size="10MB" name="fileBtn{{$index}}" ng-model="picFileBtn" accept="image/*" class="active md-raised">
+                                    <span class="upld icon-image-upload"></span>
+                                </md-button>
+                            </div>
+
+                            <!-- <div class="button-wrap anmt-box" ng-if="widget.fullimage === 'yes'">
+                                <md-checkbox ng-model="widget.animate" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Animate">
+                                    Animate
+                                </md-checkbox>
+                            </div> -->
+                        </div>
+                        <!--
+                        <md-input-container flex>
+                            <div class="button" ngf-drop="upload($file, $index, widget)" ng-class="{smallsize : widget.smallimage === 'yes', mediumsize : widget.mediumimage === 'yes', fullsize : widget.fullimage === 'yes'}">
+                                <div class="placeholder" ng-show="!widget.data">
+                                    <span class="img-icon icon-image-bigger"></span>
+                                    <span class="text">Drag and drop image</span>
+                                    <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                                        <span class="upldtxt">
+                                            <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                            Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <img ng-class="{fullsize : widget.fullimage === 'yes'}" ng-hide="!widget.data" ng-src="{{widget.dataCdn||widget.data}}" ngf-drop="upload($file, $index, widget)" alt="">
+                            </div>
+                        </md-input-container>
+                        -->
+                        <md-input-container flex>
+                            <div class="button fullsize" ngf-drop="showImageWidgetCropModal($file, $index, picFileDnd, 'fileBtn')" ngf-max-size="10MB"
+                                name="fileDnd{{$index}}" ng-model="picFileDnd" accept="image/*">
+                                <div class="placeholder" ng-show="!widget.data">
+                                    <span class="img-icon icon-image-bigger"></span>
+                                    <span class="text">Drag and drop image</span>
+                                    <span class="uploading" ng-if="uploadingtxt === 'yes'">
+                                        <span class="upldtxt">
+                                            <md-progress-circular md-diameter="35px"></md-progress-circular>
+                                            Uploading<span class="dtn">.</span><span class="dtn">.</span><span class="dtn">.</span>
+                                        </span>
+                                    </span>
+                                </div>
+                                <img class="fullsize" ng-hide="!widget.data" ng-src="{{widget.dataCdn || widget.data}}"
+                                    ngf-drop="upload($file, $index, widget)" alt="">
+                            </div>
+                        </md-input-container>
+                        <div ng-if="widget.invalidContentTypeError === 'yes'" class="error">
+                            <span class="icon icon-notification-alert"></span>
+                            <span class="text">Wrong format, we accept .JPG .PNG &amp; .GIF</span>
+                        </div>
+                        <div class="error"
+                            ng-show="formWidgeteForm.fileBtn{{$index}}.$error.maxSize || formWidgeteForm.fileDnd{{$index}}.$error.maxSize">
+                            <span class="icon icon-notification-alert"></span>
+                            <span class="text">Sorry, image file size can not be more than 10 MB.</span>
+                        </div>
+                    </div>
+
+                    <!-- Profile widget -->
+                    <div class="form-widget prfl-widget close-enabled" ng-if="widget.type === 'profile'" ng-click=showPopOver($index);>
+                            <div class="control-popover" ng-if="$index === popop_index">
+                                <div class="arrow"></div>
+                                <div class="btm-wrap">
+                                    <md-input-container ng-class="{'type-mob' : widget.dtype === 'mobile'}" class="direct-dropdown">
+                                        <md-select aria-label="Select profile option" ng-model="widget.mgrid" md-container-class="prof-dd form-dd" ng-change="onProfileRoleChange(widget)">
+                                            <md-option ng-repeat="mgr in commManagers track by $index" value="{{mgr.uid}}">{{mgr.l}}</md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <div class="switch-wrap">
+                                        <md-switch ng-model="widget.dispnme" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Display name">
+                                            Display name
+                                        </md-switch>
+                                        <md-switch ng-model="widget.link" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Link to profile info">
+                                            Link to profile info
+                                        </md-switch>
+                                    </div>
+                                    <div class="tltpwrp">
+                                        <span class="icn icon-tooltip"></span>
+                                        <md-tooltip class="manager-tooltip" md-direction="top">
+                                            <span class="copy">
+                                                <h4 class="title">LINK TO PROFILE INFO</h4>
+                                                <p>
+                                                    Image links to participants contact information.
+                                                </p>
+                                            </span>
+                                        </md-tooltip>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hdmsk"></div>
+                            <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                            <span class="field-name-wrap">
+                                <span class="field-name truncate">{{getParticipantLabel(widget.mgrid);}}</span>
+                            </span>
+                            <div class="nm-input">
+                                <img class="prflicn" ng-class="{lnk : widget.link === 'yes'}" src="//static.enboarder.net/images/profile-placeholder.gif" alt="">
+                                <span class="dispnm" ng-if="widget.dispnme === 'yes'">
+                                    {{getParticipantLabel(widget.mgrid);}} full name
+                                </span>
+                            </div>
+        				</div>
+
+                    <!-- Horizontal rule -->
+    				<div  class="rule close-enabled" ng-if="widget.type === 'line'">
+    					<hr><span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+    				</div>
+
+                    <!-- Video -->
+                    <div class="video close-enabled" ng-if="widget.type === 'video'">
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <dnd-nodrag class="vidinptwrp">
+                            <input placeholder="Video URL" focus="true" type="text" class="video-url" ng-model="widget.data" ng-model-options="{ updateOn: 'blur' }" ng-change="getVideoUrl($index);">
+                        </dnd-nodrag>
+                        <span class="blrdv vdo frm"></span>
+                        <div ng-class="placeholder" ng-show="!widget.data">
+                            <span class="text">
+                                Paste Youtube, Vimeo or Wistia URL address above to embed video...
+                            </span>
+                        </div>
+                        <iframe title="video frame" class="video-iframe" width="420" height="315" ng-hide="!widget.data" ng-src="{{widget.safevideourl}}"></iframe>
+                    </div>
+
+                    <!-- Short text-->
+    				<div  class="form-widget short-text close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'small-text'" ng-click=showPopOver($index);>
+                        <div class="control-popover" ng-if="$index === popop_index">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap">
+                                <div class="custom-dropdown-wrap">
+                                    <button class="mm-dropdown">
+                                        <span class="icon-dropdown icon-dynamic-text"></span>
+                                        <span class="text">Insert answers</span>
+                                        <span class="icon-dropdown icon-arrow-4"></span>
+                                    </button>
+                                    <ul class="list-wrap multi">
+                                        <li>
+                                            <span class="truncate">Names</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li>
+                                                    <span ng-click="setNameFieldAnswer($event,widget, '{{account_name}}');">Account name</span>
+                                                </li>
+                                                <li ng-repeat="(key, value) in nameMap">
+                                                    <span class="truncate">{{nameLabelMap[key]}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="(innerKey, innerValue) in value">
+                                                            <span class="icon-dtype icon-{{nameTypeMap[innerKey]}}"></span>
+                                                            <span class="truncate" ng-bind="getInnerValue(key, innerValue)"  ng-click="setNameFieldAnswer($event,widget, innerKey);"></span>
+                                                        </li>
+
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="catdropdown">
+                                            <span class="truncate">Categories</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="(key, opt) in catdropdown track by $index" ng-click="setCategoryAnswer($event,widget, key);">
+                                                    <span class="icon-dtype icon-f-choice"></span>
+                                                    <span class="truncate">{{opt}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="cfAnswerOptions.length > 0">
+                                            <span class="truncate">Custom fields</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="cfopt in cfAnswerOptions track by $index" ng-click="setCustomFieldAnswer($event,widget,cfopt.uid)">
+                                                    <span ng-if="cfopt.typ !== 'f-picklist'" class="icon-dtype icon-{{cfopt.typ}}"></span>
+                                                    <span ng-if="cfopt.typ === 'f-picklist'" class="icon-dtype icon-f-choice"></span>
+                                                    <span class="truncate">{{cfopt.nm}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="formDropdownOptions.length > 0">
+                                            <span class="truncate">Forms</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="formitem in formDropdownOptions track by $index">
+                                                    <span class="truncate">{{formitem.formname}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="formelement in formitem.formfields track by $index"  ng-click="setformFieldAnswer($event,widget, formitem.formid, formelement.uid,formitem.formname, formelement.fnm );">
+                                                            <span ng-if="formelement.type !== 'fileupload'" class="icon-dtype {{formelement.icon}}"></span>
+                                                            <span class="truncate" ng-if="formelement.type !== 'fileupload'">{{formelement.fnm}}</span>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <span class="icon-dtype icon-f-date"></span>
+                                            <span class="truncate" ng-click="setNameFieldAnswer($event,widget,'{{newhire_startdt}}');">Start date</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hide">
+                                        Hide
+                                    </md-switch>
+                                </div>
+                                <!-- <div class="switch-wrap">
+                                    <md-switch ng-model="widget.sec" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Secure">
+                                        Secure
+                                    </md-switch>
+                                </div> -->
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.sec === 'yes'" class="icon-fld icon-secure"></span>
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input" ng-if="!widget.ans">
+                            <span class="lbl truncate">{{widget.lbl}}</span>
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="icon-dd icon-f-shorttext"></span>
+                        </div>
+                        <div class="nm-input show-ans" ng-if="widget.ans">
+                            <md-input-container md-no-float class="txt-area-wrap lblsm">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="tokens-wrap">
+                                <span class="tokens">{{widget.ansval}}<span class="rmv-tkn icon-close-3" ng-click="removeAnswer(widget);"></span></span>
+                            </span>
+                            <span class="icon-dd icon-f-shorttext"></span>
+                        </div>
+    				</div>
+
+                    <!-- Contact channel -->
+    				<div  class="form-widget contact-channel close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'contact-channel'" ng-click=showPopOver($index);>
+                        <div class="control-popover" ng-if="$index === popop_index">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap">
+                                <md-input-container class="direct-dropdown md-block rating-dd" md-no-float>
+                                    <md-select aria-label="Choose contact channel" placeholder="Select" md-container-class="crit-cont" ng-model="widget.availchnl" multiple>
+                                        <md-option value="mobile">
+                                            Mobile
+                                        </md-option>
+                                        <md-option value="email">
+                                            Email
+                                        </md-option>
+                                        <!-- <md-option value="msn">
+                                            Instant messenger
+                                        </md-option>
+                                        <md-option value="skp">
+                                            Skype
+                                        </md-option> -->
+                                    </md-select>
+                                </md-input-container>
+                                <div class="custom-dropdown-wrap">
+                                    <button class="mm-dropdown">
+                                        <span class="icon-dropdown icon-dynamic-text"></span>
+                                        <span class="text">Insert answers</span>
+                                        <span class="icon-dropdown icon-arrow-4"></span>
+                                    </button>
+                                    <ul class="list-wrap multi">
+                                        <li>
+                                            <span class="truncate">Names</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="(key, value) in nameMap">
+                                                    <span class="truncate">{{nameLabelMap[key]}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="(innerKey, innerValue) in value" ng-if="innerKey.indexOf('_contact') !== -1 || innerKey.indexOf('_mobile') !== -1 || innerKey.indexOf('_email') !== -1">
+                                                            <span class="icon-dtype icon-{{nameTypeMap[innerKey]}}"></span>
+                                                            <span class="truncate" ng-bind="getInnerValue(key, innerValue)"  ng-click="setNameFieldAnswer($event,widget, innerKey);"></span>
+                                                        </li>
+
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hidden">
+                                        Hide
+                                    </md-switch>
+                                </div>
+                                <!-- <div class="switch-wrap">
+                                    <md-switch ng-model="widget.sec" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Secure">
+                                        Secure
+                                    </md-switch>
+                                </div> -->
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.sec === 'yes'" class="icon-fld icon-secure"></span>
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input">
+                            <span class="lbl truncate">{{widget.lbl}}</span>
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <div class="comtype-wrap" layout="row" layout-align="center center">
+                                <div flex="30" class="com-type-dd">
+                                    <md-input-container md-no-float class="com-type">
+                                        <md-select aria-label="Communication type" placeholder="Channel" ng-model="widget.commtype" disabled>
+                                            <md-option value="mobile">
+                                                Mobile
+                                            </md-option>
+                                            <md-option value="email">
+                                                Email
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <span class="icon-dd icon-arrow-4"></span>
+                                </div>
+                                <div flex="70" ng-if="!widget.ans">
+                                    <md-input-container md-no-float class="md-block">
+                                        <input placeholder="Contact details" disabled>
+                                    </md-input-container>
+                                </div>
+                                <div flex="70" class="show-ans" ng-if="widget.ans">
+                                    <span class="tokens-wrap">
+                                        <span class="tokens">{{widget.ansval}}<span class="rmv-tkn icon-close-3" ng-click="removeAnswer(widget);"></span></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+
+                    <!-- Long text -->
+    				<div  class="form-widget long-text close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'long-text'" ng-click=showPopOver($index);>
+                        <div class="control-popover" ng-if="$index === popop_index">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap">
+                                <div class="custom-dropdown-wrap">
+                                    <button class="mm-dropdown">
+                                        <span class="icon-dropdown icon-dynamic-text"></span>
+                                        <span class="text">Insert answers</span>
+                                        <span class="icon-dropdown icon-arrow-4"></span>
+                                    </button>
+                                    <ul class="list-wrap multi">
+                                        <li>
+                                            <span class="truncate">Names</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li>
+                                                    <span ng-click="setNameFieldAnswer($event,widget, '{{account_name}}');">Account name</span>
+                                                </li>
+                                                <li ng-repeat="(key, value) in nameMap">
+                                                    <span class="truncate">{{nameLabelMap[key]}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="(innerKey, innerValue) in value">
+                                                            <span class="icon-dtype icon-{{nameTypeMap[innerKey]}}"></span>
+                                                            <span class="truncate" ng-bind="getInnerValue(key, innerValue)"  ng-click="setNameFieldAnswer($event,widget, innerKey);"></span>
+                                                        </li>
+
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="catdropdown">
+                                            <span class="truncate">Categories</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="(key, opt) in catdropdown track by $index" ng-click="setCategoryAnswer($event,widget, key);">
+                                                    <span class="icon-dtype icon-f-choice"></span>
+                                                    <span class="truncate">{{opt}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="cfAnswerOptions.length > 0">
+                                            <span class="truncate">Custom fields</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="cfopt in cfAnswerOptions track by $index" ng-click="setCustomFieldAnswer($event,widget,cfopt.uid)">
+                                                    <span ng-if="cfopt.typ !== 'f-picklist'" class="icon-dtype icon-{{cfopt.typ}}"></span>
+                                                    <span ng-if="cfopt.typ === 'f-picklist'" class="icon-dtype icon-f-choice"></span>
+                                                    <span class="truncate">{{cfopt.nm}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="formDropdownOptions.length > 0">
+                                            <span class="truncate">Forms</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="formitem in formDropdownOptions track by $index">
+                                                    <span class="truncate">{{formitem.formname}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="formelement in formitem.formfields track by $index"  ng-click="setformFieldAnswer($event,widget, formitem.formid, formelement.uid,formitem.formname, formelement.fnm );">
+                                                            <span ng-if="formelement.type !== 'fileupload'" class="icon-dtype {{formelement.icon}}"></span>
+                                                            <span class="truncate" ng-if="formelement.type !== 'fileupload'">{{formelement.fnm}}</span>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <span class="icon-dtype icon-f-date"></span>
+                                            <span class="truncate" ng-click="setNameFieldAnswer($event,widget,'{{newhire_startdt}}');">Start date</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hidden">
+                                        Hide
+                                    </md-switch>
+                                </div>
+                                <!-- <div class="switch-wrap">
+                                    <md-switch ng-model="widget.sec" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Secure">
+                                        Secure
+                                    </md-switch>
+                                </div> -->
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.sec === 'yes'" class="icon-fld icon-secure"></span>
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input" ng-if="!widget.ans">
+                            <span class="lbl truncate">{{widget.lbl}}</span>
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="icon-dd icon-f-longtext"></span>
+                        </div>
+                        <div class="nm-input show-ans" ng-if="widget.ans">
+                            <md-input-container md-no-float class="txt-area-wrap lblsm">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="tokens-wrap">
+                                <span class="tokens">{{widget.ansval}}<span class="rmv-tkn icon-close-3" ng-click="removeAnswer(widget);"></span></span>
+                            </span>
+                            <span class="icon-dd icon-f-longtext"></span>
+                        </div>
+    				</div>
+
+                    <!-- Multiple Choice widget -->
+                    <div  class="form-widget multiple-choice-widget close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'multiple-choice'">
+
+                        <div class="control-popover">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap multiple">
+                                <md-input-container class="mc-dd">
+                                    <md-select aria-label="Multiple Choice Type" placeholder="Select" ng-model="widget.dtype" md-container-class="form-dd" required>
+                                        <md-option value="radio">
+                                            <span class="icon-select icon-radio-small"></span>
+                                            Radio button (single answer)
+                                        </md-option>
+                                        <md-option value="check">
+                                            <span class="icon-select icon-ratetick2"></span>
+                                            Tick box (multiple answers)
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hidden" >
+                                        Hide
+                                    </md-switch>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input">
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+
+                            <div class="radio-wrap" ng-if="widget.dtype === 'radio'">
+                                <md-radio-group ng-model="widget.val" dnd-nodrag ng-repeat="opt in widget.options track by $index">
+                                    <md-radio-button value="{{opt.val}}" aria-label="radio button"></md-radio-button>
+                                    <md-input-container md-no-float class="txt-area-wrap">
+                                        <textarea class="text-field" placeholder="Enter a choice" ng-model="opt.val" required focused-on="$last"></textarea>
+                                    </md-input-container>
+                                    <md-button class="delete-btn" ng-click="widget.options.splice($index,1)" aria-label="Close">
+                                        <span class="icon-del icon-close-5"></span>
+                                    </md-button>
+                        		</md-radio-group>
+                                <div class="add-more-new-wrap">
+                                    <md-button class="add-more" ng-click="widget.options.push({val:''})">
+                                        <span class="icon-plus"></span>
+                                        <span class="text">add choice</span>
+                                    </md-button>
+                                </div>
+                            </div>
+                            <div class="checkbox-wrap" ng-if="widget.dtype === 'check'">
+                                <div class="checkbox-wrap-inner" dnd-nodrag ng-repeat="opt in widget.options track by $index">
+                                    <md-checkbox ng-model="opt.sel" aria-label="Checkbox" ng-true-value="'true'" ng-false-value="'false'"></md-checkbox>
+                                    <md-input-container md-no-float class="txt-area-wrap">
+                                        <textarea class="text-field" placeholder="Enter a choice" ng-model="opt.val" required focused-on="$last"></textarea>
+                                    </md-input-container>
+                                    <md-button class="delete-btn" ng-click="widget.options.splice($index,1)" aria-label="Close">
+                                        <span class="icon-del icon-close-5"></span>
+                                    </md-button>
+                        		</div>
+                                <div class="add-more-new-wrap">
+                                    <md-button class="add-more" ng-click="widget.options.push({val:'', sel:false})">
+                                        <span class="icon-plus"></span>
+                                        <span class="text">add choice</span>
+                                    </md-button>
+                                </div>
+                            </div>
+
+                        </div>
+
+    				</div>
+
+                    <!-- Dropdown widget -->
+                    <div  class="form-widget dropdown-widget close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'dropdown'">
+
+                        <div class="control-popover">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap">
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hidden">
+                                        Hide
+                                    </md-switch>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input">
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="icon-dd icon-arrow-4"></span>
+
+                            <div class="choice-wrap">
+                                <div class="input-wrap" ng-repeat="opt in widget.options track by $index">
+                                    <input class="text-field"  placeholder="Enter a choice" ng-model="opt.val" focused-on="$last">
+                                    <md-button class="delete-btn" ng-click="widget.options.splice($index,1)" aria-label="Close">
+                                        <span class="icon-del icon-close-5"></span>
+                                    </md-button>
+                                </div>
+
+                                <div class="add-more-new-wrap">
+                                    <md-button class="add-more" ng-click="widget.options.push({val:''})">
+                                        <span class="icon-plus"></span>
+                                        <span class="text">add choice</span>
+                                    </md-button>
+                                </div>
+                            </div>
+                        </div>
+    				</div>
+
+                    <!-- File upload widget -->
+                    <div  class="form-widget fileupload-widget close-enabled" ng-class="{'form-error' : widget.valerr === 'yes'}" ng-if="widget.type === 'fileupload'">
+
+                        <div class="control-popover">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div ng-if="controlfields === 'yes'">
+                                <hr />
+                                <div class="input-wrap">
+                                    <label class="placeholder">Custom Field:</label>
+                                    <input type="text" class="field" ng-model="widget.depfield">
+                                </div>
+                            </div>
+
+                            <div class="btm-wrap">
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.sec === 'yes'" class="icon-fld icon-secure"></span>
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input">
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <div class="upld-inpt-wrap">
+                                <span class="icon-fileupload-small"></span>
+                                <input class="upload-input" ng-model="widget.upload" placeholder="Upload file">
+                            </div>
+                        </div>
+    				</div>
+
+                    <!-- Special field widget -->
+                    <div  class="form-widget special-text-widget close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes'}" ng-if="widget.type === 'special-text'" ng-click=showPopOver($index);>
+
+                        <div class="control-popover" ng-if="$index === popop_index">
+                            <div class="arrow"></div>
+                            <div class="input-wrap">
+                                <label class="placeholder">Field name:</label>
+                                <dnd-nodrag>
+                                    <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                </dnd-nodrag>
+                            </div>
+                            <div class="btm-wrap">
+                                <md-input-container ng-class="{'type-mob' : widget.dtype === 'mobile'}" class="direct-dropdown">
+                                    <md-select aria-label="Short text/Long text option" placeholder="Select" ng-model="widget.dtype" md-container-class="form-dd" ng-change="changeSpecialField(widget);">
+                                        <md-option value="date">
+                                            <span class="icon-select icon-f-date"></span>
+                                            Date field
+                                        </md-option>
+                                        <md-option value="time">
+                                            <span class="icon-select icon-f-time"></span>
+                                            Time field
+                                        </md-option>
+                                        <md-option value="number">
+                                            <span class="icon-select icon-f-numbers"></span>
+                                            Numbers field
+                                        </md-option>
+                                        <md-option value="email">
+                                            <span class="icon-select icon-mail-small"></span>
+                                            Email field
+                                        </md-option>
+                                        <md-option value="mobile">
+                                            <span class="icon-select icon-mobile-small"></span>
+                                            Mobile field
+                                        </md-option>
+                                        <md-option value="directory">
+                                            <span class="icon-select icon-newhire"></span>
+                                            Profile Directory
+                                        </md-option>
+                                    </md-select>
+                                </md-input-container>
+                                <div class="custom-dropdown-wrap" ng-if="widget.tokensData.avail==='yes'">
+                                    <button class="mm-dropdown">
+                                        <span class="icon-dropdown icon-dynamic-text"></span>
+                                        <span class="text">Insert answers</span>
+                                        <span class="icon-dropdown icon-arrow-4"></span>
+                                    </button>
+                                    <ul class="list-wrap multi">
+                                        <li ng-if="widget.tokensData.cf.length > 0">
+                                            <span class="truncate">Custom fields</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="cfopt in widget.tokensData.cf track by $index" ng-click="setCustomFieldAnswer($event,widget, cfopt.uid);">
+                                                    <span ng-if="cfopt.typ !== 'f-picklist'" class="icon-dtype icon-{{cfopt.typ}}"></span>
+                                                    <span ng-if="cfopt.typ === 'f-picklist'" class="icon-dtype icon-f-choice"></span>
+                                                    <span class="truncate">{{cfopt.nm}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+
+                                        <li ng-if="widget.tokensData.formtokens.length > 0">
+                                            <span class="truncate">Forms</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner">
+                                                <li ng-repeat="formitem in widget.tokensData.formtokens track by $index">
+                                                    <span class="truncate">{{formitem.formname}}</span>
+                                                    <span class="more-arrow icon-arrow-6"></span>
+                                                    <ul class="list-wrap-inner">
+                                                        <li ng-repeat="formelement in formitem.formfields track by $index" ng-click="setformFieldAnswer($event, widget, formitem.formid, formelement.uid, formitem.formname, formelement.fnm);">
+                                                            <span ng-if="formelement.type !== 'fileupload'" class="icon-dtype {{formelement.icon}}"></span>
+                                                            <span class="truncate">{{formelement.fnm}}</span>
+                                                        </li>
+                                                    </ul>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="widget.dtype === 'time'">
+                                            <span class="truncate">Time preset</span>
+                                            <span class="more-arrow icon-arrow-6"></span>
+                                            <ul class="list-wrap-inner timedd">
+                                                <li ng-repeat="timedata in timeArr track by $index">
+                                                    <span class="truncate" ng-click="setTimeFieldAnswer($event,widget,timedata.value);">{{timedata.value}}</span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li ng-if="widget.dtype === 'date'">
+                                            <span class="icon-dtype icon-f-date"></span>
+                                            <span class="truncate" ng-click="setNameFieldAnswer($event,widget,'{{newhire_startdt}}');">Start date</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="switch-wrap">
+                                    <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                        Required
+                                    </md-switch>
+                                    <md-switch ng-model="widget.hid" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Hidden">
+                                        Hide
+                                    </md-switch>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="hdmsk"></div>
+                        <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                        <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                            <span ng-if="widget.sec === 'yes'" class="icon-fld icon-secure"></span>
+                            <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                            <span class="field-name truncate">{{widget.fnm}}</span>
+                        </span>
+
+                        <div class="nm-input" ng-if="!widget.ans">
+                            <span class="lbl truncate">{{widget.lbl}}</span>
+                            <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span ng-if="widget.dtype === 'number'" class="icon-dd icon-f-numbers"></span>
+                            <span ng-if="widget.dtype === 'time'" class="icon-dd icon-f-time"></span>
+                            <span ng-if="widget.dtype === 'email'" class="icon-dd icon-mail-small"></span>
+                            <span ng-if="widget.dtype === 'date'" class="icon-dd icon-f-date"></span>
+                            <span ng-if="widget.dtype === 'mobile'" class="icon-dd icon-mobile-small"></span>
+                            <span ng-if="widget.dtype === 'directory'" class="icon-dd icon-newhire"></span>
+                        </div>
+                        <div class="nm-input show-ans" ng-if="widget.ans">
+                            <md-input-container md-no-float class="txt-area-wrap lblsm">
+                                <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                            </md-input-container>
+                            <span class="tokens-wrap">
+                                <span ng-if="widget.dtype === 'number'" class="icon-dd icon-f-numbers"></span>
+                                <span ng-if="widget.dtype === 'time'" class="icon-dd icon-f-time"></span>
+                                <span ng-if="widget.dtype === 'email'" class="icon-dd icon-mail-small"></span>
+                                <span ng-if="widget.dtype === 'date'" class="icon-dd icon-f-date"></span>
+                                <span ng-if="widget.dtype === 'mobile'" class="icon-dd icon-mobile-small"></span>
+                                <span ng-if="widget.dtype === 'directory'" class="icon-dd icon-newhire"></span>
+                                <span class="tokens">{{widget.ansval}}<span class="rmv-tkn icon-close-3" ng-click="removeAnswer(widget);"></span></span>
+                            </span>
+                        </div>
+    				</div>
+
+                    <!-- Rating widget -->
+                    <div  class="form-widget rating-widget close-enabled" ng-class="{'form-error' : widget.valerr === 'yes', 'wdgtHddn' : widget.hid === 'yes', 'mainovrly' : (widget.uid.indexOf('473benchmark155_')===0), 'first' : (widget.bmwdgidx === 'first' || widget.bmwdgidx === 'single'), 'last' : (widget.bmwdgidx === 'last' || widget.bmwdgidx === 'single')}" ng-if="widget.type === 'rating'">
+                        <div class="ovrly" dnd-nodrag></div>
+                        <div class="ovrlyclr" dnd-nodrag></div>
+                        <div class="lockwrp" dnd-nodrag>
+                            <span class="icn icon-security-1"></span>
+                        </div>
+                        <div class="ratingswrp" dnd-nodrag>
+                            <div class="control-popover">
+                                <div class="arrow"></div>
+                                <div class="input-wrap">
+                                    <label class="placeholder">Field name:</label>
+                                    <dnd-nodrag>
+                                        <input focus="true" type="text" class="field" ng-model="widget.fnm">
+                                    </dnd-nodrag>
+                                </div>
+                                <div class="btm-wrap">
+                                    <md-input-container class="direct-dropdown rating-dd">
+                                        <md-select aria-label="Short text/Long text option" placeholder="Select" md-container-class="form-dd" ng-model="widget.scale" ng-change="getRatingNumber(widget);">
+                                            <md-option value="3">
+                                                1-3 Rating
+                                            </md-option>
+                                            <md-option value="5">
+                                                1-5 Rating
+                                            </md-option>
+                                            <md-option value="6">
+                                                1-6 Rating
+                                            </md-option>
+                                            <md-option value="11">
+                                                0-10 Rating
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <md-input-container class="direct-dropdown star-dropdown">
+                                        <md-select aria-label="Rating Shape" placeholder="Select" ng-model="widget.dtype" md-container-class="form-dd">
+                                            <md-option value="star">
+                                                <span class="icon-select icon-ratestar2"></span>
+                                                Star shape
+                                            </md-option>
+                                            <md-option value="heart">
+                                                <span class="icon-select icon-rateheart2"></span>
+                                                Heart shape
+                                            </md-option>
+                                            <md-option value="thumb">
+                                                <span class="icon-select icon-ratethumb2"></span>
+                                                Thumbs up
+                                            </md-option>
+                                            <md-option value="user">
+                                                <span class="icon-select icon-rateuser2"></span>
+                                                User
+                                            </md-option>
+                                            <md-option value="tick">
+                                                <span class="icon-select icon-ratetick2"></span>
+                                                Tick
+                                            </md-option>
+                                            <md-option value="number">
+                                                <span class="icon-select icon-ratenumber"></span>
+                                                Number
+                                            </md-option>
+                                        </md-select>
+                                    </md-input-container>
+                                    <div class="switch-wrap">
+                                        <md-switch ng-model="widget.lblinfo" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Label">
+                                            Labels
+                                        </md-switch>
+                                        <md-switch ng-model="widget.req" ng-true-value="'yes'" ng-false-value="'no'" aria-label="Required" ng-change="widget.req === 'no' ? placeholder='Type a question or description' : placeholder='Type a question or description'">
+                                            Required
+                                        </md-switch>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="hdmsk"></div>
+                            <span class="icon icon-close-4" ng-click="removeWidget($index,widget);"></span>
+                            <span class="field-name-wrap" ng-if="widget.fnm.length > 0">
+                                <span ng-if="widget.req === 'yes'" class="field-name required">Required</span>
+                                <span class="field-name truncate">{{widget.fnm}}</span>
+                            </span>
+
+                            <div class="nm-input">
+                                <md-input-container dnd-nodrag md-no-float class="txt-area-wrap">
+                                    <textarea class="text-field" ng-model="widget.lbl" placeholder="{{placeholder}}"></textarea>
+                                </md-input-container>
+                                <span ng-class="{'five-rat' : getRatingsArr(widget).length == 5, 'six-rat' : getRatingsArr(widget).length == 6, 'three-rat' : getRatingsArr(widget).length == 3, 'ten-rat' : getRatingsArr(widget).length == 11}">
+                                    <div layout="row" layout-align="{{rateLayout}} start" class="rate-wrap star-type">
+                                        <div ng-repeat="ratingShape in  getRatingsArr(widget) track by $index">
+                                            <span ng-if="widget.dtype !== 'number'" class="icon-rate icon-rate{{ratingShape}}1"></span>
+                                            <span ng-if="widget.dtype === 'number'" class="nmbrs">
+                                                <span ng-if="getRatingsArr(widget).length === 11">{{$index}}</span>
+                                                <span ng-if="getRatingsArr(widget).length !== 11">{{$index + 1}}</span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div ng-if="widget.lblinfo === 'yes'" class="rating-label" layout="row" layout-align="{{rateLayout}} start">
+                                        <div class="lblin">
+                                            <md-input-container md-no-float class="md-block">
+                                                <textarea ng-trim="false" placeholder="Poor" ng-model="widget.lblinfoPoor"></textarea>
+                                            </md-input-container>
+                                        </div>
+                                        <div class="lblin">
+                                            <md-input-container md-no-float class="md-block">
+                                                <textarea ng-trim="false" placeholder="Average" ng-model="widget.lblinfoAverage"></textarea>
+                                            </md-input-container>
+                                        </div><div class="lblin">
+                                            <md-input-container md-no-float class="md-block">
+                                                <textarea ng-trim="false" placeholder="Great" ng-model="widget.lblinfoBest"></textarea>
+                                            </md-input-container>
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+                        </div>
+    				</div>
+    			</div>
+
+                <div id="formError" class="error error-form" ng-if="reqFldErr === 'yes'">
+                    <span class="icon icon-notification-alert"></span>
+                    <span class="text">Before you exit, please fill in all required: field questions, field names, or form-options.</span>
+                </div>
+
+    		</div>
+
+            <!-- <div>
+                <label>URL : </label><input type="text" ng-model="webhook.url"/><p></p>
+                <label>Method : </label><input type="text" ng-model="webhook.method"/><p></p>
+                <label>Header : </label>
+                <div ng-repeat="header in webhook.headers track by $index">
+                    <input type="text" ng-model="header.key"/><span> : </span><input type="text" ng-model="header.value"/>
+                    <p></p>
+                </div>
+                <label>Payload</label>
+                <textarea class="txt-area" ng-model="webhook.payload"></textarea>
+            </div> -->
+
+            <div class="advanced-option-wrap">
+                <div class="show-hide">
+                    <span class="arrow-toggle icon-arrow-1"></span>
+                    <span class="text">Advanced settings</span>
+                </div>
+                <div class="detail-section">
+                    <div class="maskwrap" ng-class="{maskon : formsuvery.enabled === 'yes'}">
+                        <div class="mask"></div>
+                        <div class="action-wrap">
+                            <span class="icon-advanced icon-mail-small"></span>
+                            <span class="info">Forward form-results via email</span>
+                            <!-- <span class="email-type" ng-if="emailFormat">({{emailFormat}})</span> -->
+                            <md-button class="md-raised refresh" aria-label="Add/Edit Recipients" ng-click="addrecipients();">
+                                <span class="text" ng-if="!displayEmailList.length">add recipients</span>
+                                <span class="text" ng-if="displayEmailList.length > 0">edit recipients</span>
+                            </md-button>
+                            <div class="answer">
+                                <span class="info" ng-repeat="dispRecp in displayEmailList track by $index">{{dispRecp}}</span>
+                            </div>
+                        </div>
+                        <div class="action-wrap" ng-controller="addWebhookController">
+                            <span class="icon-advanced icon-webhook"></span>
+                            <span class="info">Forward form-results to a URL</span>
+                            <md-button class="md-raised refresh" ng-click="addWebhookLink();">
+                                <span class="text" ng-if="!webhook.url">add webhook</span>
+                                <span class="text" ng-if="webhook.url">edit webhook</span>
+                            </md-button>
+                            <div class="answer">
+                                <span class="info">{{webhook.url}}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slnk-wrap">
+                        <md-checkbox class="send-admin" ng-change="generateSurveyLink();" aria-label="Turn form into an anonymous survey" ng-model="formsuvery.enabled" ng-true-value="'yes'" ng-false-value="'no'">
+            	         	<span>Turn form into an anonymous survey</span>
+            	        </md-checkbox>
+
+                        <div class="slnk" ng-if="formsuvery.enabled === 'yes'">
+                            <div class="dd-container">
+                    	        <span class="label">Style survey with brand:</span>
+                                <md-input-container flex>
+                                    <md-select aria-label="Brand name" ng-model="formsuvery.brand" ng-change="updateSurveyLink();">
+                                        <md-option value="{{brand.key}}" ng-repeat="brand in brands track by $index">{{brand.val}}</md-option>
+                                    </md-select>
+                                </md-input-container>
+                            </div>
+                            <div class="slcont">
+                                <div class="label">
+                                    Anonymous survey link:
+                                </div>
+                                <div class="link">
+                                    <span ng-if="!surveyurl">No survey link generated</span>
+                                    <span ng-if="surveyurl">{{surveyurlBranded}}</span>
+                                </div>
+                                <div class="info">
+                                    Copy the link above and share with the participants you like to complete the survey. (The widget 'File upload' and all dynamic tokens other than 'Brand' do not work within anonymous survey links).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="slnk-wrap hide">
+                        <md-checkbox class="send-admin" aria-label="Turn form into an anonymous survey" ng-model="allowpoll" ng-true-value="'yes'" ng-false-value="'no'">
+            	         	<span>Allow Polling</span>
+            	        </md-checkbox>
+                    </div>
+                    <div class="slnk-wrap hide">
+                        <md-checkbox class="send-admin" aria-label="" ng-model="controlfields" ng-true-value="'yes'" ng-false-value="'no'">
+            	         	<span>Control Fields</span>
+            	        </md-checkbox>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Exit button -->
+        <div ng-controller="saveModuleCtrl">
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="!modid" ng-click="showExitEditorModal(null, true);">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn sve save save-spinner md-raised" ng-if="modid" ng-click="saveAndStay();">
+                <span class="text">Save</span>
+                <span class="text-save">save</span>
+        		<span class="text-saved">saved <span class="icon-notification-ok"></span></span>
+        		<span class="spinner">
+        			<md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+        		</span>
+            </md-button>
+            <md-button class="exit-btn md-raised" ng-click="showExitEditorModal();">
+                <span class="text">Save and exit</span>
+            </md-button>
+        </div>
+    </form>
+</div>

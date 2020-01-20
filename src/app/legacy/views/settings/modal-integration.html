@@ -1,0 +1,444 @@
+<md-dialog aria-label="Select ESigning" class="esign-modal integration-modal md-default-theme">
+    <form name="JobadderConnectionForm" novalidate>
+        <md-toolbar ng-if="esign !== 'yes' || (esign === 'yes' && showLvl !== 2)">
+            <div class="md-toolbar-tools">
+                <h2 ng-if="showLvl === 'd'">DELETE</h2>
+                <div ng-if="showLvl !== 'd'" class="img-wrap">
+                    <img ng-class="{snp : integDetail.nm === 'Snaphire', int : integDetail.nm === 'Intercom', lvr : integDetail.nm === 'Lever', wc : integDetail.nm === 'Workchat', secs : integDetail.nm === 'Secured Signing'}"
+                        ng-if="integDetail.safe_icon_url" ng-src="{{integDetail.safe_icon_url}}"
+                        alt="{{integDetail.nm}}" />
+                </div>
+                <span flex></span>
+                <md-button type="button" aria-label="Close" type="button" class="md-icon-button" ng-click="cancel()">
+                    <span class="icon icon-close-2"></span>
+                </md-button>
+            </div>
+        </md-toolbar>
+
+        <md-dialog-content ng-if="!showLvl || showLvl === 1" style="min-width:570px;max-width:570px">
+            <!-- <span class="icnv lft icon-button-arrow-left"></span> -->
+            <div class="stptxt pndng" ng-if="integType === 'snaphire' && localdata.snaphiretenantstatus === 'pending'">
+                <span class="icon icon-f-time"></span>
+                <span class="text"
+                    ng-if="integType === 'snaphire' && localdata.snaphiretenantstatus === 'pending'">PENDING -
+                    Integration setup within SnapHire is required</span>
+                <!-- <span class="text" ng-if="integType !== 'snaphire' && mode === 'add'">SETUP - Review and confirm your integration settings are correct</span> -->
+            </div>
+            <div class="stptxt pndng" ng-if="integDetail.avail === 'coming'">
+                <span class="text">COMING SOON...</span>
+            </div>
+            <div class="stptxt pndng" ng-if="integDetail.marketupgrade === 'yes'">
+                <span class="text">UPGRADE YOUR ACCOUNT TO ACCESS EXTRA INTEGRATIONS</span>
+            </div>
+            <div class="stptxt done" ng-if="integrated === 'yes' && localdata.snaphiretenantstatus !== 'pending'">
+                <span class="icon icon-notification-ok"></span>
+                <span class="text">INTEGRATED</span>
+            </div>
+            <div class="imgwrap">
+                <img ng-if="integDetail.safe_img_url" ng-src="{{integDetail.safe_img_url}}" alt="{{integDetail.nm}}">
+            </div>
+            <!-- <span class="icnv rt icon-button-arrow-right"></span> -->
+            <div class="info-wrap">
+                <span class="txt">
+                    {{integDetail.text}}
+                </span>
+                <span class="txtwrp" ng-if="integDetail.video">
+                    <span class="awrp">
+                        <span class="icn icon-video"></span>
+                        <span class="text">
+                            <a href="{{integDetail.video}}" target="_blank">
+                                watch video
+                            </a>
+                        </span>
+                    </span>
+                </span>
+                <span class="txtwrp" ng-if="integDetail.url">
+                    <span class="awrp">
+                        <span class="icn icon-go-to-small"></span>
+                        <span class="text">
+                            <a href="{{integDetail.url}}" target="_blank">
+                                go to website
+                            </a>
+                        </span>
+                    </span>
+                </span>
+                <!-- need to show webhook icon and text here id:5757 name: modal-integration -->
+                <!-- add back to below element:::::: ng-if="integDetail.webhook === 'yes'" :::: -->
+                <span class="txtwrp" ng-if="integDetail.webhook === 'yes'">
+                    <span class="modal__controls awrp">
+                        <div class="modal__controls-section">
+                            <span class="section__icon">
+                                <span class="icon icon-webhook"></span>
+                            </span>
+                            <span class="section__content">
+                                This integration gives you the option to add 'OAuth2 Authentication' to Webhooks 
+                                when sending data from Enboarder back into this application.
+                            </span>
+                        </div>
+                    </span>
+                </span>
+            </div>
+        </md-dialog-content>
+
+        <!-- <md-dialog-content ng-if="!showLvl || showLvl === 1" style="min-width:570px;max-width:570px">
+            <div class="info-wrap del">
+                <span class="txt">
+                    <span class="tick-wrap">
+                        <img src="//static.enboarder.net/images/tick-animated.gif" alt="confirmation">
+                    </span>
+                    <span class="dne">Integration successful!</span>
+                    Costs for integration have been added to your account.
+                </span>
+            </div>
+        </md-dialog-content> -->
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'intercom'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your App-Id below to integrate the intercom-messenger<br>service with Enboarder.
+                </p>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>App ID</label>
+                    <input md-no-asterisk ng-model="localdata.intercomappid" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="error" ng-if="intercomError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{intercomError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'greenhouse'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your Greenhouse Harvest API Key to Integrate with Enboarder.
+                </p>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>API Key</label>
+                    <input md-no-asterisk ng-model="localdata.greenhousekey" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="error" ng-if="greenhouseError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{greenhouseError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'lever'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your Lever API Key and Signing Token<br>to Integrate with Enboarder.
+                </p>
+            </div>
+            <div layout="column" layout-align="space-around center">
+                <md-radio-group class="radio-inline" ng-model="localdata.leveraccttype" required>
+                    <md-radio-button value="sandbox">
+                        <div class="description">Sandbox</div>
+                    </md-radio-button>
+                    <md-radio-button value="prod">
+                        <div class="description">Production</div>
+                    </md-radio-button>
+                </md-radio-group>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>API Key</label>
+                    <input md-no-asterisk ng-model="localdata.leverkey" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>Signing Token</label>
+                    <input md-no-asterisk ng-model="localdata.leversigntoken" type="text" required>
+                </md-input-container>
+            </div>
+            <span class="lbl-inn">
+                <span class="lbl">Webhook URL:</span>
+                <span class="info wb-url">{{tempdata.leverurl}}</span>
+            </span>
+
+            <!-- DO NOT add anything after ERROR inside </md-dialog-content> IN ANY MODAL -->
+            <div class="error" ng-if="leverError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{leverError}}</span>
+            </div>
+            <div class="error" ng-if="trackercorpError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{trackercorpError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'trackercorp'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your Trackercorp API Endpoint, API Key and Client Id<br>to Integrate with Enboarder.
+                </p>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>API Endpoint</label>
+                    <input md-no-asterisk ng-model="localdata.trackercorp_apiurl" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>API Key</label>
+                    <input md-no-asterisk ng-model="localdata.trackercorp_apikey" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>Client ID</label>
+                    <input md-no-asterisk ng-model="localdata.trackercorp_clientid" type="text" required>
+                </md-input-container>
+            </div>
+
+            <!-- DO NOT add anything after ERROR inside </md-dialog-content> IN ANY MODAL -->
+            <div class="error" ng-if="trackercorpError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{trackercorpError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'snaphire'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your Snaphire tenant short code<br>to integrate with Enboarder.
+                </p>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>Snaphire tenant short code</label>
+                    <input md-no-asterisk ng-model="localdata.snaphiretenantid" type="text" required>
+                </md-input-container>
+            </div>
+            <!-- DO NOT add anything after ERROR inside </md-dialog-content> IN ANY MODAL -->
+            <div class="error" ng-if="snaphireError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{snaphireError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && integType === 'slack'" style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p>
+                    Enter your details below to integrate with Enboarder.
+                    <br>(e.g. enboarder.com)
+                </p>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>Access token</label>
+                    <input md-no-asterisk ng-model="localdata.slackaccesstoken" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="input-wrap">
+                <md-input-container class="required">
+                    <label>Email domain</label>
+                    <input md-no-asterisk ng-model="localdata.slackdomain" type="text" required>
+                </md-input-container>
+            </div>
+            <!-- DO NOT add anything after ERROR inside </md-dialog-content> IN ANY MODAL -->
+            <div class="error" ng-if="slackError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{slackError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 2 && localdata.connection === 'oauth2'"
+            style="min-width:570px;max-width:570px">
+            <div class="input-wrap allntcb" ng-if="integType === 'azuread' && integrated === 'no'">
+                <md-checkbox aria-label="Download all initial profiles, then sync new data once per day"
+                    ng-model="localdata.initLoadPrfl">
+                    <span>Download all initial profiles, then sync new data once per day. (Initial profiles loaded for
+                        Active Directory can take up to 24hours before appearing within Enboarder) </span>
+                </md-checkbox>
+            </div>
+            <div class="info-text"
+                ng-if="integType !== 'azuread' && integType !== 'bamboohr' && integType !== 'jobadder'">
+                <p>
+                    Select authentication type to Integrate with Enboarder.
+                </p>
+            </div>
+            <md-select ng-model="localdata.authtype" placeholder="auth" ng-change="changeAuthSel(localdata.authtype)"
+                ng-if="integType !== 'azuread' && integType !== 'bamboohr' && integType !== 'jobadder'">
+                <md-option value="custom">Custom</md-option>
+                <md-option value="oauth2">oAuth 2</md-option>
+            </md-select>
+            <div class="info-block" ng-if="integType === 'bamboohr' && integrated === 'no'">
+                <md-input-container class="required">
+                    <label>Enter your BambooHR Domain to login</label>
+                    <input md-no-asterisk ng-model="localdata.companysubdomain" type="text">
+                </md-input-container>
+            </div>
+            <div class="error" ng-if="oauthError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{oauthError}}</span>
+            </div>
+        </md-dialog-content>
+        <md-dialog-content ng-if="showLvl === 3 && localdata.authtype === 'oauth2'"
+            style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p ng-if="integType !== 'workchat'">
+                    Authorise now to Integrate with Enboarder.
+                </p>
+                <p ng-if="integType === 'workchat'">
+                    Authorise now to Integrate with Enboarder.<br>
+                    (e.g. enboarder.com)
+                </p>
+            </div>
+            <div class="info-block">
+                <span class="label long"
+                    ng-if="integType !== 'azuread' && integType !== 'workchat' && integType !== 'bamboohr' && integType !== 'jira'">
+                    Auto-pull data every:
+                </span>
+                <md-select ng-model="localdata.freq" placeholder="Polling frequency"
+                    ng-change="changePollFreq(localdata.freq)"
+                    ng-if="integType !== 'azuread' && integType !== 'workchat' && integType !== 'bamboohr' && integType !== 'jira'">
+                    <md-option value="1m">1 min</md-option>
+                    <md-option value="5m">5 mins</md-option>
+                    <md-option value="15m">15 mins</md-option>
+                    <md-option value="1h">1 hour</md-option>
+                    <md-option value="12h">12 hours</md-option>
+                    <md-option value="24h">24 hours</md-option>
+                </md-select>
+                <md-checkbox aria-label="enabled onBorading status"
+                            ng-model="localdata.enableOnboardStatus" ng-if="integType === 'smartrecruiter'">
+                            <span> I have enabled onboarding status in Smart Recruiter </span>
+                </md-checkbox>
+                <md-input-container ng-if="integType === 'smartrecruiter'">
+                    <label>Filter</label>
+                    <input md-no-asterisk ng-model="localdata.filter" type="text">
+                </md-input-container>
+                <md-input-container class="required" ng-if="integType === 'azuread' || integType === 'jira'">
+                    <label>Application (client) ID</label>
+                    <input md-no-asterisk ng-model="localdata.client_id" type="text">
+                </md-input-container>
+                <md-input-container class="required" ng-if="integType === 'azuread'">
+                    <label>Directory (tenant) ID</label>
+                    <input md-no-asterisk ng-model="localdata.tenant_id" type="text">
+                </md-input-container>
+                <md-input-container class="required" ng-if="integType === 'azuread' || integType === 'jira'">
+                    <label>Secret</label>
+                    <input md-no-asterisk ng-model="localdata.client_secret" type="password" required
+                        autocomplete="off">
+                </md-input-container>
+                <div class="info-block" ng-if="integType === 'workchat'">
+                    <span class="label long">
+                        Enter domain for workchat integration:
+                    </span>
+                    <md-input-container>
+                        <label>Email domain</label>
+                        <input md-no-asterisk ng-model="localdata.workchatdomain" type="text" ng-required="true">
+                    </md-input-container>
+                </div>
+
+            </div>
+
+            <span class="lbl-inn" ng-if="integType === 'bamboohr'">
+                <span class="lbl">Webhook URL:</span>
+                <span class="info wb-url">{{tempdata.bambooWebhookurl}}</span>
+            </span>
+            <div class="error" ng-if="oauthError">
+                <span class="icon icon-notification-alert"></span>
+                <span class="text">{{oauthError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 3 && integType === 'smartrecruiter' && localdata.authtype !=='oauth2'"
+            style="min-width:570px;max-width:570px">
+            <div class="info-text">
+                <p ng-if="!localdata.authtype || localdata.authtype === 'custom'">
+                    Enter your API Key to Integrate with Enboarder.
+                </p>
+            </div>
+            <div class="input-wrap" ng-if="!localdata.authtype || localdata.authtype === 'custom'">
+                <md-input-container class="required">
+                    <label>API Key</label>
+                    <input md-no-asterisk ng-model="localdata.smartreckey" type="text" required>
+                </md-input-container>
+            </div>
+            <div class="error" ng-if="smartrecError || oauthError">
+                <span class="icon icon-notification-alert"></span>
+                <span ng-if="smartrecError" class="text">{{smartrecError}}</span>
+                <span ng-if="oauthError" class="text">{{oauthError}}</span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-content ng-if="showLvl === 'd'" style="min-width:570px;max-width:570px">
+            <div class="info-wrap del">
+                <span class="txt">
+                    Are you sure you want to delete your integration <br>with
+                    <strong><em>{{integTypeName}}</em></strong>?
+                </span>
+            </div>
+        </md-dialog-content>
+
+        <md-dialog-actions layout="row"
+            ng-if="showLvl === 1 && (integDetail.avail !== 'coming' && integDetail.avail !== 'no')">
+            <md-button aria-label="Save" class="save md-default-theme" ng-click="next();" md-autofocus>
+                <span class="text" ng-if="mode === 'add'">ADD INTEGRATION</span>
+                <span class="text" ng-if="mode === 'update'">UPDATE INTEGRATION</span>
+            </md-button>
+        </md-dialog-actions>
+        <md-dialog-actions layout="row" ng-if="(showLvl === 2 || showLvl === 3 ) && mode === 'add' && esign !== 'yes'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();">Back</md-button>
+            <md-button aria-label="Next" ng-if="(showLvl === 2 && integDetail.connection === 'oauth2')"
+                class="md-default-theme" ng-click="next();">Next</md-button>
+            <md-button aria-label="Save"
+                ng-if="((showLvl === 2 && integDetail.connection !== 'oauth2') || (showLvl === 3 && integDetail.connection === 'oauth2'))"
+                class="save save-spinner md-default-theme" ng-click="saveIntegration()"
+                ng-disabled="JobadderConnectionForm.$invalid" md-autofocus>
+                <span class="text">Integrate Now</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions layout="row"
+            ng-if="(showLvl === 2 || showLvl === 3) && mode === 'update' && esign !== 'yes'">
+            <md-button ng-if="showLvl === 2 || showDelete === 'yes'" class="delete-btn" aria-label="Delete"
+                ng-click="deleteIntegration(integType)">
+                <span class="icon">DELETE INTEGRATION</span>
+            </md-button>
+            <md-button aria-label="Back" ng-if="showLvl === 3 && showDelete != 'yes'" class="md-default-theme"
+                ng-click="back();">Back</md-button>
+            <md-button aria-label="Next" ng-if="(showLvl === 2 && integDetail.connection === 'oauth2')"
+                class="md-default-theme" ng-click="next();">Next</md-button>
+            <md-button aria-label="Save"
+                ng-if="((showLvl === 2 && integDetail.connection !== 'oauth2') || (showLvl === 3 && integDetail.connection === 'oauth2'))"
+                class="save save-spinner md-default-theme" ng-click="saveIntegration()"
+                ng-disabled="JobadderConnectionForm.$invalid" md-autofocus>
+                <span class="text">Update Integration</span>
+                <span class="text-save">Saving...</span>
+                <span class="text-saved">Saved <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+
+        <md-dialog-actions layout="row" ng-if="showLvl === 'd' && mode === 'update'">
+            <md-button aria-label="Back" class="md-default-theme" ng-click="back();">Back</md-button>
+            <md-button aria-label="Ok" class="save save-spinner md-default-theme"
+                ng-click="confirmDeleteIntegration(integType)" md-autofocus>
+                <span class="text">yes, delete</span>
+                <span class="text-save">Deleting...</span>
+                <span class="text-saved">Deleted <span class="icon-notification-ok"></span></span>
+                <span class="spinner">
+                    <md-progress-circular class="wht" md-diameter="20px"></md-progress-circular>
+                </span>
+            </md-button>
+        </md-dialog-actions>
+
+    </form>
+    <div ng-if="showLvl === 2 && esign === 'yes'" class="esgnicld" ng-include="'views/settings/div-new-esign.html'">
+    </div>
+</md-dialog>

@@ -1,0 +1,44 @@
+<div class="status-wrap-inner">
+    <!-- <div class="img-wrp">
+        <img src="//static.enboarder.net/images/alert-notification.gif" alt="Alert Notification" />
+    </div> -->
+    <!-- {{auditRow}} -->
+    <div class="copy" ng-if="auditRow.action !=='esign_err'">
+        <span ng-if="auditRow.actionText === 'Preparing'">
+            <p><em>Preparing:</em></p>
+            <p>We are collecting email addresses for all participants. The document will be sent when all emails are ready to go.</p>
+        </span>
+        <span ng-if="auditRow.actionText === 'Started'">
+            <p><em>Started:</em></p>
+            <p>The signing process has started, you can track the progress below.</p>
+        </span>
+        <span ng-if="auditRow.actionText === 'Completed'">
+            <p><em>Complete:</em></p>
+            <p>Awesome, this is all signed and ready!</p>
+        </span>
+    </div>
+    <div class="copy" ng-if="auditRow.action ==='esign_err'">
+        <p><em>Error:</em></p>
+        <!-- error has value for securedsign and message is empty -->
+        <p>{{provider_errMsg.message}}{{provider_errMsg.error}}</p>
+    </div>
+    <div class="collapse-wrap" ng-repeat="signer in showSigners track by $index">
+        <div class="show-hide-dashboard">
+            <span class="text" ng-if="signer.role">{{signer.role}}</span>
+            <span class="text" ng-if="!signer.role">[ Empty ]</span>
+            <span class="text cc" ng-if="signer.ccrole==='yes'">CC</span>
+            <span class="arrow-toggle icon-arrow-3"></span>
+        </div>
+        <div class="detail-section-dashboard show-row">
+            <span class="info" ng-if="signer.role">{{signer.l}} : {{signer.n}} , {{signer.e}}</span>
+            <span class="status" ng-class="{'wait' : signer.es === 'Awaiting Email Capture', 'wait2' : signer.es === 'Awaiting signature',  'received' : signer.es === 'Email Captured'}">
+                <span class="text">{{signer.es}}</span>
+                <span class="icon {{signer.es_icon}}"></span>
+            </span>
+            <span class="status" ng-if="signer.ss !== 'Awaiting all signatures'" ng-class="{'wait' : signer.ss === 'Awaiting all signatures', 'wait2' : signer.ss === 'Awaiting signature', 'received' : signer.ss === 'Copy Received', 'received2' : signer.ss === 'Signed', 'err' : signer.ss === 'Not signed'}">
+                <span class="text">{{signer.ss}}</span>
+                <span class="icon {{signer.ss_icon}}"></span>
+            </span>
+        </div>
+    </div>
+</div>

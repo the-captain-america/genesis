@@ -1,0 +1,93 @@
+@import 'variables'; //imports variables.less.  This will include contents of variable.less when main.less is compiled to css
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 145px;
+    padding-top: 80px;
+    background-color: @background-color;
+}
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Set the fixed height of the footer here */
+    height: auto;
+    background-color: #f5f5f5;
+}
+
+
+/* Custom page CSS
+-------------------------------------------------- */
+/* Not required for template or sticky footer method. */
+
+body > .container {
+    padding: 60px 0;
+}
+.row {
+    padding: 0px 15px
+}
+
+.footer > .container {
+    padding: 15px;
+    text-align: center;
+}
+
+.footer > .container a {
+    font-weight: bold;
+}
+
+.footer > .container a:hover {
+    text-decoration: none;
+}
+
+.footer .row div {
+    padding: 10px 0px 0px 0px;
+}
+
+ul {
+    list-style-type: none;
+    margin-left: 0px;
+    padding-left: 0px;
+}
+
+
+.todo {
+    padding: 6px;
+    margin: 6px 8px 6px 8px;
+    min-width: 300px;
+    border-radius: 0px;
+    font-size: 14px;
+    text-align: center;
+    text-transform: uppercase;
+    text-decoration:none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    background-color: @default-color;
+    color:@default-text-color;
+
+    /*example of nesting. same as .todo:hover{} */
+    &:hover{
+        background-color: fade(@default-color,80%);
+    }
+}
+.todo.done {
+    text-decoration: line-through;
+    background-color: grey;
+    &:hover{
+        background-color: fade(gray,80%);
+    }
+}
+
+.todo-detail {
+    /*example of nesting. same as .todo-detail label{} */
+    label{
+        font-weight: bold;
+    }
+}

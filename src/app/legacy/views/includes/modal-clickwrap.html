@@ -1,0 +1,32 @@
+<md-dialog aria-label="Enboarder Agreement" class="modal-clickwrap md-default-theme">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Enboarder Agreement</h2>
+      <span flex></span>
+      <md-button class="md-icon-button" aria-label="Close" type="button" ng-click="cancel()">
+        <span class="icon icon-close-2"></span>
+      </md-button>
+    </div>
+  </md-toolbar>
+
+  <md-dialog-content style="min-width:570px;max-width:700px;max-height:810px;">
+
+    <div class="checkbox-wrap" layout="row" layout-wrap>
+      <div flex>
+        <md-checkbox ng-model="acceptflag" aria-label="Terms and Condition"></md-checkbox>
+        <span class="text"> By checking this box, you agree to our <a href="https://enboarder.com.au/terms/" target="_blank">Terms and Conditions</a> as well as <a href="https://enboarder.com.au/privacy/" target="_blank">Privacy Policy</a>.</span>
+      </div>
+    </div>
+
+	</md-dialog-content>
+
+  <md-dialog-actions layout="row">
+    <md-button aria-label="Cancel" class="md-raised md-default-theme" ng-click="cancel()" md-autofocus>
+    	Cancel
+    </md-button>
+    <md-button aria-label="Accept" class="md-raised save md-default-theme" ng-click="saveClickWrap()" md-autofocus ng-disabled="!acceptflag">
+    	Accept
+    </md-button>
+  </md-dialog-actions>
+
+</md-dialog>
