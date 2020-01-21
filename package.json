@@ -37,7 +37,7 @@
         "jquery": "1.12.4",
         "less": "3.10.3",
         "little-loader": "^0.2.0",
-        "lodash": "4.17.4",
+        "lodash": "4.17.15",
         "moment": "2.18.1",
         "ng-redux": "4.4.1",
         "ngreact": "0.5.2",
