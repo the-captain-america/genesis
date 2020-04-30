@@ -34,7 +34,7 @@
         "angular-ui-router": "1.0.23",
         "async": "2.5.0",
         "axios": "0.19.0",
-        "jquery": "1.12.4",
+        "jquery": "3.5.0",
         "less": "3.10.3",
         "little-loader": "^0.2.0",
         "lodash": "4.17.4",
